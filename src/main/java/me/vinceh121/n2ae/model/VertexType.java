@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae;
+package me.vinceh121.n2ae.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

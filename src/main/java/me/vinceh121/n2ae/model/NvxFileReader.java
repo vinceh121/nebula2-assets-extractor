@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae;
+package me.vinceh121.n2ae.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Vector;
 
 import com.badlogic.gdx.math.Vector3;
+
+import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NvxFileReader {
 	public static final String MAGIC_STRING = "NVX1";

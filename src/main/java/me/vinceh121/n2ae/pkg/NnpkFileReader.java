@@ -1,9 +1,11 @@
-package me.vinceh121.n2ae;
+package me.vinceh121.n2ae.pkg;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
+
+import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NnpkFileReader implements AutoCloseable {
 	public static final int MAX_PATH_LEN = 512;

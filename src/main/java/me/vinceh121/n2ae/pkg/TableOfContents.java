@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae;
+package me.vinceh121.n2ae.pkg;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
