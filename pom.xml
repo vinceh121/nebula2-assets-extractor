@@ -9,4 +9,14 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
+
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx -->
+		<!-- TODO: this is only here for vector classes, filter out everything else -->
+		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx</artifactId>
+			<version>1.10.0</version>
+		</dependency>
+	</dependencies>
 </project>

@@ -13,9 +13,16 @@ public class LEDataInputStream extends DataInputStream {
 	public int readIntLE() throws IOException {
 		return Integer.reverseBytes(this.readInt());
 	}
-	
+
 	public short readShortLE() throws IOException {
 		return Short.reverseBytes(this.readShort());
 	}
-	
+
+	public float readFloatLE() throws IOException {
+		return Float.intBitsToFloat(this.readIntLE());
+	}
+
+	public int readUnsignedShortLE() throws IOException {
+		return this.readShortLE() & 0xFFFF;
+	}
 }
