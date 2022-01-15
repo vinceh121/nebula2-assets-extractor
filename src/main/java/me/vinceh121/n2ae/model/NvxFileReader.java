@@ -41,7 +41,7 @@ public class NvxFileReader {
 	}
 	
 	public void writeObj(OutputStream out) {
-		this.writeObj(new PrintWriter(out));
+		this.writeObj(new PrintWriter(out, true));
 	}
 	
 	public void writeObj(PrintWriter out) {
