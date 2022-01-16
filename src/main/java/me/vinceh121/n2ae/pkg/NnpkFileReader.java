@@ -3,11 +3,12 @@ package me.vinceh121.n2ae.pkg;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayDeque;
 
 import me.vinceh121.n2ae.LEDataInputStream;
 
-public class NnpkFileReader implements AutoCloseable {
+public class NnpkFileReader {
 	public static final int MAX_PATH_LEN = 512;
 	public static final String NO_NAME = "<noname>";
 	public static final String MAGIC_STRING = "NPK0";
@@ -23,26 +24,30 @@ public class NnpkFileReader implements AutoCloseable {
 		NnpkFileReader r = new NnpkFileReader(new FileInputStream(args[0]));
 		r.readAll();
 
-		printToc(r.getTableOfContents(), 0);
+		printToc(r.getTableOfContents(), System.out);
 	}
 
-	private static void printToc(TableOfContents toc, int depth) {
+	public static void printToc(TableOfContents toc, PrintStream out) {
+		printToc(toc, 0, out);
+	}
+	
+	private static void printToc(TableOfContents toc, int depth, PrintStream out) {
 		for (int i = 0; i < depth; i++) {
 			if (depth != 1 && i == depth - 1) {
-				System.out.print(" ");
+				out.print(" ");
 			} else {
-				System.out.print("│");
+				out.print("│");
 			}
 		}
 		if (toc.isDirectory()) {
 			System.out.println("└" + toc.getName());
 			for (TableOfContents t : toc.getEntries().values()) {
-				printToc(t, depth + 1);
+				printToc(t, depth + 1, out);
 			}
 		} else if (toc.isFile()) {
 			System.out.println("├" + toc.getName() + "  " + toc.getOffset() + ":" + toc.getLength());
 		} else {
-			System.out.println("├ TOC entry is niether file nor dir: " + toc);
+			System.out.println("├ TOC entry is neither file nor dir: " + toc);
 		}
 	}
 
@@ -124,9 +129,5 @@ public class NnpkFileReader implements AutoCloseable {
 
 	public int getDataOffset() {
 		return dataOffset;
-	}
-
-	public void close() throws Exception {
-		this.in.close();
 	}
 }

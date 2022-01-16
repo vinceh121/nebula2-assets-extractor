@@ -17,7 +17,6 @@ public class NnpkFileExtractor {
 
 	public static void main(String[] args) throws IOException {
 		try (FileInputStream in = new FileInputStream(args[0])) {
-			@SuppressWarnings("resource")
 			NnpkFileReader r = new NnpkFileReader(in);
 			r.readAll();
 
