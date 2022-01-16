@@ -4,7 +4,11 @@ import java.awt.image.BufferedImage;
 
 public enum BlockFormat {
 	NONE(0), RGB8(BufferedImage.TYPE_INT_RGB), ARGB8(BufferedImage.TYPE_INT_ARGB),
-	RGB565(BufferedImage.TYPE_USHORT_565_RGB), ARGB4(BufferedImage.TYPE_4BYTE_ABGR);
+	RGB565(BufferedImage.TYPE_USHORT_565_RGB),
+	/**
+	 * Need to swap red and blue
+	 */
+	ARGB4(BufferedImage.TYPE_4BYTE_ABGR);
 
 	private int nativeFormat;
 

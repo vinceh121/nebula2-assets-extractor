@@ -29,7 +29,7 @@ public class NtvFileReader {
 			NtvFileReader r = new NtvFileReader(in);
 			r.readHeader();
 			r.readAllTextures();
-			for (int i = 0; i < r.getCountBlocks(); i++) {
+			for (int i = 0; i < r.getTextures().size(); i++) {
 				BufferedImage img = r.getTextures().get(i);
 				System.out.println(r.getBlocks().get(i));
 				System.out.println(img);
@@ -78,6 +78,17 @@ public class NtvFileReader {
 				sbuf.get(sarr);
 				for (int i = 0; i < sarr.length; i++) {
 					img.getRaster().getDataBuffer().setElem(i, Short.reverseBytes(sarr[i]));
+				}
+			} else if (block.getFormat() == BlockFormat.ARGB4) {
+				if (buf.length < 4) {
+					System.err.println("Won't process ARGB4 block because of invalid size: " + block);
+					continue;
+				}
+				for (int i = 0; i < buf.length; i += 4) {
+					img.getRaster().getDataBuffer().setElem(i, buf[i + 2]); // Blue -> Red
+					img.getRaster().getDataBuffer().setElem(i, buf[i + 1]); // Green -> Green
+					img.getRaster().getDataBuffer().setElem(i, buf[i]); // Red -> Blue
+					img.getRaster().getDataBuffer().setElem(i, buf[i + 3]); // Alpha -> Alpha
 				}
 			} else {
 				for (int i = 0; i < buf.length; i++) {
