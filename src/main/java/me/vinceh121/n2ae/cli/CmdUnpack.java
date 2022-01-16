@@ -10,7 +10,7 @@ import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "unpack", description = { "Unpacks an NPK archives" })
+@Command(name = "unpack", description = { "Unpacks an NPK archive" })
 public class CmdUnpack implements Callable<Integer> {
 	@Option(names = { "-o", "--output" }, defaultValue = "./")
 	private File outputFolder;
