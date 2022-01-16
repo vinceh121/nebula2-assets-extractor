@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 
 import me.vinceh121.n2ae.LEDataInputStream;
 
-public class NtvFileReader {
+public class NtxFileReader {
 	public static final String MAGIC_STRING = "NTX1";
 	public static final int MAGIC_NUMBER = 1314150449; // ByteBuffer.wrap("NTX1".getBytes("US-ASCII")).getInt();
 
@@ -26,7 +26,7 @@ public class NtvFileReader {
 
 	public static void main(String[] args) throws IOException {
 		try (FileInputStream in = new FileInputStream(args[0])) {
-			NtvFileReader r = new NtvFileReader(in);
+			NtxFileReader r = new NtxFileReader(in);
 			r.readHeader();
 			r.readAllTextures();
 			for (int i = 0; i < r.getTextures().size(); i++) {
@@ -39,7 +39,7 @@ public class NtvFileReader {
 		}
 	}
 
-	public NtvFileReader(InputStream in) {
+	public NtxFileReader(InputStream in) {
 		this.in = new LEDataInputStream(in);
 	}
 
@@ -82,6 +82,7 @@ public class NtvFileReader {
 			} else if (block.getFormat() == BlockFormat.ARGB4) {
 				if (buf.length < 4) {
 					System.err.println("Won't process ARGB4 block because of invalid size: " + block);
+					this.textures.add(null);
 					continue;
 				}
 				for (int i = 0; i < buf.length; i += 4) {
