@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
@@ -19,6 +20,8 @@ import picocli.CommandLine.Option;
 
 @Command(name = "extract", description = { "Unpacks an NPK archive and converts all assets" })
 public class CmdFullExtract implements Callable<Integer> {
+	public static final List<String> FILES_TO_NOT_DELETE = List.of("npk", "wav");
+
 	@Option(names = { "-o", "--output" }, required = true)
 	private File outputFolder;
 
@@ -83,13 +86,13 @@ public class CmdFullExtract implements Callable<Integer> {
 		case "ntx":
 			this.processTexture(file, new File(outPath + ".png"));
 			break;
-		case "npk":
-			break;
 		default:
-			this.unprocessableFile(file);
+			if (!FILES_TO_NOT_DELETE.contains(extension)) {
+				this.unprocessableFile(file);
+			}
 		}
 
-		if (this.delete && !"npk".equals(extension)) {
+		if (this.delete && !FILES_TO_NOT_DELETE.contains(extension)) {
 			file.delete();
 		}
 	}
