@@ -20,7 +20,7 @@ import picocli.CommandLine.Option;
 
 @Command(name = "extract", description = { "Unpacks an NPK archive and converts all assets" })
 public class CmdFullExtract implements Callable<Integer> {
-	public static final List<String> FILES_TO_NOT_DELETE = List.of("npk", "wav");
+	public static final List<String> FILES_TO_NOT_DELETE = List.of("npk", "wav", "obj", "png");
 
 	@Option(names = { "-o", "--output" }, required = true)
 	private File outputFolder;
