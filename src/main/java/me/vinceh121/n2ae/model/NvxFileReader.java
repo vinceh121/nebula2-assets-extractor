@@ -44,20 +44,25 @@ public class NvxFileReader {
 	}
 
 	public void writeObj(PrintWriter out) {
-		for (Vertex v : this.getVertices()) {
-			out.printf("v %.6f %.6f %.6f\n", v.getCoord()[0], v.getCoord()[1], v.getCoord()[2]);
+		if (this.types.contains(VertexType.COORD)) {
+			for (Vertex v : this.getVertices()) {
+				out.printf("v %.6f %.6f %.6f\n", v.getCoord()[0], v.getCoord()[1], v.getCoord()[2]);
+			}
 		}
-		for (Vertex v : this.getVertices()) {
-			out.printf("vt %.6f %.6f\n", v.getUv().get(0)[0], v.getUv().get(0)[1]);
+		if (this.types.contains(VertexType.UV0)) {
+			for (Vertex v : this.getVertices()) {
+				out.printf("vt %.6f %.6f\n", v.getUv().get(0)[0], v.getUv().get(0)[1]);
+			}
 		}
-		for (Vertex v : this.getVertices()) {
-			out.printf("vn %.6f %.6f %.6f\n", v.getNormal()[0], v.getNormal()[1], v.getNormal()[2]);
+		if (this.types.contains(VertexType.NORM)) {
+			for (Vertex v : this.getVertices()) {
+				out.printf("vn %.6f %.6f %.6f\n", v.getNormal()[0], v.getNormal()[1], v.getNormal()[2]);
+			}
 		}
 
 		for (int i = 0; i < this.getTriangles().size(); i++) {
 			int[] t = this.getTriangles().get(i);
-			out.printf("f %d/%d %d/%d %d/%d\n",
-					t[0] + 1, t[0] + 1, //
+			out.printf("f %d/%d %d/%d %d/%d\n", t[0] + 1, t[0] + 1, //
 					t[1] + 1, t[1] + 1, //
 					t[2] + 1, t[2] + 1);
 		}
