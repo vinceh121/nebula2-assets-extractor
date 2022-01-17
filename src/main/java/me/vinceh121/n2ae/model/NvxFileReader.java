@@ -11,8 +11,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Vector;
 
-import com.badlogic.gdx.math.Vector3;
-
 import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NvxFileReader {
@@ -39,20 +37,20 @@ public class NvxFileReader {
 	public NvxFileReader(InputStream in) {
 		this.in = new LEDataInputStream(in);
 	}
-	
+
 	public void writeObj(OutputStream out) {
 		this.writeObj(new PrintWriter(out, true));
 	}
-	
+
 	public void writeObj(PrintWriter out) {
 		for (Vertex v : this.getVertices()) {
-			out.printf("v %.6f %.6f %.6f\n", v.getCoord().x, v.getCoord().y, v.getCoord().z);
+			out.printf("v %.6f %.6f %.6f\n", v.getCoord()[0], v.getCoord()[1], v.getCoord()[2]);
 		}
 		for (int[] t : this.getTriangles()) {
 			out.printf("f %d %d %d\n", t[0] + 1, t[1] + 1, t[2] + 1);
 		}
 	}
-	
+
 	public void readAll() throws IOException {
 		this.readHeader();
 		this.readData();
@@ -84,14 +82,14 @@ public class NvxFileReader {
 				float x = this.in.readFloatLE();
 				float y = this.in.readFloatLE();
 				float z = this.in.readFloatLE();
-				vertex.setCoord(new Vector3(x, y, z));
+				vertex.setCoord(new float[] { x, y, z });
 			}
 
 			if (this.types.contains(VertexType.NORM)) {
 				float x = this.in.readFloatLE();
 				float y = this.in.readFloatLE();
 				float z = this.in.readFloatLE();
-				vertex.setNormal(new Vector3(x, y, z));
+				vertex.setNormal(new float[] { x, y, z });
 			}
 
 			if (this.types.contains(VertexType.RGBA)) {
@@ -101,22 +99,22 @@ public class NvxFileReader {
 			if (this.types.contains(VertexType.UV0)) {
 				float x = this.in.readFloatLE();
 				float y = this.in.readFloatLE();
-				vertex.getUv().get(0).set(x, y);
+				vertex.getUv().set(0, new float[] { x, y });
 			}
 			if (this.types.contains(VertexType.UV1)) {
 				float x = this.in.readFloatLE();
 				float y = this.in.readFloatLE();
-				vertex.getUv().get(1).set(x, y);
+				vertex.getUv().set(1, new float[] { x, y });
 			}
 			if (this.types.contains(VertexType.UV2)) {
 				float x = this.in.readFloatLE();
 				float y = this.in.readFloatLE();
-				vertex.getUv().get(2).set(x, y);
+				vertex.getUv().set(2, new float[] { x, y });
 			}
 			if (this.types.contains(VertexType.UV3)) {
 				float x = this.in.readFloatLE();
 				float y = this.in.readFloatLE();
-				vertex.getUv().get(3).set(x, y);
+				vertex.getUv().set(3, new float[] { x, y });
 			}
 
 			if (this.types.contains(VertexType.JOINTS_WEIGHTS)) {

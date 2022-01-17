@@ -12,13 +12,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx -->
-		<!-- TODO: this is only here for vector classes, filter out everything else -->
-		<dependency>
-			<groupId>com.badlogicgames.gdx</groupId>
-			<artifactId>gdx</artifactId>
-			<version>1.10.0</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.github.stephenc.java-iso-tools/loop-fs-iso-impl -->
 		<dependency>
 			<groupId>com.github.stephenc.java-iso-tools</groupId>
