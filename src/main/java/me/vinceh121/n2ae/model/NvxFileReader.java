@@ -62,9 +62,13 @@ public class NvxFileReader {
 
 		for (int i = 0; i < this.getTriangles().size(); i++) {
 			int[] t = this.getTriangles().get(i);
-			out.printf("f %d/%d %d/%d %d/%d\n", t[0] + 1, t[0] + 1, //
-					t[1] + 1, t[1] + 1, //
-					t[2] + 1, t[2] + 1);
+			if (this.types.contains(VertexType.UV0)) {
+				out.printf("f %d/%d %d/%d %d/%d\n", t[0] + 1, t[0] + 1, //
+						t[1] + 1, t[1] + 1, //
+						t[2] + 1, t[2] + 1);
+			} else {
+				out.printf("f %d %d %d\n", t[0] + 1, t[1] + 1, t[2] + 1);
+			}
 		}
 	}
 
