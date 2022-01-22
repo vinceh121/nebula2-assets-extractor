@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class NOBClazz {
 	private String name;
-	private Map<String, String> methods = new Hashtable<>();
+	private Map<String, CmdPrototype> methods = new Hashtable<>();
 
 	/**
 	 * @return the name
@@ -24,15 +24,15 @@ public class NOBClazz {
 	/**
 	 * @return the methods
 	 */
-	public Map<String, String> getMethods() {
+	public Map<String, CmdPrototype> getMethods() {
 		return methods;
 	}
 
-	public String getMethod(String key) {
+	public CmdPrototype getMethod(String key) {
 		return methods.get(key);
 	}
 
-	public String putMethod(String key, String value) {
+	public CmdPrototype putMethod(String key, CmdPrototype value) {
 		return methods.put(key, value);
 	}
 

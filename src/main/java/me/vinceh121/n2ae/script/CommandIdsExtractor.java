@@ -49,7 +49,7 @@ public class CommandIdsExtractor {
 				if (clazz.containsMethod(match.group(2))) {
 					throw new RuntimeException("method already exists");
 				}
-				clazz.putMethod(match.group(2), match.group(1));
+				clazz.putMethod(match.group(2), new CmdPrototype(match.group(1)));
 				hasAnything = true;
 			}
 		}
