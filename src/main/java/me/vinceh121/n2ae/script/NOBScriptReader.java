@@ -11,7 +11,7 @@ import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NOBScriptReader {
 	public static final String MAGIC_STRING = "NOB0";
-	public static final int MAGIC_NUMBER = 1313817136;
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
 	private final LEDataInputStream stream;
 	/**
 	 * Stores context of created vars with `_new`. Key: var name Value: var class

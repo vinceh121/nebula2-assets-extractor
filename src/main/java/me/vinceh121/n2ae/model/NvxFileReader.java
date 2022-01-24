@@ -11,11 +11,12 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Vector;
 
+import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NvxFileReader {
 	public static final String MAGIC_STRING = "NVX1";
-	public static final int MAGIC_NUMBER = 1314281521;
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
 
 	private final LEDataInputStream in;
 

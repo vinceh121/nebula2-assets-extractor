@@ -11,11 +11,12 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
+import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NtxFileReader {
 	public static final String MAGIC_STRING = "NTX1";
-	public static final int MAGIC_NUMBER = 1314150449; // ByteBuffer.wrap("NTX1".getBytes("US-ASCII")).getInt();
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
 
 	private final LEDataInputStream in;
 

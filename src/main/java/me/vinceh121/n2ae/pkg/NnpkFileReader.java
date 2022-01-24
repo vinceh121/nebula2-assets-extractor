@@ -6,13 +6,14 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
 
+import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NnpkFileReader {
 	public static final int MAX_PATH_LEN = 512;
 	public static final String NO_NAME = "<noname>";
 	public static final String MAGIC_STRING = "NPK0";
-	public static final int MAGIC_NUMBER = 1313884976;
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
 
 	private final LEDataInputStream in;
 
