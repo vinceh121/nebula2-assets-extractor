@@ -23,19 +23,14 @@ public class NtxFileReader {
 	private Vector<Block> blocks = new Vector<>();
 	private int headerSize;
 	private Vector<BufferedImage> textures = new Vector<>();
+	private Vector<byte[]> raws = new Vector<>();
 
 	public static void main(String[] args) throws IOException {
 		try (FileInputStream in = new FileInputStream(args[0])) {
 			NtxFileReader r = new NtxFileReader(in);
 			r.readHeader();
 			r.readAllTextures();
-			for (int i = 0; i < r.getTextures().size(); i++) {
-				BufferedImage img = r.getTextures().get(i);
-				System.out.println(r.getBlocks().get(i));
-				System.out.println(img);
-				System.out.println();
-				ImageIO.write(img, "png", new File("/tmp/" + i + ".png"));
-			}
+			ImageIO.write(r.getTextures().get(0), "png", new File("/tmp/out.png"));
 		}
 	}
 
@@ -65,6 +60,13 @@ public class NtxFileReader {
 		this.headerSize = /* magic number */4 + /* 8 ints in each block */4 * 8 * this.countBlocks;
 	}
 
+	public void readAllRaws() throws IOException {
+		for (Block block : this.blocks) {
+			byte[] buf = this.in.readNBytes(block.getDataLength());
+			this.raws.add(buf);
+		}
+	}
+
 	public void readAllTextures() throws IOException {
 		for (Block block : this.blocks) {
 			int width = block.getWidth();
@@ -80,16 +82,20 @@ public class NtxFileReader {
 					img.getRaster().getDataBuffer().setElem(i, Short.reverseBytes(sarr[i]));
 				}
 			} else if (block.getFormat() == BlockFormat.ARGB4) {
-				if (buf.length < 4) {
-					System.err.println("Won't process ARGB4 block because of invalid size: " + block);
-					this.textures.add(null);
-					continue;
-				}
-				for (int i = 0; i < buf.length; i += 4) {
-					img.getRaster().getDataBuffer().setElem(i, buf[i + 2]); // Blue -> Red
-					img.getRaster().getDataBuffer().setElem(i, buf[i + 1]); // Green -> Green
-					img.getRaster().getDataBuffer().setElem(i, buf[i]); // Red -> Blue
-					img.getRaster().getDataBuffer().setElem(i, buf[i + 3]); // Alpha -> Alpha
+				for (int i = 0; i < buf.length; i += 2) {
+					int pixel4 = buf[i] << 8 | buf[i + 1];
+					int alpha = pixel4 >> 12;
+					int red = pixel4 >> 8 & 0xF;
+					int green = pixel4 >> 4 & 0xF;
+					int blue = pixel4 & 0xF;
+
+					alpha *= 17;
+					red *= 17;
+					green *= 17;
+					blue *= 17;
+
+					int pixel = alpha << 24 | red << 16 | green << 8 | blue;
+					img.getRaster().getDataBuffer().setElem(i / 2, pixel);
 				}
 			} else {
 				for (int i = 0; i < buf.length; i++) {
@@ -115,5 +121,9 @@ public class NtxFileReader {
 
 	public Vector<BufferedImage> getTextures() {
 		return textures;
+	}
+
+	public Vector<byte[]> getRaws() {
+		return raws;
 	}
 }
