@@ -2,9 +2,9 @@
 Extracts and converts assets (packs) for the Nebula Device 2 engine.
 
 Implemented formats:
-  - NPK archives
-  - NTX textures
-  - NVX models
+  - NPK0 archives
+  - NTX1 textures
+  - NVX1 models
 
 ## Usage
 
