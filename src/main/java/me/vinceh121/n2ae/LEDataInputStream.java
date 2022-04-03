@@ -5,9 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class LEDataInputStream extends DataInputStream {
+	private long readBytes = 0;
 
 	public LEDataInputStream(InputStream in) {
 		super(in);
+	}
+
+	@Override
+	public int read() throws IOException {
+		readBytes++;
+		return super.read();
 	}
 
 	public int readIntLE() throws IOException {
@@ -24,5 +31,9 @@ public class LEDataInputStream extends DataInputStream {
 
 	public int readUnsignedShortLE() throws IOException {
 		return this.readShortLE() & 0xFFFF;
+	}
+
+	public long getReadBytes() {
+		return readBytes;
 	}
 }
