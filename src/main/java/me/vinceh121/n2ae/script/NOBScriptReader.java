@@ -26,7 +26,7 @@ public class NOBScriptReader {
 		ex.readRecurse(new File("/home/vincent/github-workspace/nebuladevice2/"));
 
 		LEDataInputStream stream = new LEDataInputStream(new FileInputStream(
-				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/bomber03.n/_main.n"));
+				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/s_scoutgarage01.n/_main.n"));
 		NOBScriptReader read = new NOBScriptReader(stream);
 		read.setClazzes(ex.getClazzes());
 		read.readHeader();
@@ -65,10 +65,11 @@ public class NOBScriptReader {
 			NOBClazz cls = this.clazzes.get(this.currentClass);
 			String fourcc = FourccUtils.fourccToString(cmd);
 			/* short somethingToSkipIdkWhat = */this.stream.readShortLE();
-			if (cls != null)
-				System.out.println(cls.getMethod(fourcc));
-			else
-				System.out.println(fourcc);
+			System.out.println(cls != null && cls.containsMethod(fourcc) ? cls.getMethod(fourcc) : fourcc);
+			int argLength = this.stream.readUnsignedShortLE();
+			System.out.print(argLength + " args: ");
+			byte[] args = this.stream.readNBytes(argLength);
+			System.out.println();
 		}
 	}
 
