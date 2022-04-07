@@ -1,15 +1,11 @@
 package me.vinceh121.n2ae.texture;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Vector;
-
-import javax.imageio.ImageIO;
 
 import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
@@ -25,15 +21,6 @@ public class NtxFileReader {
 	private int headerSize;
 	private Vector<BufferedImage> textures = new Vector<>();
 	private Vector<byte[]> raws = new Vector<>();
-
-	public static void main(String[] args) throws IOException {
-		try (FileInputStream in = new FileInputStream(args[0])) {
-			NtxFileReader r = new NtxFileReader(in);
-			r.readHeader();
-			r.readAllTextures();
-			ImageIO.write(r.getTextures().get(0), "png", new File("/tmp/out.png"));
-		}
-	}
 
 	public NtxFileReader(InputStream in) {
 		this.in = new LEDataInputStream(in);
@@ -84,8 +71,8 @@ public class NtxFileReader {
 				}
 			} else if (block.getFormat() == BlockFormat.ARGB4) {
 				for (int i = 0; i < buf.length; i += 2) {
-					int pixel4 = buf[i] << 8 | buf[i + 1];
-					int alpha = pixel4 >> 12;
+					int pixel4 = (buf[i] & 0xFF) << 8 | (buf[i + 1] & 0xFF);
+					int alpha = pixel4 >> 12 & 0xF;
 					int red = pixel4 >> 8 & 0xF;
 					int green = pixel4 >> 4 & 0xF;
 					int blue = pixel4 & 0xF;
