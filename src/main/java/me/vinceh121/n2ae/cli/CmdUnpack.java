@@ -27,11 +27,6 @@ public class CmdUnpack implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		if (!outputFolder.isDirectory()) {
-			System.err.println("Output must be a directory");
-			return -1;
-		}
-
 		try (FileInputStream is = new FileInputStream(inputFile)) {
 			NnpkFileReader r = new NnpkFileReader(is);
 			r.readAll();
