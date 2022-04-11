@@ -1,7 +1,7 @@
 package me.vinceh121.n2ae.script;
 
 public enum NOBType {
-	VOID('v'), INT('i'), FLOAT('f'), STRING('s'), BOOL('b'), OBJECT('o'), LIST('l'), FLOAT4, MATRIX44;
+	VOID('v'), INT('i'), FLOAT('f'), STRING('s'), USTIRNG('u'), BOOL('b'), OBJECT('o'), CODE('c'), LIST('l'), FLOAT4, MATRIX44;
 
 	private char type;
 
@@ -23,6 +23,6 @@ public enum NOBType {
 				return t;
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("Don't know type '" + c + "'");
 	}
 }

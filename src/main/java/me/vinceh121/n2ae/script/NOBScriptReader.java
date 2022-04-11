@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
@@ -22,8 +23,16 @@ public class NOBScriptReader {
 	private String currentClass = "nroot";
 
 	public static void main(String[] args) throws IOException {
-		CommandIdsExtractor ex = new CommandIdsExtractor();
-		ex.readRecurse(new File("/home/vincent/github-workspace/nebuladevice2/"));
+		DecompiledCommandIdsExtractor ex = new DecompiledCommandIdsExtractor();
+		ex.readRecurse(new File("/home/vincent/Decomp/projectnomads/decomp-dumps"));
+
+		System.out.println("Knows " + ex.getClazzes().size() + " classes");
+		for (NOBClazz c : ex.getClazzes().values()) {
+			System.out.println(c.getName());
+			for (Entry<String, CmdPrototype> e : c.getMethods().entrySet()) {
+				System.out.println("\t" + e.getKey() + " " + e.getValue());
+			}
+		}
 
 		LEDataInputStream stream = new LEDataInputStream(new FileInputStream(
 				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/s_scoutgarage01.n/_main.n"));
