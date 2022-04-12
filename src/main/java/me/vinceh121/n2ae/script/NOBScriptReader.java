@@ -60,7 +60,7 @@ public class NOBScriptReader {
 		}
 
 		String header = this.readString();
-		System.out.println(header);
+		System.out.println("# " + header);
 	}
 
 	public void readBlock() throws IOException {
@@ -76,8 +76,11 @@ public class NOBScriptReader {
 			String path = this.readString();
 			if ("..".equals(path)) {
 				this.classStack.pop();
+			} else {
+				System.err.println("uhoh");
 			}
-			System.out.println("sel " + path);
+			System.out.println("sel " + path + " # " + this.classStack);
+			System.out.println();
 		} else {
 			NOBClazz cls = this.clazzes.get(this.classStack.peek());
 			String fourcc = FourccUtils.fourccToString(cmd);
@@ -93,26 +96,25 @@ public class NOBScriptReader {
 							+ " in hiearchy of class " + cls.getName());
 				}
 			}
-			System.out.println(Integer.toHexString(cmd) + " " + fourcc + " " + method);
+			System.out.print("." + method.getName());
 			int argCount = method.getInArgs().size();
 			for (int i = 0; i < argCount; i++) {
 				NOBType arg = method.getInArgs().get(i);
-				System.out.print("\t");
+				System.out.print(" ");
 				switch (arg) {
 				case INT:
-					System.out.println(this.stream.readIntLE());
+					System.out.print(this.stream.readIntLE());
 					break;
 				case FLOAT:
-					System.out.println(this.stream.readFloatLE());
+					System.out.print(this.stream.readFloatLE());
 					break;
 				case STRING:
 				case USTRING:
 				case CODE:
-					int strLength = this.stream.readUnsignedShortLE();
-					System.out.println("\"" + new String(this.stream.readNBytes(strLength)) + "\"");
+					System.out.print("\"" + this.readString() + "\"");
 					break;
 				case BOOL:
-					System.out.println(this.stream.readByte() != 0);
+					System.out.print(this.stream.readByte() != 0);
 					break;
 				case VOID:
 					break;
@@ -120,6 +122,7 @@ public class NOBScriptReader {
 					throw new IllegalArgumentException("fuck " + arg);
 				}
 			}
+			System.out.println();
 		}
 	}
 

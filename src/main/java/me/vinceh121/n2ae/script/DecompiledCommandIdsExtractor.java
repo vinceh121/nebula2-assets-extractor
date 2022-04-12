@@ -16,8 +16,8 @@ import me.vinceh121.n2ae.FourccUtils;
 
 public class DecompiledCommandIdsExtractor {
 	public static final Pattern PAT_CLASS_INIT = Pattern.compile("__cdecl n_init_([a-zA-Z0-9]+)\\("),
-			PAT_SUPERCLASS = Pattern.compile(
-					Pattern.quote("(**(code **)(*param_2 + 4))(\"") + "([a-zA-Z0-9]+)" + Pattern.quote("\",param_1);")),
+			PAT_SUPERCLASS = Pattern.compile(Pattern.quote("(**(code **)(*param_2 + ") + "[0-9a-fx]+"
+					+ Pattern.quote("))(\"") + "([a-zA-Z0-9]+)\"[,\\)]"),
 			PAT_INIT_CMDS_CALL = Pattern.compile("uVar1 = FUN_([0-9a-zA-Z]+)\\(param_1\\)"),
 			PAT_ADDCMD = Pattern.compile("nClass::AddCmd\\(param_1,\"([_a-zA-Z0-9]+)\",0x([0-9a-z]+),");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
