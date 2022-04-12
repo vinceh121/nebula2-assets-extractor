@@ -43,9 +43,9 @@ public class NOBScriptReader {
 				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/first_island.n/_main.n"));
 		NOBScriptReader read = new NOBScriptReader(stream);
 		read.setClazzes(ex.getClazzes());
-		read.readHeader();
+		System.out.println(read.readHeader());
 		while (stream.available() > 0) {
-			read.readBlock();
+			System.out.print(read.readBlock());
 		}
 	}
 
@@ -53,17 +53,22 @@ public class NOBScriptReader {
 		this.stream = stream;
 	}
 
-	public void readHeader() throws IOException {
+	public String readHeader() throws IOException {
 		int magic = this.stream.readIntLE();
 		if (magic != MAGIC_NUMBER) {
 			throw new IOException("Invalid magic number");
 		}
 
 		String header = this.readString();
-		System.out.println("# " + header);
+		StringBuilder sb = new StringBuilder();
+		sb.append("# ---\n");
+		sb.append("# " + header + "\n");
+		sb.append("# ---\n");
+		return sb.toString();
 	}
 
-	public void readBlock() throws IOException {
+	public String readBlock() throws IOException {
+		StringBuilder sb = new StringBuilder();
 		int cmd = this.stream.readIntLE();
 
 		if (cmd == FourccUtils.fourcc("_new")) {
@@ -71,16 +76,13 @@ public class NOBScriptReader {
 			String name = this.readString();
 			this.context.put(name, clazz);
 			this.classStack.push(clazz); // _new automatically cds into created object
-			System.out.println("new " + clazz + " " + name);
+			sb.append("new " + clazz + " " + name + "\n");
 		} else if (cmd == FourccUtils.fourcc("_sel")) {
 			String path = this.readString();
 			if ("..".equals(path)) {
 				this.classStack.pop();
-			} else {
-				System.err.println("uhoh");
 			}
-			System.out.println("sel " + path + " # " + this.classStack);
-			System.out.println();
+			sb.append("sel " + path + " # " + this.classStack + "\n\n");
 		} else {
 			NOBClazz cls = this.clazzes.get(this.classStack.peek());
 			String fourcc = FourccUtils.fourccToString(cmd);
@@ -90,31 +92,31 @@ public class NOBScriptReader {
 				if (this.ignoreUnknownMethods) {
 					System.err.println("Skipping " + Integer.toHexString(cmd) + " " + fourcc + " " + method);
 					this.stream.skip(argLength);
-					return;
+					return sb.toString();
 				} else {
 					throw new IllegalStateException("Couldn't find method " + Integer.toHexString(cmd) + " " + fourcc
 							+ " in hiearchy of class " + cls.getName());
 				}
 			}
-			System.out.print("." + method.getName());
+			sb.append("." + method.getName());
 			int argCount = method.getInArgs().size();
 			for (int i = 0; i < argCount; i++) {
 				NOBType arg = method.getInArgs().get(i);
-				System.out.print(" ");
+				sb.append(" ");
 				switch (arg) {
 				case INT:
-					System.out.print(this.stream.readIntLE());
+					sb.append(this.stream.readIntLE());
 					break;
 				case FLOAT:
-					System.out.print(this.stream.readFloatLE());
+					sb.append(this.stream.readFloatLE());
 					break;
 				case STRING:
 				case USTRING:
 				case CODE:
-					System.out.print("\"" + this.readString() + "\"");
+					sb.append("\"" + this.readString() + "\"");
 					break;
 				case BOOL:
-					System.out.print(this.stream.readByte() != 0);
+					sb.append(this.stream.readByte() != 0);
 					break;
 				case VOID:
 					break;
@@ -122,8 +124,9 @@ public class NOBScriptReader {
 					throw new IllegalArgumentException("fuck " + arg);
 				}
 			}
-			System.out.println();
+			sb.append("\n");
 		}
+		return sb.toString();
 	}
 
 	public CmdPrototype recursiveGetMethod(NOBClazz cls, String fourcc) {
