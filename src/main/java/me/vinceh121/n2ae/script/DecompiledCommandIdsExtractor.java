@@ -15,8 +15,10 @@ import java.util.stream.Collectors;
 import me.vinceh121.n2ae.FourccUtils;
 
 public class DecompiledCommandIdsExtractor {
-	public static final Pattern PAT_CLASS_INIT = Pattern.compile("__cdecl n_init_([a-z]+)\\("),
-			PAT_INIT_CMDS_CALL = Pattern.compile("uVar1 = FUN_([0-9]+)\\(param_1\\)"),
+	public static final Pattern PAT_CLASS_INIT = Pattern.compile("__cdecl n_init_([a-zA-Z0-9]+)\\("),
+			PAT_SUPERCLASS = Pattern.compile(
+					Pattern.quote("(**(code **)(*param_2 + 4))(\"") + "([a-zA-Z0-9]+)" + Pattern.quote("\",param_1);")),
+			PAT_INIT_CMDS_CALL = Pattern.compile("uVar1 = FUN_([0-9a-zA-Z]+)\\(param_1\\)"),
 			PAT_ADDCMD = Pattern.compile("nClass::AddCmd\\(param_1,\"([_a-zA-Z0-9]+)\",0x([0-9a-z]+),");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
@@ -43,14 +45,25 @@ public class DecompiledCommandIdsExtractor {
 			if (initMatcher.find()) {
 				final String className = initMatcher.group(1);
 
+				final NOBClazz clazz = new NOBClazz(); // we register classes even if they don't have methods
+				clazz.setName(className);
+				this.clazzes.put(className, clazz);
 				String callLine;
 				while (!(callLine = lines.get(i++)).contains("return")) { // if we reach a return, this init doesn't
-																			// have n_initcmds
+																			// have n_initcmds nor superclass
+					final Matcher superClassMatcher = PAT_SUPERCLASS.matcher(callLine);
 					final Matcher callMatcher = PAT_INIT_CMDS_CALL.matcher(callLine);
+
+					if (superClassMatcher.find()) {
+						final String superClass = superClassMatcher.group(1);
+						clazz.setSuperclass(superClass);
+					}
+
 					if (callMatcher.find()) { // we've found our n_initcmds
 						final int funPos = findNInitCmds(lines, callMatcher.group(1));
+
 						if (funPos != -1)
-							readCmds(lines, className, funPos);
+							readCmds(lines, clazz, funPos);
 						break; // no need to search more
 					}
 				}
@@ -58,9 +71,7 @@ public class DecompiledCommandIdsExtractor {
 		}
 	}
 
-	private void readCmds(List<String> lines, String className, int funPos) {
-		final NOBClazz clazz = new NOBClazz();
-		clazz.setName(className);
+	private void readCmds(List<String> lines, NOBClazz clazz, int funPos) {
 		for (int i = funPos; i < lines.size(); i++) {
 			final String line = lines.get(i);
 			if (line.contains("nClass::EndCmds")) {
@@ -75,7 +86,6 @@ public class DecompiledCommandIdsExtractor {
 				clazz.putMethod(sFourcc, proto);
 			}
 		}
-		this.clazzes.put(className, clazz);
 	}
 
 	private int findNInitCmds(List<String> lines, String funPtr) {

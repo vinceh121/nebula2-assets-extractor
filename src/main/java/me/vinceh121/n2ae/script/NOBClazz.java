@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class NOBClazz {
-	private String name;
+	private String name, superclass;
 	private Map<String, CmdPrototype> methods = new Hashtable<>();
 
 	/**
@@ -19,6 +19,14 @@ public class NOBClazz {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getSuperclass() {
+		return superclass;
+	}
+
+	public void setSuperclass(String superclass) {
+		this.superclass = superclass;
 	}
 
 	/**
@@ -42,6 +50,6 @@ public class NOBClazz {
 
 	@Override
 	public String toString() {
-		return "NOBClazz [name=" + name + ", methods=" + methods + "]";
+		return "NOBClazz [name=" + name + ", superclass=" + superclass + ", methods=" + methods + "]";
 	}
 }

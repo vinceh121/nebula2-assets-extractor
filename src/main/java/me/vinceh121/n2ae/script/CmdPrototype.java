@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 public class CmdPrototype {
-	private List<NOBType> inArgs = new Vector<>(), returnArgs = new Vector<>();
+	private final List<NOBType> inArgs = new Vector<>(), returnArgs = new Vector<>();
 	private String name;
 
 	public CmdPrototype() {
@@ -26,6 +26,22 @@ public class CmdPrototype {
 		while (idx < proto.length() && (c = proto.charAt(idx++)) != '_') {
 			this.inArgs.add(NOBType.getType(c));
 		}
+	}
+
+	public List<NOBType> getInArgs() {
+		return inArgs;
+	}
+
+	public List<NOBType> getReturnArgs() {
+		return returnArgs;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override
