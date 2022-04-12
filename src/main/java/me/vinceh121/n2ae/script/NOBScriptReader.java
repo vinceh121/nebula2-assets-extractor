@@ -40,7 +40,7 @@ public class NOBScriptReader {
 		}
 
 		LEDataInputStream stream = new LEDataInputStream(new FileInputStream(
-				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/s_scoutgarage01.n/_main.n"));
+				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/first_island.n/_main.n"));
 		NOBScriptReader read = new NOBScriptReader(stream);
 		read.setClazzes(ex.getClazzes());
 		read.readHeader();
@@ -112,7 +112,7 @@ public class NOBScriptReader {
 					System.out.println("\"" + new String(this.stream.readNBytes(strLength)) + "\"");
 					break;
 				case BOOL:
-					System.out.println(this.stream.readCharLE() != 0);
+					System.out.println(this.stream.readByte() != 0);
 					break;
 				case VOID:
 					break;
