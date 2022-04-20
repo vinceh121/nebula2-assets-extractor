@@ -1,6 +1,7 @@
 package me.vinceh121.n2ae.cli;
 
 import java.awt.image.BufferedImage;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -84,7 +85,7 @@ public class CmdFullExtract implements Callable<Integer> {
 			this.processModel(file, new File(outPath + ".obj"));
 			break;
 		case "ntx":
-			this.processTexture(file, new File(outPath + ".png"));
+			this.processTexture(file, new File(outPath + "." + this.format));
 			break;
 		default:
 			if (!FILES_TO_NOT_DELETE.contains(extension)) {
@@ -98,6 +99,24 @@ public class CmdFullExtract implements Callable<Integer> {
 	}
 
 	private void processTexture(File fileIn, File fileOut) throws IOException {
+		if ("ktx".equals(this.format)) {
+			this.processTextureKtx(fileIn, fileOut);
+		} else {
+			this.processTextureJava(fileIn, fileOut);
+		}
+	}
+
+	private void processTextureKtx(File fileIn, File fileOut) throws IOException {
+		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
+			NtxFileReader r = new NtxFileReader(is);
+			r.readHeader();
+			r.readAllRaws();
+
+			r.writeKtx(new DataOutputStream(os));
+		}
+	}
+
+	private void processTextureJava(File fileIn, File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
 			NtxFileReader r = new NtxFileReader(is);
 			r.readHeader();

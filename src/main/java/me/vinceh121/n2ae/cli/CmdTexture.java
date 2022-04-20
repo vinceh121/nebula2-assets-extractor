@@ -1,6 +1,7 @@
 package me.vinceh121.n2ae.cli;
 
 import java.awt.image.BufferedImage;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -48,6 +49,18 @@ public class CmdTexture implements Callable<Integer> {
 				for (int i = 0; i < reader.getCountBlocks(); i++) {
 					System.out.println(i + ": " + reader.getBlocks().get(i));
 				}
+				return 0;
+			}
+
+			if ("ktx".equals(this.format)) {
+				if (this.block != -1) {
+					System.err.println("-b is incompatible with ktx format");
+					return -1;
+				}
+
+				reader.readAllRaws();
+				reader.writeKtx(new DataOutputStream(os));
+
 				return 0;
 			}
 
