@@ -3,6 +3,7 @@ package me.vinceh121.n2ae.script;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,8 +50,8 @@ public class NOBScriptReader {
 		}
 	}
 
-	public NOBScriptReader(LEDataInputStream stream) {
-		this.stream = stream;
+	public NOBScriptReader(InputStream stream) {
+		this.stream = new LEDataInputStream(stream);
 	}
 
 	public String readHeader() throws IOException {
@@ -85,6 +86,9 @@ public class NOBScriptReader {
 			sb.append("sel " + path + " # " + this.classStack + "\n\n");
 		} else {
 			NOBClazz cls = this.clazzes.get(this.classStack.peek());
+			if (cls == null) {
+				throw new IllegalStateException("Unknown nscript class " + this.classStack.peek());
+			}
 			String fourcc = FourccUtils.fourccToString(cmd);
 			CmdPrototype method = this.recursiveGetMethod(cls, fourcc);
 			short argLength = this.stream.readShortLE();

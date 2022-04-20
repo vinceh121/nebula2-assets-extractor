@@ -19,7 +19,8 @@ public class DecompiledCommandIdsExtractor {
 			PAT_SUPERCLASS = Pattern.compile(Pattern.quote("(**(code **)(*param_2 + ") + "[0-9a-fx]+"
 					+ Pattern.quote("))(\"") + "([a-zA-Z0-9]+)\"[,\\)]"),
 			PAT_INIT_CMDS_CALL = Pattern.compile("uVar1 = FUN_([0-9a-zA-Z]+)\\(param_1\\)"),
-			PAT_ADDCMD = Pattern.compile("nClass::AddCmd\\(param_1,\"([_a-zA-Z0-9]+)\",0x([0-9a-z]+),");
+			PAT_ADDCMD = Pattern.compile("nClass::AddCmd\\(param_1,\"([_a-zA-Z0-9]+)\",0x([0-9a-z]+),"),
+			PAT_CLASS_MANUAL_INIT = Pattern.compile("__cdecl ([a-zA-Z0-9]+)_init\\(");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
 	public void readRecurse(File file) throws IOException {
@@ -41,8 +42,9 @@ public class DecompiledCommandIdsExtractor {
 	public void readFile(List<String> lines) {
 		for (int i = 0; i < lines.size(); i++) {
 			final String line = lines.get(i);
-			final Matcher initMatcher = PAT_CLASS_INIT.matcher(line);
-			if (initMatcher.find()) {
+			final Matcher initMatcher;
+			if ((initMatcher = this.tryMatchers(
+					new Matcher[] { PAT_CLASS_INIT.matcher(line), PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
 				final String className = initMatcher.group(1);
 
 				final NOBClazz clazz = new NOBClazz(); // we register classes even if they don't have methods
@@ -69,6 +71,15 @@ public class DecompiledCommandIdsExtractor {
 				}
 			}
 		}
+	}
+
+	private Matcher tryMatchers(Matcher[] matchers) {
+		for (Matcher m : matchers) {
+			if (m.find()) {
+				return m;
+			}
+		}
+		return null;
 	}
 
 	private void readCmds(List<String> lines, NOBClazz clazz, int funPos) {
