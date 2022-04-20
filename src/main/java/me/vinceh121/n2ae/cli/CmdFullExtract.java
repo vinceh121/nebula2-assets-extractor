@@ -7,13 +7,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileExtractor;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
+import me.vinceh121.n2ae.script.NOBClazz;
+import me.vinceh121.n2ae.script.NOBScriptReader;
 import me.vinceh121.n2ae.texture.Block;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 import picocli.CommandLine.Command;
@@ -21,7 +27,7 @@ import picocli.CommandLine.Option;
 
 @Command(name = "extract", description = { "Unpacks an NPK archive and converts all assets" })
 public class CmdFullExtract implements Callable<Integer> {
-	public static final List<String> FILES_TO_NOT_DELETE = List.of("npk", "wav", "obj", "png", "ktx");
+	public static final List<String> FILES_TO_NOT_DELETE = List.of("npk", "wav", "obj", "png", "ktx", "tcl");
 
 	@Option(names = { "-o", "--output" }, required = true)
 	private File outputFolder;
@@ -34,6 +40,10 @@ public class CmdFullExtract implements Callable<Integer> {
 
 	@Option(names = { "-f", "--format" }, description = { "texture output image format" }, defaultValue = "png")
 	private String format;
+
+	@Option(names = { "-m",
+			"--model" }, description = "Json file containing a class model generated using `extract-classes`")
+	private File clazzModel;
 
 	@Override
 	public Integer call() throws Exception {
@@ -86,6 +96,9 @@ public class CmdFullExtract implements Callable<Integer> {
 			break;
 		case "ntx":
 			this.processTexture(file, new File(outPath + "." + this.format));
+			break;
+		case "n":
+			this.processScript(file, new File(outPath + ".tcl"));
 			break;
 		default:
 			if (!FILES_TO_NOT_DELETE.contains(extension)) {
@@ -144,6 +157,28 @@ public class CmdFullExtract implements Callable<Integer> {
 			NvxFileReader r = new NvxFileReader(is);
 			r.readAll();
 			r.writeObj(os);
+		}
+	}
+
+	private void processScript(File fileIn, File fileOut) throws IOException {
+		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
+			NOBScriptReader r = new NOBScriptReader(is);
+
+			if (clazzModel != null) {
+				ObjectMapper mapper = new ObjectMapper();
+				Map<String, NOBClazz> model = mapper.readValue(clazzModel, new TypeReference<Map<String, NOBClazz>>() {
+				});
+				r.setClazzes(model);
+
+				NOBClazz nroot = new NOBClazz();
+				nroot.setName("nroot");
+				model.put(nroot.getName(), nroot);
+			}
+
+			os.write(r.readHeader().getBytes());
+			while (is.available() > 0) {
+				os.write(r.readBlock().getBytes());
+			}
 		}
 	}
 
