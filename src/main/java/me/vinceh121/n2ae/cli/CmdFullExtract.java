@@ -87,7 +87,8 @@ public class CmdFullExtract implements Callable<Integer> {
 		}
 		String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1);
 
-		String outPath = file.toPath().resolveSibling(file.getName().substring(0, file.getName().length() - 4))
+		String outPath = file.toPath()
+				.resolveSibling(file.getName().substring(0, file.getName().length() - extension.length() + 1))
 				.toString();
 
 		switch (extension) {
