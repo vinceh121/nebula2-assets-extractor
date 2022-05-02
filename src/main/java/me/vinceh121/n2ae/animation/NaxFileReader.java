@@ -1,7 +1,6 @@
 package me.vinceh121.n2ae.animation;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,20 +9,21 @@ import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NaxFileReader {
 	public static final String MAGIC_STRING = "NAX0";
-	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NaxFileReader.MAGIC_STRING);
 	public static final String CURVE_MAGIC_STRING = "CHDR";
-	public static final int CURVE_MAGIC_NUMBER = FourccUtils.fourcc(CURVE_MAGIC_STRING);
+	public static final int CURVE_MAGIC_NUMBER = FourccUtils.fourcc(NaxFileReader.CURVE_MAGIC_STRING);
 
 	private final LEDataInputStream input;
 
 	private int blockLength, curvesCount;
 
-	public static void main(String[] args) throws IOException {
-		NaxFileReader r = new NaxFileReader(new FileInputStream(
+	public static void main(final String[] args) throws IOException {
+		final NaxFileReader r = new NaxFileReader(new FileInputStream(
 				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_john.n/character.nax"));
 		r.readHeader();
-		for (int i = 0; i < r.getCurvesCount(); i++)
+		for (int i = 0; i < r.getCurvesCount(); i++) {
 			r.readCurve();
+		}
 	}
 
 	public NaxFileReader(final InputStream stream) {
@@ -31,8 +31,8 @@ public class NaxFileReader {
 	}
 
 	public void readHeader() throws IOException {
-		int magic = this.input.readIntLE();
-		if (magic != MAGIC_NUMBER) {
+		final int magic = this.input.readIntLE();
+		if (magic != NaxFileReader.MAGIC_NUMBER) {
 			throw new IOException("Invalid file magic number");
 		}
 
@@ -41,30 +41,30 @@ public class NaxFileReader {
 	}
 
 	public void readCurve() throws IOException {
-		int magic = this.input.readIntLE();
-		if (magic != CURVE_MAGIC_NUMBER) {
+		final int magic = this.input.readIntLE();
+		if (magic != NaxFileReader.CURVE_MAGIC_NUMBER) {
 			System.out.println(FourccUtils.fourccToString(magic));
 			throw new IOException("Invalid curve magic number");
 		}
 
 		this.blockLength = this.input.readIntLE(); // why is the header overwritten?
-		int startKey = this.input.readIntLE();
-		int numKeys = this.input.readIntLE();
-		float keysPerSec = this.input.readFloatLE();
+		final int startKey = this.input.readIntLE();
+		final int numKeys = this.input.readIntLE();
+		final float keysPerSec = this.input.readFloatLE();
 
 		// the version of nebula's code that i have has those as shorts, but
 		// Teivaz's extractor seems to work reading them as bytes
-		byte ipolType = this.input.readByte();
-		byte repType = this.input.readByte();
-		byte keyType = this.input.readByte();
-		byte padding = this.input.readByte();
+		final byte ipolType = this.input.readByte();
+		final byte repType = this.input.readByte();
+		final byte keyType = this.input.readByte();
+		final byte padding = this.input.readByte();
 
-		short curveNameLength = this.input.readShortLE();
-		String curveName = new String(this.input.readNBytes(curveNameLength));
+		final short curveNameLength = this.input.readShortLE();
+		final String curveName = new String(this.input.readNBytes(curveNameLength));
 		System.out.println(curveName);
 		// build curve object
 
-		int curveType = this.input.readIntLE(); // either 'CDTV' for VANILLA or 'CDTP' for PACKED
+		final int curveType = this.input.readIntLE(); // either 'CDTV' for VANILLA or 'CDTP' for PACKED
 		System.out.println(FourccUtils.fourccToString(curveType));
 		this.blockLength = this.input.readIntLE(); // again, why is the header overwritten?
 		int dataSize;
@@ -73,11 +73,11 @@ public class NaxFileReader {
 		} else {
 			dataSize = numKeys * 2 * 4; // ushort x, y, z, w
 		}
-		byte[] data = this.input.readNBytes(dataSize);
+		final byte[] data = this.input.readNBytes(dataSize);
 	}
 
 	public int getCurvesCount() {
-		return curvesCount;
+		return this.curvesCount;
 	}
 
 	public enum Interpolation {

@@ -1,7 +1,6 @@
 package me.vinceh121.n2ae.pkg;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,11 +14,11 @@ public class NnpkFileExtractor {
 	private final InputStream in;
 	private File output = new File(".");
 
-	public NnpkFileExtractor(InputStream in) {
+	public NnpkFileExtractor(final InputStream in) {
 		this.in = in;
 	}
 
-	public void extractAllFiles(TableOfContents toc) throws IOException {
+	public void extractAllFiles(final TableOfContents toc) throws IOException {
 		if (!this.output.isDirectory()) {
 			throw new IllegalStateException("output must be a folder");
 		}
@@ -27,22 +26,22 @@ public class NnpkFileExtractor {
 		this.extractAllFiles(toc, new ArrayDeque<>(6));
 	}
 
-	private void extractAllFiles(TableOfContents toc, Deque<String> path) throws IOException {
+	private void extractAllFiles(final TableOfContents toc, final Deque<String> path) throws IOException {
 		if (toc.isDirectory()) {
-			Path dirPath = output.toPath();
-			for (String p : path) {
+			Path dirPath = this.output.toPath();
+			for (final String p : path) {
 				dirPath = dirPath.resolve(p);
 			}
 			dirPath.toFile().mkdirs();
-			
-			for (TableOfContents t : toc.getEntries().values()) {
+
+			for (final TableOfContents t : toc.getEntries().values()) {
 				path.add(t.getName());
-				extractAllFiles(t, path);
+				this.extractAllFiles(t, path);
 				path.pollLast();
 			}
 		} else if (toc.isFile()) {
-			Path outPath = output.toPath();
-			for (String p : path) {
+			Path outPath = this.output.toPath();
+			for (final String p : path) {
 				outPath = outPath.resolve(p);
 			}
 			try (FileOutputStream out = new FileOutputStream(outPath.toFile())) {
@@ -51,33 +50,35 @@ public class NnpkFileExtractor {
 		}
 	}
 
-	public void extractFile(TableOfContents toc) throws IOException {
+	public void extractFile(final TableOfContents toc) throws IOException {
 		if (!toc.isFile()) {
 			throw new IllegalArgumentException("TOC entry isn't a file");
 		}
 
-		in.skip(toc.getOffset());
+		this.in.skip(toc.getOffset());
 
-		try (FileOutputStream out = new FileOutputStream(output)) {
+		try (FileOutputStream out = new FileOutputStream(this.output)) {
 			this.writeFile(out, toc.getLength());
 		}
 	}
 
-	private void writeFile(OutputStream out, int length) throws IOException {
-		byte[] buf = new byte[BUFFER_SIZE];
+	private void writeFile(final OutputStream out, final int length) throws IOException {
+		final byte[] buf = new byte[NnpkFileExtractor.BUFFER_SIZE];
 		int totalRead = 0;
 		while (totalRead < length) { // maybe <= ?
-			int read = in.read(buf, 0, totalRead + BUFFER_SIZE > length ? length - totalRead : BUFFER_SIZE);
+			final int read = this.in.read(buf, 0,
+					totalRead + NnpkFileExtractor.BUFFER_SIZE > length ? length - totalRead
+							: NnpkFileExtractor.BUFFER_SIZE);
 			totalRead += read;
 			out.write(buf, 0, read);
 		}
 	}
 
 	public File getOutput() {
-		return output;
+		return this.output;
 	}
 
-	public void setOutput(File output) {
+	public void setOutput(final File output) {
 		this.output = output;
 	}
 }

@@ -11,70 +11,70 @@ public class TableOfContents {
 	private final Map<String, TableOfContents> entries = new LinkedHashMap<>();
 
 	public boolean isDirectory() {
-		return directory;
+		return this.directory;
 	}
 
-	public void setDirectory(boolean directory) {
+	public void setDirectory(final boolean directory) {
 		this.directory = directory;
 	}
 
 	public boolean isFile() {
-		return file;
+		return this.file;
 	}
 
-	public void setFile(boolean file) {
+	public void setFile(final boolean file) {
 		this.file = file;
 	}
 
 	public int getOffset() {
-		return offset;
+		return this.offset;
 	}
 
-	public void setOffset(int offset) {
+	public void setOffset(final int offset) {
 		this.offset = offset;
 	}
 
 	public int getLength() {
-		return length;
+		return this.length;
 	}
 
-	public void setLength(int length) {
+	public void setLength(final int length) {
 		this.length = length;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public Map<String, TableOfContents> getEntries() {
-		return entries;
+		return this.entries;
 	}
 
-	public TableOfContents get(String key) {
-		return entries.get(key);
+	public TableOfContents get(final String key) {
+		return this.entries.get(key);
 	}
 
-	public TableOfContents get(Iterable<String> path) {
+	public TableOfContents get(final Iterable<String> path) {
 		TableOfContents toc = this;
-		for (String s : path) {
+		for (final String s : path) {
 			toc = toc.get(s);
 		}
 		return toc;
 	}
 
-	public void put(String key, TableOfContents value) {
-		entries.put(key, value);
+	public void put(final String key, final TableOfContents value) {
+		this.entries.put(key, value);
 	}
 
-	public void put(Iterable<String> path, TableOfContents value) {
+	public void put(final Iterable<String> path, final TableOfContents value) {
 		TableOfContents toc = this;
-		Iterator<String> it = path.iterator();
+		final Iterator<String> it = path.iterator();
 		while (it.hasNext()) {
-			String key = it.next();
+			final String key = it.next();
 			if (!it.hasNext()) {
 				toc.put(key, value);
 			} else {
@@ -85,7 +85,7 @@ public class TableOfContents {
 
 	@Override
 	public String toString() {
-		return "TableOfContents [directory=" + directory + ", file=" + file + ", offset=" + offset + ", length="
-				+ length + ", name=" + name + ", entries=" + entries + "]";
+		return "TableOfContents [directory=" + this.directory + ", file=" + this.file + ", offset=" + this.offset
+				+ ", length=" + this.length + ", name=" + this.name + ", entries=" + this.entries + "]";
 	}
 }

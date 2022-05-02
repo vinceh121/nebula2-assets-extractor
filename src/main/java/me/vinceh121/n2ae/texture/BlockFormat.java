@@ -22,7 +22,7 @@ public enum BlockFormat {
 
 	private final int javaFormat, glType, glFormat, glInternalFormat;
 
-	private BlockFormat(int javaFormat, int glType, int glFormat, int glInternalFormat) {
+	BlockFormat(final int javaFormat, final int glType, final int glFormat, final int glInternalFormat) {
 		this.javaFormat = javaFormat;
 		this.glType = glType;
 		this.glFormat = glFormat;
@@ -30,18 +30,18 @@ public enum BlockFormat {
 	}
 
 	public int getJavaFormat() {
-		return javaFormat;
+		return this.javaFormat;
 	}
 
 	public int getGlType() {
-		return glType;
+		return this.glType;
 	}
 
 	public int getGlFormat() {
-		return glFormat;
+		return this.glFormat;
 	}
 
 	public int getGlInternalFormat() {
-		return glInternalFormat;
+		return this.glInternalFormat;
 	}
 }

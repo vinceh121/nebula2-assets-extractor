@@ -30,15 +30,16 @@ public class CmdScript implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		try (OutputStream out = this.outputFile == null ? System.out : new FileOutputStream(outputFile);
-				LEDataInputStream in = new LEDataInputStream(new FileInputStream(inputFile))) {
+		try (OutputStream out = this.outputFile == null ? System.out : new FileOutputStream(this.outputFile);
+				LEDataInputStream in = new LEDataInputStream(new FileInputStream(this.inputFile))) {
 
-			NOBScriptReader reader = new NOBScriptReader(in);
+			final NOBScriptReader reader = new NOBScriptReader(in);
 
-			if (clazzModel != null) {
-				ObjectMapper mapper = new ObjectMapper();
-				Map<String, NOBClazz> model = mapper.readValue(clazzModel, new TypeReference<Map<String, NOBClazz>>() {
-				});
+			if (this.clazzModel != null) {
+				final ObjectMapper mapper = new ObjectMapper();
+				final Map<String, NOBClazz> model = mapper.readValue(this.clazzModel,
+						new TypeReference<Map<String, NOBClazz>>() {
+						});
 				reader.setClazzes(model);
 			}
 

@@ -22,15 +22,15 @@ public class CmdModel implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		if (outputFile == null) {
-			outputFile = new File("./" + (inputFile.getName().endsWith(".nvx")
-					? inputFile.getName().substring(0, inputFile.getName().length() - 4)
-					: inputFile.getName()) + ".obj");
+		if (this.outputFile == null) {
+			this.outputFile = new File("./" + (this.inputFile.getName().endsWith(".nvx")
+					? this.inputFile.getName().substring(0, this.inputFile.getName().length() - 4)
+					: this.inputFile.getName()) + ".obj");
 		}
 
-		try (FileInputStream is = new FileInputStream(inputFile);
-				FileOutputStream os = new FileOutputStream(outputFile)) {
-			NvxFileReader reader = new NvxFileReader(is);
+		try (FileInputStream is = new FileInputStream(this.inputFile);
+				FileOutputStream os = new FileOutputStream(this.outputFile)) {
+			final NvxFileReader reader = new NvxFileReader(is);
 			reader.readAll();
 
 			if (this.info) {
@@ -43,7 +43,7 @@ public class CmdModel implements Callable<Integer> {
 			}
 
 			reader.writeObj(os);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return -1;
 		}

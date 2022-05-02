@@ -27,21 +27,21 @@ public class CmdUnpack implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		try (FileInputStream is = new FileInputStream(inputFile)) {
-			NnpkFileReader r = new NnpkFileReader(is);
+		try (FileInputStream is = new FileInputStream(this.inputFile)) {
+			final NnpkFileReader r = new NnpkFileReader(is);
 			r.readAll();
 
-			if (list) {
+			if (this.list) {
 				NnpkFileReader.printToc(r.getTableOfContents(), System.out);
 				return 0;
 			}
 
-			NnpkFileExtractor ex = new NnpkFileExtractor(is);
-			ex.setOutput(outputFolder);
-			if (path == null) {
+			final NnpkFileExtractor ex = new NnpkFileExtractor(is);
+			ex.setOutput(this.outputFolder);
+			if (this.path == null) {
 				ex.extractAllFiles(r.getTableOfContents());
 			} else {
-				ex.extractFile(r.getTableOfContents().get(path));
+				ex.extractFile(r.getTableOfContents().get(this.path));
 			}
 		}
 		return 0;

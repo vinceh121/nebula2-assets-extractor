@@ -1,6 +1,5 @@
 package me.vinceh121.n2ae.pkg;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -13,7 +12,7 @@ public class NnpkFileReader {
 	public static final int MAX_PATH_LEN = 512;
 	public static final String NO_NAME = "<noname>";
 	public static final String MAGIC_STRING = "NPK0";
-	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NnpkFileReader.MAGIC_STRING);
 
 	private final LEDataInputStream in;
 
@@ -21,11 +20,11 @@ public class NnpkFileReader {
 
 	private TableOfContents toc;
 
-	public static void printToc(TableOfContents toc, PrintStream out) {
-		printToc(toc, 0, out);
+	public static void printToc(final TableOfContents toc, final PrintStream out) {
+		NnpkFileReader.printToc(toc, 0, out);
 	}
-	
-	private static void printToc(TableOfContents toc, int depth, PrintStream out) {
+
+	private static void printToc(final TableOfContents toc, final int depth, final PrintStream out) {
 		for (int i = 0; i < depth; i++) {
 			if (depth != 1 && i == depth - 1) {
 				out.print(" ");
@@ -35,8 +34,8 @@ public class NnpkFileReader {
 		}
 		if (toc.isDirectory()) {
 			System.out.println("└" + toc.getName());
-			for (TableOfContents t : toc.getEntries().values()) {
-				printToc(t, depth + 1, out);
+			for (final TableOfContents t : toc.getEntries().values()) {
+				NnpkFileReader.printToc(t, depth + 1, out);
 			}
 		} else if (toc.isFile()) {
 			System.out.println("├" + toc.getName() + "  " + toc.getOffset() + ":" + toc.getLength());
@@ -45,11 +44,11 @@ public class NnpkFileReader {
 		}
 	}
 
-	public NnpkFileReader(InputStream in) {
+	public NnpkFileReader(final InputStream in) {
 		this(new LEDataInputStream(in));
 	}
 
-	public NnpkFileReader(LEDataInputStream in) {
+	public NnpkFileReader(final LEDataInputStream in) {
 		this.in = in;
 	}
 
@@ -59,57 +58,57 @@ public class NnpkFileReader {
 	}
 
 	private void readHeader() throws IOException {
-		int magic = in.readIntLE();
-		if (magic != MAGIC_NUMBER) {
+		final int magic = this.in.readIntLE();
+		if (magic != NnpkFileReader.MAGIC_NUMBER) {
 			throw new IOException("Invalid magic number");
 		}
 
-		/* int blockLen = */in.readIntLE();
-		int dataBlockStart = in.readIntLE();
-		dataOffset = dataBlockStart + 8;
+		/* int blockLen = */this.in.readIntLE();
+		final int dataBlockStart = this.in.readIntLE();
+		this.dataOffset = dataBlockStart + 8;
 	}
 
 	private void readTableOfContents() throws IOException {
 		boolean insideToc = true;
-		ArrayDeque<String> path = new ArrayDeque<>(6);
+		final ArrayDeque<String> path = new ArrayDeque<>(6);
 
 		while (insideToc) {
-			int type = this.in.readIntLE();
-			/* int blockLen = */in.readIntLE();
+			final int type = this.in.readIntLE();
+			/* int blockLen = */this.in.readIntLE();
 
 			if (type == NpkEntryType.DIR.getStartInt()) {
-				short nameLength = this.in.readShortLE();
-				String name = new String(this.in.readNBytes(nameLength));
+				final short nameLength = this.in.readShortLE();
+				final String name = new String(this.in.readNBytes(nameLength));
 
-				if (NO_NAME.equals(name)) {
+				if (NnpkFileReader.NO_NAME.equals(name)) {
 					// XXX replace name with file name
 				}
 
 				path.add(name);
-				TableOfContents e = new TableOfContents();
+				final TableOfContents e = new TableOfContents();
 				e.setDirectory(true);
 				e.setName(name);
-				if (toc == null) {
-					toc = e;
+				if (this.toc == null) {
+					this.toc = e;
 					path.pop();
 				} else {
-					toc.put(path, e);
+					this.toc.put(path, e);
 				}
 			} else if (type == NpkEntryType.DEND.getStartInt()) {
 				path.pollLast();
 			} else if (type == NpkEntryType.FILE.getStartInt()) {
-				int fileOffset = in.readIntLE();
-				int fileLength = in.readIntLE();
-				int nameLength = in.readShortLE();
-				String name = new String(in.readNBytes(nameLength));
+				final int fileOffset = this.in.readIntLE();
+				final int fileLength = this.in.readIntLE();
+				final int nameLength = this.in.readShortLE();
+				final String name = new String(this.in.readNBytes(nameLength));
 
 				path.add(name);
-				TableOfContents e = new TableOfContents();
+				final TableOfContents e = new TableOfContents();
 				e.setFile(true);
 				e.setLength(fileLength);
 				e.setOffset(fileOffset);
 				e.setName(name);
-				toc.put(path, e);
+				this.toc.put(path, e);
 				path.pollLast();
 			} else {
 				insideToc = false;
@@ -118,10 +117,10 @@ public class NnpkFileReader {
 	}
 
 	public TableOfContents getTableOfContents() {
-		return toc;
+		return this.toc;
 	}
 
 	public int getDataOffset() {
-		return dataOffset;
+		return this.dataOffset;
 	}
 }

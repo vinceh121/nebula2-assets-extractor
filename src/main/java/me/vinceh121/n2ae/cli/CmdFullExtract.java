@@ -47,47 +47,47 @@ public class CmdFullExtract implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		if (!outputFolder.isDirectory()) {
+		if (!this.outputFolder.isDirectory()) {
 			System.err.println("Output must be a directory");
 			return -1;
 		}
 
-		try (FileInputStream is = new FileInputStream(inputFile)) {
-			NnpkFileReader r = new NnpkFileReader(is);
+		try (FileInputStream is = new FileInputStream(this.inputFile)) {
+			final NnpkFileReader r = new NnpkFileReader(is);
 			r.readAll();
 
-			NnpkFileExtractor ex = new NnpkFileExtractor(is);
-			ex.setOutput(outputFolder);
+			final NnpkFileExtractor ex = new NnpkFileExtractor(is);
+			ex.setOutput(this.outputFolder);
 			ex.extractAllFiles(r.getTableOfContents());
 		}
 
-		recurse(outputFolder);
+		this.recurse(this.outputFolder);
 
 		return 0;
 	}
 
-	private void recurse(File file) {
+	private void recurse(final File file) {
 		if (file.isDirectory()) {
-			for (File f : file.listFiles()) {
-				recurse(f);
+			for (final File f : file.listFiles()) {
+				this.recurse(f);
 			}
 		} else {
 			try {
 				this.processFile(file);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				System.err.println("Failed to process " + file.getPath());
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private void processFile(File file) throws IOException {
+	private void processFile(final File file) throws IOException {
 		if (!file.getName().contains(".")) {
 			this.unprocessableFile(file);
 		}
-		String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1);
+		final String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1);
 
-		String outPath = file.toPath()
+		final String outPath = file.toPath()
 				.resolveSibling(file.getName().substring(0, file.getName().length() - extension.length() - 1))
 				.toString();
 
@@ -102,17 +102,17 @@ public class CmdFullExtract implements Callable<Integer> {
 			this.processScript(file, new File(outPath + ".tcl"));
 			break;
 		default:
-			if (!FILES_TO_NOT_DELETE.contains(extension)) {
+			if (!CmdFullExtract.FILES_TO_NOT_DELETE.contains(extension)) {
 				this.unprocessableFile(file);
 			}
 		}
 
-		if (this.delete && !FILES_TO_NOT_DELETE.contains(extension)) {
+		if (this.delete && !CmdFullExtract.FILES_TO_NOT_DELETE.contains(extension)) {
 			file.delete();
 		}
 	}
 
-	private void processTexture(File fileIn, File fileOut) throws IOException {
+	private void processTexture(final File fileIn, final File fileOut) throws IOException {
 		if ("ktx".equals(this.format)) {
 			this.processTextureKtx(fileIn, fileOut);
 		} else {
@@ -120,9 +120,9 @@ public class CmdFullExtract implements Callable<Integer> {
 		}
 	}
 
-	private void processTextureKtx(File fileIn, File fileOut) throws IOException {
+	private void processTextureKtx(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			NtxFileReader r = new NtxFileReader(is);
+			final NtxFileReader r = new NtxFileReader(is);
 			r.readHeader();
 			r.readAllRaws();
 
@@ -130,48 +130,49 @@ public class CmdFullExtract implements Callable<Integer> {
 		}
 	}
 
-	private void processTextureJava(File fileIn, File fileOut) throws IOException {
+	private void processTextureJava(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			NtxFileReader r = new NtxFileReader(is);
+			final NtxFileReader r = new NtxFileReader(is);
 			r.readHeader();
 			r.readAllTextures();
 
 			int maxRes = 0;
 			int maxIdx = 0;
 			for (int i = 0; i < r.getCountBlocks(); i++) {
-				Block b = r.getBlocks().get(i);
-				int res = b.getHeight() * b.getWidth();
+				final Block b = r.getBlocks().get(i);
+				final int res = b.getHeight() * b.getWidth();
 				if (res > maxRes) {
 					maxRes = res;
 					maxIdx = i;
 				}
 			}
 
-			BufferedImage img = r.getTextures().get(maxIdx);
+			final BufferedImage img = r.getTextures().get(maxIdx);
 
 			ImageIO.write(img, this.format, os);
 		}
 	}
 
-	private void processModel(File fileIn, File fileOut) throws IOException {
+	private void processModel(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			NvxFileReader r = new NvxFileReader(is);
+			final NvxFileReader r = new NvxFileReader(is);
 			r.readAll();
 			r.writeObj(os);
 		}
 	}
 
-	private void processScript(File fileIn, File fileOut) throws IOException {
+	private void processScript(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			NOBScriptReader r = new NOBScriptReader(is);
+			final NOBScriptReader r = new NOBScriptReader(is);
 
-			if (clazzModel != null) {
-				ObjectMapper mapper = new ObjectMapper();
-				Map<String, NOBClazz> model = mapper.readValue(clazzModel, new TypeReference<Map<String, NOBClazz>>() {
-				});
+			if (this.clazzModel != null) {
+				final ObjectMapper mapper = new ObjectMapper();
+				final Map<String, NOBClazz> model = mapper.readValue(this.clazzModel,
+						new TypeReference<Map<String, NOBClazz>>() {
+						});
 				r.setClazzes(model);
 
-				NOBClazz nroot = new NOBClazz();
+				final NOBClazz nroot = new NOBClazz();
 				nroot.setName("nroot");
 				model.put(nroot.getName(), nroot);
 			}
@@ -183,7 +184,7 @@ public class CmdFullExtract implements Callable<Integer> {
 		}
 	}
 
-	private void unprocessableFile(File file) {
+	private void unprocessableFile(final File file) {
 		System.err.println("Don't know how to process file " + file.getPath());
 		if (this.delete) {
 			file.delete();

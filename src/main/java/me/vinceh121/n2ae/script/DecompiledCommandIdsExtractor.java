@@ -23,28 +23,29 @@ public class DecompiledCommandIdsExtractor {
 			PAT_CLASS_MANUAL_INIT = Pattern.compile("__cdecl ([a-zA-Z0-9]+)_init\\(");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
-	public void readRecurse(File file) throws IOException {
+	public void readRecurse(final File file) throws IOException {
 		if (file.isDirectory()) {
-			for (File f : file.listFiles()) {
-				readRecurse(f);
+			for (final File f : file.listFiles()) {
+				this.readRecurse(f);
 			}
 		} else {
-			readFile(file);
+			this.readFile(file);
 		}
 	}
 
-	public void readFile(File file) throws FileNotFoundException, IOException {
+	public void readFile(final File file) throws FileNotFoundException, IOException {
 		try (final BufferedReader br = new BufferedReader(new FileReader(file))) {
-			readFile(br.lines().collect(Collectors.toList()));
+			this.readFile(br.lines().collect(Collectors.toList()));
 		}
 	}
 
-	public void readFile(List<String> lines) {
+	public void readFile(final List<String> lines) {
 		for (int i = 0; i < lines.size(); i++) {
 			final String line = lines.get(i);
 			final Matcher initMatcher;
-			if ((initMatcher = this.tryMatchers(
-					new Matcher[] { PAT_CLASS_INIT.matcher(line), PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
+			if ((initMatcher = this
+					.tryMatchers(new Matcher[] { DecompiledCommandIdsExtractor.PAT_CLASS_INIT.matcher(line),
+							DecompiledCommandIdsExtractor.PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
 				final String className = initMatcher.group(1);
 
 				final NOBClazz clazz = new NOBClazz(); // we register classes even if they don't have methods
@@ -53,8 +54,8 @@ public class DecompiledCommandIdsExtractor {
 				String callLine;
 				while (!(callLine = lines.get(i++)).contains("return")) { // if we reach a return, this init doesn't
 																			// have n_initcmds nor superclass
-					final Matcher superClassMatcher = PAT_SUPERCLASS.matcher(callLine);
-					final Matcher callMatcher = PAT_INIT_CMDS_CALL.matcher(callLine);
+					final Matcher superClassMatcher = DecompiledCommandIdsExtractor.PAT_SUPERCLASS.matcher(callLine);
+					final Matcher callMatcher = DecompiledCommandIdsExtractor.PAT_INIT_CMDS_CALL.matcher(callLine);
 
 					if (superClassMatcher.find()) {
 						final String superClass = superClassMatcher.group(1);
@@ -62,10 +63,11 @@ public class DecompiledCommandIdsExtractor {
 					}
 
 					if (callMatcher.find()) { // we've found our n_initcmds
-						final int funPos = findNInitCmds(lines, callMatcher.group(1));
+						final int funPos = this.findNInitCmds(lines, callMatcher.group(1));
 
-						if (funPos != -1)
-							readCmds(lines, clazz, funPos);
+						if (funPos != -1) {
+							this.readCmds(lines, clazz, funPos);
+						}
 						break; // no need to search more
 					}
 				}
@@ -73,8 +75,8 @@ public class DecompiledCommandIdsExtractor {
 		}
 	}
 
-	private Matcher tryMatchers(Matcher[] matchers) {
-		for (Matcher m : matchers) {
+	private Matcher tryMatchers(final Matcher[] matchers) {
+		for (final Matcher m : matchers) {
 			if (m.find()) {
 				return m;
 			}
@@ -82,14 +84,14 @@ public class DecompiledCommandIdsExtractor {
 		return null;
 	}
 
-	private void readCmds(List<String> lines, NOBClazz clazz, int funPos) {
+	private void readCmds(final List<String> lines, final NOBClazz clazz, final int funPos) {
 		for (int i = funPos; i < lines.size(); i++) {
 			final String line = lines.get(i);
 			if (line.contains("nClass::EndCmds")) {
 				break;
 			}
 
-			final Matcher addCmdMatcher = PAT_ADDCMD.matcher(line);
+			final Matcher addCmdMatcher = DecompiledCommandIdsExtractor.PAT_ADDCMD.matcher(line);
 			if (addCmdMatcher.find()) {
 				final int iFourcc = Integer.parseInt(addCmdMatcher.group(2), 16);
 				final String sFourcc = FourccUtils.fourccToString(iFourcc);
@@ -99,9 +101,9 @@ public class DecompiledCommandIdsExtractor {
 		}
 	}
 
-	private int findNInitCmds(List<String> lines, String funPtr) {
+	private int findNInitCmds(final List<String> lines, final String funPtr) {
 		for (int i = 0; i < lines.size(); i++) {
-			String line = lines.get(i);
+			final String line = lines.get(i);
 			if (line.contains("__cdecl FUN_" + funPtr + "(nClass")) {
 				return i;
 			}
@@ -110,6 +112,6 @@ public class DecompiledCommandIdsExtractor {
 	}
 
 	public Map<String, NOBClazz> getClazzes() {
-		return clazzes;
+		return this.clazzes;
 	}
 }

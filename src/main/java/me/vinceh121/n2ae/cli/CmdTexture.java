@@ -34,15 +34,15 @@ public class CmdTexture implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		if (outputFile == null) {
-			outputFile = new File("./" + (inputFile.getName().endsWith(".nvx")
-					? inputFile.getName().substring(0, inputFile.getName().length() - 4)
-					: inputFile.getName()) + "." + this.format);
+		if (this.outputFile == null) {
+			this.outputFile = new File("./" + (this.inputFile.getName().endsWith(".nvx")
+					? this.inputFile.getName().substring(0, this.inputFile.getName().length() - 4)
+					: this.inputFile.getName()) + "." + this.format);
 		}
 
-		try (FileInputStream is = new FileInputStream(inputFile);
-				FileOutputStream os = new FileOutputStream(outputFile)) {
-			NtxFileReader reader = new NtxFileReader(is);
+		try (FileInputStream is = new FileInputStream(this.inputFile);
+				FileOutputStream os = new FileOutputStream(this.outputFile)) {
+			final NtxFileReader reader = new NtxFileReader(is);
 			reader.readHeader();
 
 			if (this.listBlocks) {
@@ -71,8 +71,8 @@ public class CmdTexture implements Callable<Integer> {
 				int maxRes = 0;
 				int maxIdx = 0;
 				for (int i = 0; i < reader.getCountBlocks(); i++) {
-					Block b = reader.getBlocks().get(i);
-					int res = b.getHeight() * b.getWidth();
+					final Block b = reader.getBlocks().get(i);
+					final int res = b.getHeight() * b.getWidth();
 					if (res > maxRes) {
 						maxRes = res;
 						maxIdx = i;
@@ -80,11 +80,11 @@ public class CmdTexture implements Callable<Integer> {
 				}
 				img = reader.getTextures().get(maxIdx);
 			} else {
-				img = reader.getTextures().get(block);
+				img = reader.getTextures().get(this.block);
 			}
 
-			ImageIO.write(img, format, outputFile);
-		} catch (Exception e) {
+			ImageIO.write(img, this.format, this.outputFile);
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return -1;
 		}

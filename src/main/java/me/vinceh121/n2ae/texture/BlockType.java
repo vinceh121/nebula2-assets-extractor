@@ -5,15 +5,15 @@ public enum BlockType {
 
 	private final int numberOfFaces;
 
-	private BlockType() {
+	BlockType() {
 		this(1);
 	}
 
-	private BlockType(int numberOfFaces) {
+	BlockType(final int numberOfFaces) {
 		this.numberOfFaces = numberOfFaces;
 	}
 
 	public int getNumberOfFaces() {
-		return numberOfFaces;
+		return this.numberOfFaces;
 	}
 }

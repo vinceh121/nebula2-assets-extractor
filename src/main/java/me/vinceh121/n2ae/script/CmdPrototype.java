@@ -10,14 +10,14 @@ public class CmdPrototype {
 	public CmdPrototype() {
 	}
 
-	public CmdPrototype(String proto) {
+	public CmdPrototype(final String proto) {
 		char c;
 		int idx = 0;
 		while (idx < proto.length() && (c = proto.charAt(idx++)) != '_') {
 			this.returnArgs.add(NOBType.getType(c));
 		}
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		while ((c = proto.charAt(idx++)) != '_') {
 			sb.append(c);
 		}
@@ -29,31 +29,31 @@ public class CmdPrototype {
 	}
 
 	public List<NOBType> getInArgs() {
-		return inArgs;
+		return this.inArgs;
 	}
 
 	public List<NOBType> getReturnArgs() {
-		return returnArgs;
+		return this.returnArgs;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (NOBType rt : this.returnArgs) {
+		final StringBuilder sb = new StringBuilder();
+		for (final NOBType rt : this.returnArgs) {
 			sb.append(rt.getType());
 		}
 		sb.append('_');
 		sb.append(this.name);
 		sb.append('_');
-		for (NOBType it : this.inArgs) {
+		for (final NOBType it : this.inArgs) {
 			sb.append(it.getType());
 		}
 		return sb.toString();

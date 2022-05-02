@@ -7,7 +7,7 @@ import picocli.CommandLine.HelpCommand;
 @Command(name = "nebula2-extractor", subcommands = { HelpCommand.class, CmdModel.class, CmdTexture.class,
 		CmdUnpack.class, CmdFullExtract.class, CmdScript.class, CmdExtractClasses.class })
 public class ExtractorCli {
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.exit(new CommandLine(new ExtractorCli()).execute(args));
 	}
 }

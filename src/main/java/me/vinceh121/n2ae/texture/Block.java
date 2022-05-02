@@ -6,73 +6,73 @@ public class Block {
 	private int width, height, depth, mipmapLevel, dataOffset, dataLength;
 
 	public BlockFormat getFormat() {
-		return format;
+		return this.format;
 	}
 
-	public void setFormat(BlockFormat format) {
+	public void setFormat(final BlockFormat format) {
 		this.format = format;
 	}
 
 	public BlockType getType() {
-		return type;
+		return this.type;
 	}
 
-	public void setType(BlockType type) {
+	public void setType(final BlockType type) {
 		this.type = type;
 	}
 
 	public int getWidth() {
-		return width;
+		return this.width;
 	}
 
-	public void setWidth(int width) {
+	public void setWidth(final int width) {
 		this.width = width;
 	}
 
 	public int getHeight() {
-		return height;
+		return this.height;
 	}
 
-	public void setHeight(int height) {
+	public void setHeight(final int height) {
 		this.height = height;
 	}
 
 	public int getDepth() {
-		return depth;
+		return this.depth;
 	}
 
-	public void setDepth(int depth) {
+	public void setDepth(final int depth) {
 		this.depth = depth;
 	}
 
 	public int getMipmapLevel() {
-		return mipmapLevel;
+		return this.mipmapLevel;
 	}
 
-	public void setMipmapLevel(int mipmapLevel) {
+	public void setMipmapLevel(final int mipmapLevel) {
 		this.mipmapLevel = mipmapLevel;
 	}
 
 	public int getDataOffset() {
-		return dataOffset;
+		return this.dataOffset;
 	}
 
-	public void setDataOffset(int dataOffset) {
+	public void setDataOffset(final int dataOffset) {
 		this.dataOffset = dataOffset;
 	}
 
 	public int getDataLength() {
-		return dataLength;
+		return this.dataLength;
 	}
 
-	public void setDataLength(int dataLength) {
+	public void setDataLength(final int dataLength) {
 		this.dataLength = dataLength;
 	}
 
 	@Override
 	public String toString() {
-		return "Block [format=" + format + ", type=" + type + ", width=" + width + ", height=" + height + ", depth="
-				+ depth + ", mipmapLevel=" + mipmapLevel + ", dataOffset=" + dataOffset + ", dataLength=" + dataLength
-				+ "]";
+		return "Block [format=" + this.format + ", type=" + this.type + ", width=" + this.width + ", height="
+				+ this.height + ", depth=" + this.depth + ", mipmapLevel=" + this.mipmapLevel + ", dataOffset="
+				+ this.dataOffset + ", dataLength=" + this.dataLength + "]";
 	}
 }

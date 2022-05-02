@@ -7,13 +7,13 @@ import java.io.InputStream;
 public class LEDataInputStream extends DataInputStream {
 	private long readBytes = 0;
 
-	public LEDataInputStream(InputStream in) {
+	public LEDataInputStream(final InputStream in) {
 		super(in);
 	}
 
 	@Override
 	public int read() throws IOException {
-		readBytes++;
+		this.readBytes++;
 		return super.read();
 	}
 
@@ -28,7 +28,7 @@ public class LEDataInputStream extends DataInputStream {
 	public float readFloatLE() throws IOException {
 		return Float.intBitsToFloat(this.readIntLE());
 	}
-	
+
 	public char readCharLE() throws IOException {
 		return Character.reverseBytes(this.readChar());
 	}
@@ -38,6 +38,6 @@ public class LEDataInputStream extends DataInputStream {
 	}
 
 	public long getReadBytes() {
-		return readBytes;
+		return this.readBytes;
 	}
 }

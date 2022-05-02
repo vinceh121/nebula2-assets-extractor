@@ -20,10 +20,10 @@ public class CmdExtractClasses implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		DecompiledCommandIdsExtractor ex = new DecompiledCommandIdsExtractor();
-		ex.readRecurse(input);
-		mapper.writeValue(output, ex.getClazzes());
+		final ObjectMapper mapper = new ObjectMapper();
+		final DecompiledCommandIdsExtractor ex = new DecompiledCommandIdsExtractor();
+		ex.readRecurse(this.input);
+		mapper.writeValue(this.output, ex.getClazzes());
 		return 0;
 	}
 }

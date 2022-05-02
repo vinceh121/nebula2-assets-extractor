@@ -14,26 +14,26 @@ public class CommandIdsExtractor {
 			.compile("AddCmd[ ]*\\([ ]*\"([_\\-0-9a-zA-Z]+)\",[ \t]*\\'([A-Z0-9_\\-]+)\\'[ ]*,");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
-	public void readRecurse(File file) throws IOException {
+	public void readRecurse(final File file) throws IOException {
 		if (file.isDirectory()) {
-			for (File f : file.listFiles()) {
-				readRecurse(f);
+			for (final File f : file.listFiles()) {
+				this.readRecurse(f);
 			}
 		} else {
-			String name = file.getName().replace("_cmds.cc", "");
+			final String name = file.getName().replace("_cmds.cc", "");
 			try (BufferedReader read = new BufferedReader(new FileReader(file))) {
-				readFile(read, name);
+				this.readFile(read, name);
 			}
 		}
 	}
 
-	public void readFile(BufferedReader read, String name) throws IOException {
-		NOBClazz clazz = new NOBClazz();
+	public void readFile(final BufferedReader read, final String name) throws IOException {
+		final NOBClazz clazz = new NOBClazz();
 		clazz.setName(name);
 		boolean hasAnything = false;
 		String line;
 		while ((line = read.readLine()) != null) {
-			Matcher match = PATTERN_ADDCMD.matcher(line);
+			final Matcher match = CommandIdsExtractor.PATTERN_ADDCMD.matcher(line);
 			while (match.find()) {
 				if (clazz.containsMethod(match.group(2))) {
 					throw new RuntimeException("method already exists");
@@ -42,11 +42,12 @@ public class CommandIdsExtractor {
 				hasAnything = true;
 			}
 		}
-		if (hasAnything)
+		if (hasAnything) {
 			this.clazzes.put(name, clazz);
+		}
 	}
 
 	public Map<String, NOBClazz> getClazzes() {
-		return clazzes;
+		return this.clazzes;
 	}
 }

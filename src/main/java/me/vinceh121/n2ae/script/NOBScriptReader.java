@@ -1,12 +1,9 @@
 package me.vinceh121.n2ae.script;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
 import me.vinceh121.n2ae.FourccUtils;
@@ -14,28 +11,28 @@ import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NOBScriptReader {
 	public static final String MAGIC_STRING = "NOB0";
-	public static final int MAGIC_NUMBER = FourccUtils.fourcc(MAGIC_STRING);
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBScriptReader.MAGIC_STRING);
 	private final LEDataInputStream stream;
 	/**
 	 * Stores context of created vars with `_new`. Key: var name Value: var class
 	 */
-	private Map<String, String> context = new Hashtable<>();
+	private final Map<String, String> context = new Hashtable<>();
 	private Map<String, NOBClazz> clazzes = new Hashtable<>();
 	private final Stack<String> classStack = new Stack<>();
-	private boolean ignoreUnknownMethods = true;
+	private final boolean ignoreUnknownMethods = true;
 
-	public NOBScriptReader(InputStream stream) {
+	public NOBScriptReader(final InputStream stream) {
 		this.stream = new LEDataInputStream(stream);
 	}
 
 	public String readHeader() throws IOException {
-		int magic = this.stream.readIntLE();
-		if (magic != MAGIC_NUMBER) {
+		final int magic = this.stream.readIntLE();
+		if (magic != NOBScriptReader.MAGIC_NUMBER) {
 			throw new IOException("Invalid magic number");
 		}
 
-		String header = this.readString();
-		StringBuilder sb = new StringBuilder();
+		final String header = this.readString();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("# ---\n");
 		sb.append("# " + header + "\n");
 		sb.append("# ---\n");
@@ -43,29 +40,29 @@ public class NOBScriptReader {
 	}
 
 	public String readBlock() throws IOException {
-		StringBuilder sb = new StringBuilder();
-		int cmd = this.stream.readIntLE();
+		final StringBuilder sb = new StringBuilder();
+		final int cmd = this.stream.readIntLE();
 
 		if (cmd == FourccUtils.fourcc("_new")) {
-			String clazz = this.readString();
-			String name = this.readString();
+			final String clazz = this.readString();
+			final String name = this.readString();
 			this.context.put(name, clazz);
 			this.classStack.push(clazz); // _new automatically cds into created object
 			sb.append("new " + clazz + " " + name + "\n");
 		} else if (cmd == FourccUtils.fourcc("_sel")) {
-			String path = this.readString();
+			final String path = this.readString();
 			if ("..".equals(path)) {
 				this.classStack.pop();
 			}
 			sb.append("sel " + path + " # " + this.classStack + "\n\n");
 		} else {
-			NOBClazz cls = this.clazzes.get(this.classStack.peek());
+			final NOBClazz cls = this.clazzes.get(this.classStack.peek());
 			if (cls == null) {
 				throw new IllegalStateException("Unknown nscript class " + this.classStack.peek());
 			}
-			String fourcc = FourccUtils.fourccToString(cmd);
-			CmdPrototype method = this.recursiveGetMethod(cls, fourcc);
-			short argLength = this.stream.readShortLE();
+			final String fourcc = FourccUtils.fourccToString(cmd);
+			final CmdPrototype method = this.recursiveGetMethod(cls, fourcc);
+			final short argLength = this.stream.readShortLE();
 			if (method == null) {
 				if (this.ignoreUnknownMethods) {
 					System.err.println("Skipping " + Integer.toHexString(cmd) + " " + fourcc + " " + method);
@@ -77,9 +74,9 @@ public class NOBScriptReader {
 				}
 			}
 			sb.append("." + method.getName());
-			int argCount = method.getInArgs().size();
+			final int argCount = method.getInArgs().size();
 			for (int i = 0; i < argCount; i++) {
-				NOBType arg = method.getInArgs().get(i);
+				final NOBType arg = method.getInArgs().get(i);
 				sb.append(" ");
 				switch (arg) {
 				case INT:
@@ -107,12 +104,12 @@ public class NOBScriptReader {
 		return sb.toString();
 	}
 
-	public CmdPrototype recursiveGetMethod(NOBClazz cls, String fourcc) {
+	public CmdPrototype recursiveGetMethod(final NOBClazz cls, final String fourcc) {
 		if (cls.containsMethod(fourcc)) {
 			return cls.getMethod(fourcc);
 		} else {
 			if (cls.getSuperclass() != null) {
-				NOBClazz sc = this.clazzes.get(cls.getSuperclass());
+				final NOBClazz sc = this.clazzes.get(cls.getSuperclass());
 				if (sc == null) {
 					throw new IllegalStateException(cls.getName() + " has unknown superclass " + cls.getSuperclass());
 				}
@@ -126,7 +123,7 @@ public class NOBScriptReader {
 	public String readString() throws IOException { // maybe this should be moved to
 													// LEDataInputStream if it's common to
 													// the entire engine
-		int size = this.stream.readUnsignedShortLE();
+		final int size = this.stream.readUnsignedShortLE();
 		return new String(this.stream.readNBytes(size));
 	}
 
@@ -134,13 +131,13 @@ public class NOBScriptReader {
 	 * @return the clazzes
 	 */
 	public Map<String, NOBClazz> getClazzes() {
-		return clazzes;
+		return this.clazzes;
 	}
 
 	/**
 	 * @param clazzes the clazzes to set
 	 */
-	public void setClazzes(Map<String, NOBClazz> clazzes) {
+	public void setClazzes(final Map<String, NOBClazz> clazzes) {
 		this.clazzes = clazzes;
 	}
 }

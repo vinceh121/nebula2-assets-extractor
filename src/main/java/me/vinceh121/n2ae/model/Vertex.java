@@ -21,57 +21,57 @@ public class Vertex {
 	}
 
 	public float[] getCoord() {
-		return coord;
+		return this.coord;
 	}
 
-	public void setCoord(float[] coord) {
+	public void setCoord(final float[] coord) {
 		this.coord = coord;
 	}
 
 	public float[] getNormal() {
-		return normal;
+		return this.normal;
 	}
 
-	public void setNormal(float[] normal) {
+	public void setNormal(final float[] normal) {
 		this.normal = normal;
 	}
 
 	public List<float[]> getUv() {
-		return uv;
+		return this.uv;
 	}
 
-	public void setUv(List<float[]> uv) {
+	public void setUv(final List<float[]> uv) {
 		this.uv = uv;
 	}
 
 	public int getColor() {
-		return color;
+		return this.color;
 	}
 
-	public void setColor(int color) {
+	public void setColor(final int color) {
 		this.color = color;
 	}
 
 	public int[] getJointIndices() {
-		return jointIndices;
+		return this.jointIndices;
 	}
 
-	public void setJointIndices(int[] jointIndices) {
+	public void setJointIndices(final int[] jointIndices) {
 		this.jointIndices = jointIndices;
 	}
 
 	public float[] getWeights() {
-		return weights;
+		return this.weights;
 	}
 
-	public void setWeights(float[] weights) {
+	public void setWeights(final float[] weights) {
 		this.weights = weights;
 	}
 
 	@Override
 	public String toString() {
-		return "Vertex [coord=" + Arrays.toString(coord) + ", normal=" + Arrays.toString(normal) + ", uv=" + uv
-				+ ", color=" + color + ", jointIndices=" + Arrays.toString(jointIndices) + ", weights="
-				+ Arrays.toString(weights) + "]";
+		return "Vertex [coord=" + Arrays.toString(this.coord) + ", normal=" + Arrays.toString(this.normal) + ", uv="
+				+ this.uv + ", color=" + this.color + ", jointIndices=" + Arrays.toString(this.jointIndices)
+				+ ", weights=" + Arrays.toString(this.weights) + "]";
 	}
 }
