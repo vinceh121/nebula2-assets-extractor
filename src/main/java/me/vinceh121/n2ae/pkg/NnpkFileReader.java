@@ -33,14 +33,14 @@ public class NnpkFileReader {
 			}
 		}
 		if (toc.isDirectory()) {
-			System.out.println("└" + toc.getName());
+			out.println("└" + toc.getName());
 			for (final TableOfContents t : toc.getEntries().values()) {
 				NnpkFileReader.printToc(t, depth + 1, out);
 			}
 		} else if (toc.isFile()) {
-			System.out.println("├" + toc.getName() + "  " + toc.getOffset() + ":" + toc.getLength());
+			out.println("├" + toc.getName() + "  " + toc.getOffset() + ":" + toc.getLength());
 		} else {
-			System.out.println("├ TOC entry is neither file nor dir: " + toc);
+			out.println("├ TOC entry is neither file nor dir: " + toc);
 		}
 	}
 
