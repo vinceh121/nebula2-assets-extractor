@@ -14,17 +14,6 @@ public class CommandIdsExtractor {
 			.compile("AddCmd[ ]*\\([ ]*\"([_\\-0-9a-zA-Z]+)\",[ \t]*\\'([A-Z0-9_\\-]+)\\'[ ]*,");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
-	public static void main(String[] args) throws IOException {
-		CommandIdsExtractor ex = new CommandIdsExtractor();
-		ex.readRecurse(new File("/home/vincent/github-workspace/nebuladevice2/"));
-		for (NOBClazz c : ex.getClazzes().values()) {
-			System.out.println(c.getName());
-			for (String key : c.getMethods().keySet()) {
-				System.out.println("\t" + key + " = " + c.getMethod(key));
-			}
-		}
-	}
-
 	public void readRecurse(File file) throws IOException {
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {

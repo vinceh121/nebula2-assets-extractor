@@ -15,17 +15,6 @@ public class NnpkFileExtractor {
 	private final InputStream in;
 	private File output = new File(".");
 
-	public static void main(String[] args) throws IOException {
-		try (FileInputStream in = new FileInputStream(args[0])) {
-			NnpkFileReader r = new NnpkFileReader(in);
-			r.readAll();
-
-			NnpkFileExtractor ex = new NnpkFileExtractor(in);
-			ex.setOutput(new File("/tmp/pack.npk"));
-			ex.extractAllFiles(r.getTableOfContents());
-		}
-	}
-
 	public NnpkFileExtractor(InputStream in) {
 		this.in = in;
 	}

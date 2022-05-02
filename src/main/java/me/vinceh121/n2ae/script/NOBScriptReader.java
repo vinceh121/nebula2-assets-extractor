@@ -24,32 +24,6 @@ public class NOBScriptReader {
 	private final Stack<String> classStack = new Stack<>();
 	private boolean ignoreUnknownMethods = true;
 
-	public static void main(String[] args) throws IOException {
-		DecompiledCommandIdsExtractor ex = new DecompiledCommandIdsExtractor();
-		ex.readRecurse(new File("/home/vincent/Decomp/projectnomads/decomp-dumps"));
-
-		NOBClazz nroot = new NOBClazz();
-		nroot.setName("nroot");
-		ex.getClazzes().put(nroot.getName(), nroot);
-
-		System.out.println("Knows " + ex.getClazzes().size() + " classes");
-		for (NOBClazz c : ex.getClazzes().values()) {
-			System.out.println(c.getName() + " : " + c.getSuperclass());
-			for (Entry<String, CmdPrototype> e : c.getMethods().entrySet()) {
-				System.out.println("\t" + e.getKey() + " " + e.getValue());
-			}
-		}
-
-		LEDataInputStream stream = new LEDataInputStream(new FileInputStream(
-				"/home/vincent/.wine/drive_c/Program Files (x86)/Nebula2 SDK/bin/win32/pack.npk/first_island.n/_main.n"));
-		NOBScriptReader read = new NOBScriptReader(stream);
-		read.setClazzes(ex.getClazzes());
-		System.out.println(read.readHeader());
-		while (stream.available() > 0) {
-			System.out.print(read.readBlock());
-		}
-	}
-
 	public NOBScriptReader(InputStream stream) {
 		this.stream = new LEDataInputStream(stream);
 	}

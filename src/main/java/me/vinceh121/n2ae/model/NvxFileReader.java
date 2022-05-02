@@ -25,17 +25,6 @@ public class NvxFileReader {
 	private List<Vertex> vertices = new Vector<>();
 	private List<int[]> triangles = new Vector<>();
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		File file = new File(args[0]);
-		try (FileInputStream in = new FileInputStream(file);
-				FileOutputStream out = new FileOutputStream(new File(file.getPath() + ".obj"))) {
-			NvxFileReader r = new NvxFileReader(in);
-			r.readAll();
-			System.out.println(r.getTypes());
-			r.writeObj(out);
-		}
-	}
-
 	public NvxFileReader(InputStream in) {
 		this.in = new LEDataInputStream(in);
 	}

@@ -21,13 +21,6 @@ public class NnpkFileReader {
 
 	private TableOfContents toc;
 
-	public static void main(String[] args) throws IOException {
-		NnpkFileReader r = new NnpkFileReader(new FileInputStream(args[0]));
-		r.readAll();
-
-		printToc(r.getTableOfContents(), System.out);
-	}
-
 	public static void printToc(TableOfContents toc, PrintStream out) {
 		printToc(toc, 0, out);
 	}
