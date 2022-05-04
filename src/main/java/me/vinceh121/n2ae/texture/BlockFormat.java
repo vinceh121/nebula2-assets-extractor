@@ -15,6 +15,7 @@ public enum BlockFormat {
 	ARGB8(BufferedImage.TYPE_INT_ARGB, GL20.GL_UNSIGNED_INT_8_8_8_8, GL20.GL_RGBA, GL30.GL_RGBA8UI),
 	RGB565(BufferedImage.TYPE_USHORT_565_RGB, GL20.GL_UNSIGNED_SHORT_5_6_5, GL20.GL_RGB, GL41.GL_RGB565),
 	/**
+	 * Horizontally inverted for some reason
 	 * JavaImage: 16-bit ARGB with 4 bits per channel, need to convert to ARGB8
 	 * OpenGL: swap alpha
 	 */

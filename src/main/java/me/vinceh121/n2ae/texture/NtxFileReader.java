@@ -171,7 +171,7 @@ public class NtxFileReader {
 					blue *= 17;
 
 					final int pixel = alpha << 24 | red << 16 | green << 8 | blue;
-					img.getRaster().getDataBuffer().setElem(i / 2, pixel);
+					img.getRaster().getDataBuffer().setElem((buf.length - i - 1) / 2 /* reverse reading */, pixel);
 				}
 			} else {
 				for (int i = 0; i < buf.length; i++) {
