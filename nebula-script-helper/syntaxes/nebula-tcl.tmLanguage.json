@@ -1,0 +1,21 @@
+{
+	"scopeName": "source.nebula-tcl",
+	"patterns": [{ "include": "#expression" }],
+	"repository": {
+		"expression": {
+			"patterns": [{ "include": "#node-expression" }]
+		},
+		"node-expression": {
+			"begin": "^new",
+			"end": "^sel \\.\\.",
+			"beginCaptures": {
+				"0": { "name": "node.open" }
+			},
+			"endCaptures": {
+				"0": { "name": "node.close" }
+			},
+			"name": "expression.group",
+			"patterns": [{ "include": "#expression" }]
+		}
+	}
+}

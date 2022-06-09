@@ -1,0 +1,14 @@
+{
+	"surroundingPairs": [
+		["new", "sel .."]
+	],
+	"brackets": [
+		["new", "sel .."]
+	],
+	"folding": {
+		"markers":{
+			"start": "^new",
+			"end": "^sel \\.\\."
+		}
+	}
+}
