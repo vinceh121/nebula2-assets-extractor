@@ -57,7 +57,7 @@ public class NaxFileReader {
 		final byte ipolType = this.input.readByte();
 		final byte repType = this.input.readByte();
 		final byte keyType = this.input.readByte();
-		final byte padding = this.input.readByte();
+		/* final byte padding = */this.input.readByte();
 
 		final short curveNameLength = this.input.readShortLE();
 		final String curveName = new String(this.input.readNBytes(curveNameLength));
