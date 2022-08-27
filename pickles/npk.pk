@@ -1,0 +1,9 @@
+set_endian(ENDIAN_LITTLE);
+
+type Header =
+	struct {
+		uint<8>[4] magic;
+		uint<32> blockLength;
+		offset<uint<32>, B> dataBlockStart;
+	};
+
