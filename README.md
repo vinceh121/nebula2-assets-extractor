@@ -1,11 +1,11 @@
 # nebula2-assets-extractor
 Extracts and converts assets (packs) for the Nebula Device 2 engine.
 
-Implemented formats:
-  - NPK0 archives
-  - NTX1 textures
-  - NVX1 models
-  - NOB0 scripts
+Implemented formats (Reading/Writing):
+  - NPK0 archives (RW)
+  - NTX1 textures (R)
+  - NVX1 models (R)
+  - NOB0 scripts (R)
 
 ## Usage
 
