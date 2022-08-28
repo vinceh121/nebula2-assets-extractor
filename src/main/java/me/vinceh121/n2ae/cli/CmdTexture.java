@@ -93,6 +93,7 @@ public class CmdTexture implements Callable<Integer> {
 				reader.readAllRaws();
 				byte[] raw = reader.getRaws().get(this.block == -1 ? 0 : this.block);
 				os.write(raw);
+				return 0;
 			}
 
 			reader.readAllTextures(); // TODO read only concerned block
