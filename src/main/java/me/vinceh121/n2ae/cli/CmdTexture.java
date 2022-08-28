@@ -12,14 +12,20 @@ import javax.imageio.ImageIO;
 import me.vinceh121.n2ae.texture.Block;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Spec;
 
 @Command(name = "texture", description = { "Convert an NTX file to an image" })
 public class CmdTexture implements Callable<Integer> {
+	@Spec
+	private CommandSpec spec;
+
 	@Option(names = { "-o", "--output" })
 	private File outputFile;
 
-	@Option(names = { "-i", "--input" }, required = true)
+	@Option(names = { "-i", "--input" })
 	private File inputFile;
 
 	@Option(names = { "-l", "--list-blocks" }, description = { "list blocks in the texture file" })
@@ -32,8 +38,29 @@ public class CmdTexture implements Callable<Integer> {
 	@Option(names = { "-f", "--format" }, description = { "output image format" }, defaultValue = "png")
 	private String format;
 
+	@Option(names = { "--list-formats" }, description = { "lists supported output image formats" })
+	private boolean listFormats;
+
 	@Override
 	public Integer call() throws Exception {
+		if (this.listFormats) {
+			System.out.println("Specially handled formats:");
+			System.out.println();
+			System.out.println("\tktx  -  KTX 1 textures for OpenGL");
+			System.out.println("\traw  -  Raw texture block");
+			System.out.println();
+			System.out.println("Common image formats:");
+			System.out.println();
+			for (String n : ImageIO.getWriterFormatNames()) {
+				System.out.println("\t" + n);
+			}
+			return 0;
+		}
+
+		if (inputFile == null) {
+			throw new ParameterException(this.spec.commandLine(), "Missing required argument -i, --input=<inputFile>");
+		}
+
 		if (this.outputFile == null) {
 			this.outputFile = new File("./" + (this.inputFile.getName().endsWith(".nvx")
 					? this.inputFile.getName().substring(0, this.inputFile.getName().length() - 4)
