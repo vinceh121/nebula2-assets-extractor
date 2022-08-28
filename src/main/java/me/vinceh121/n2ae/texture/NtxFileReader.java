@@ -159,16 +159,17 @@ public class NtxFileReader {
 				}
 			} else if (block.getFormat() == BlockFormat.ARGB4) {
 				for (int i = 0; i < buf.length; i += 2) {
-					final int pixel4 = (buf[i] & 0xFF) << 8 | buf[i + 1] & 0xFF;
+					// this one is little endian for some reason
+					int pixel4 = Short.reverseBytes((short) ((buf[i] & 0xFF) << 8 | buf[i + 1] & 0xFF));
 					int alpha = pixel4 >> 12 & 0xF;
 					int red = pixel4 >> 8 & 0xF;
 					int green = pixel4 >> 4 & 0xF;
 					int blue = pixel4 & 0xF;
 
-					alpha *= 17;
-					red *= 17;
-					green *= 17;
-					blue *= 17;
+					alpha <<= 4;
+					red <<= 4;
+					green <<= 4;
+					blue <<= 4;
 
 					final int pixel = alpha << 24 | red << 16 | green << 8 | blue;
 					img.getRaster().getDataBuffer().setElem(i / 2, pixel);
