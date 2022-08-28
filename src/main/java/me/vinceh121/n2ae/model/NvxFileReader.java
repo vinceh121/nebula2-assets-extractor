@@ -49,9 +49,13 @@ public class NvxFileReader {
 		for (int i = 0; i < this.getTriangles().size(); i++) {
 			final int[] t = this.getTriangles().get(i);
 			if (this.types.contains(VertexType.UV0)) {
-				out.printf("f %d/%d %d/%d %d/%d\n", t[0] + 1, t[0] + 1, //
-						t[1] + 1, t[1] + 1, //
-						t[2] + 1, t[2] + 1);
+				out.printf("f %d/%d %d/%d %d/%d\n",
+						t[0] + 1,
+						t[0] + 1, //
+						t[1] + 1,
+						t[1] + 1, //
+						t[2] + 1,
+						t[2] + 1);
 			} else {
 				out.printf("f %d %d %d\n", t[0] + 1, t[1] + 1, t[2] + 1);
 			}
@@ -130,7 +134,7 @@ public class NvxFileReader {
 				final short ji2 = this.in.readShort();
 				final short ji3 = this.in.readShort();
 
-				vertex.setJointIndices(new int[] { ji0, ji1, ji2, ji3 });
+				vertex.setJointIndices(new short[] { ji0, ji1, ji2, ji3 });
 
 				final float w0 = this.in.readFloatLE();
 				final float w1 = this.in.readFloatLE();
@@ -222,5 +226,17 @@ public class NvxFileReader {
 
 	public void setTriangles(final List<int[]> triangles) {
 		this.triangles = triangles;
+	}
+
+	public void moveToWriter(NvxFileWriter writer) {
+		writer.setCountVertices(this.countVertices);
+		writer.setCountIndices(this.countIndices);
+		writer.setCountEdges(this.countEdges);
+		writer.setDataStart(this.dataStart);
+		writer.setDataSize(this.dataSize);
+
+		writer.setTypes(this.types);
+		writer.setVertices(this.vertices);
+		writer.setTriangles(this.triangles);
 	}
 }

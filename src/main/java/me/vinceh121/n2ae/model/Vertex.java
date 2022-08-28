@@ -11,7 +11,7 @@ public class Vertex {
 	/**
 	 * grrrr no Vector4
 	 */
-	private int[] jointIndices;
+	private short[] jointIndices;
 	private float[] weights;
 
 	public Vertex() {
@@ -52,11 +52,11 @@ public class Vertex {
 		this.color = color;
 	}
 
-	public int[] getJointIndices() {
+	public short[] getJointIndices() {
 		return this.jointIndices;
 	}
 
-	public void setJointIndices(final int[] jointIndices) {
+	public void setJointIndices(final short[] jointIndices) {
 		this.jointIndices = jointIndices;
 	}
 

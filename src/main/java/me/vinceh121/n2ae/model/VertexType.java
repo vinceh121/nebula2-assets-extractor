@@ -5,7 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 public enum VertexType {
-	VOID(0), COORD(1 << 0), NORM(1 << 1), RGBA(1 << 2), UV0(1 << 3), UV1(1 << 4), UV2(1 << 5), UV3(1 << 6),
+	VOID(0),
+	COORD(1 << 0),
+	NORM(1 << 1),
+	RGBA(1 << 2),
+	UV0(1 << 3),
+	UV1(1 << 4),
+	UV2(1 << 5),
+	UV3(1 << 6),
 	JOINTS_WEIGHTS(1 << 7);
 
 	private int mask;
@@ -26,5 +33,13 @@ public enum VertexType {
 			}
 		}
 		return Collections.unmodifiableList(t);
+	}
+
+	public static int getTypes(final List<VertexType> types) {
+		int mask = 0;
+		for (VertexType t : types) {
+			mask |= t.getMask();
+		}
+		return mask;
 	}
 }
