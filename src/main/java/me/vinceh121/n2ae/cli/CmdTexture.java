@@ -89,6 +89,10 @@ public class CmdTexture implements Callable<Integer> {
 				reader.writeKtx(new DataOutputStream(os));
 
 				return 0;
+			} else if ("raw".equals(this.format)) {
+				reader.readAllRaws();
+				byte[] raw = reader.getRaws().get(this.block == -1 ? 0 : this.block);
+				os.write(raw);
 			}
 
 			reader.readAllTextures(); // TODO read only concerned block
