@@ -239,4 +239,8 @@ public class NvxFileReader {
 		writer.setVertices(this.vertices);
 		writer.setTriangles(this.triangles);
 	}
+
+	public void close() throws IOException {
+		this.in.close();
+	}
 }
