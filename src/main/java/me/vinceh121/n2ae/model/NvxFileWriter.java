@@ -14,6 +14,7 @@ public class NvxFileWriter {
 	private List<VertexType> types;
 	private List<Vertex> vertices = new Vector<>();
 	private List<int[]> triangles = new Vector<>();
+	private List<short[]> edges = new Vector<>();
 
 	public NvxFileWriter(final OutputStream out) {
 		this.out = new LEDataOutputStream(out);
@@ -31,8 +32,7 @@ public class NvxFileWriter {
 	}
 
 	public void writeData() throws IOException {
-		System.out.println("Skipping " + (this.dataStart - this.out.getWrittenBytes()));
-		this.out.write(new byte[(int) (this.dataStart - this.out.getWrittenBytes())]);
+		this.out.write(new byte[(int) (this.dataStart - 7 * 4)]);
 
 		for (int i = 0; i < this.countVertices; i++) {
 			final Vertex vertex = this.vertices.get(i);
@@ -67,22 +67,22 @@ public class NvxFileWriter {
 				this.writeFloatArrayLE(vertex.getWeights());
 			}
 		}
-		
+
 		for (int i = 0; i < this.countEdges; i++) {
-			this.writeShortArrayLE(new short[4]);
+			this.writeShortArrayLE(this.edges.get(i));
 		}
-		
+
 		for (int i = 0; i < this.countIndices / 3; i++) {
-			this.writeIntArrayLE(this.triangles.get(i));
+			this.writeUnsignedShortArrayLE(this.triangles.get(i));
 		}
 	}
 
-	private void writeIntArrayLE(int[] a) throws IOException {
+	private void writeUnsignedShortArrayLE(int[] a) throws IOException {
 		for (int i : a) {
-			this.out.writeIntLE(i);
+			this.out.writeUnsignedShortLE(i);
 		}
 	}
-	
+
 	private void writeShortArrayLE(short[] a) throws IOException {
 		for (short s : a) {
 			this.out.writeShortLE(s);
@@ -159,8 +159,15 @@ public class NvxFileWriter {
 		this.triangles = triangles;
 	}
 
+	public List<short[]> getEdges() {
+		return edges;
+	}
+
+	public void setEdges(List<short[]> edges) {
+		this.edges = edges;
+	}
+
 	public void close() throws IOException {
 		this.out.close();
 	}
-
 }

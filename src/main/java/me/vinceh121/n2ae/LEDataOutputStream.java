@@ -22,24 +22,27 @@ public class LEDataOutputStream extends DataOutputStream {
 		super.write(b, off, len);
 		this.written += len;
 	}
-	
+
 	public void writeIntLE(int i) throws IOException {
 		this.writeInt(Integer.reverseBytes(i));
 	}
-	
+
 	public void writeShortLE(short s) throws IOException {
 		this.writeShort(Short.reverseBytes(s));
 	}
-	
-	
+
 	public void writeFloatLE(float f) throws IOException {
 		this.writeIntLE(Float.floatToRawIntBits(f));
 	}
-	
+
 	public void writeCharLE(char c) throws IOException {
 		this.writeChar(Character.reverseBytes(c));
 	}
-	
+
+	public void writeUnsignedShortLE(int us) throws IOException {
+		this.writeShortLE((short) us);
+	}
+
 	public long getWrittenBytes() {
 		return writtenBytes;
 	}
