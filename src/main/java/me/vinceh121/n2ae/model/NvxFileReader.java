@@ -20,6 +20,7 @@ public class NvxFileReader {
 	private List<VertexType> types;
 	private List<Vertex> vertices = new Vector<>();
 	private List<int[]> triangles = new Vector<>();
+	private List<short[]> edges = new Vector<>();
 
 	public NvxFileReader(final InputStream in) {
 		this.in = new LEDataInputStream(in);
@@ -129,10 +130,10 @@ public class NvxFileReader {
 			}
 
 			if (this.types.contains(VertexType.JOINTS_WEIGHTS)) {
-				final short ji0 = this.in.readShort();
-				final short ji1 = this.in.readShort();
-				final short ji2 = this.in.readShort();
-				final short ji3 = this.in.readShort();
+				final short ji0 = this.in.readShortLE();
+				final short ji1 = this.in.readShortLE();
+				final short ji2 = this.in.readShortLE();
+				final short ji3 = this.in.readShortLE();
 
 				vertex.setJointIndices(new short[] { ji0, ji1, ji2, ji3 });
 
@@ -148,11 +149,12 @@ public class NvxFileReader {
 		}
 
 		for (int i = 0; i < this.countEdges; i++) {
-			// skip edges
-			/* short e0 = */this.in.readShort();
-			/* short e1 = */this.in.readShort();
-			/* short e2 = */this.in.readShort();
-			/* short e3 = */this.in.readShort();
+			short e0 = this.in.readShortLE();
+			short e1 = this.in.readShortLE();
+			short e2 = this.in.readShortLE();
+			short e3 = this.in.readShortLE();
+
+			this.edges.add(new short[] { e0, e1, e2, e3 });
 		}
 
 		for (int i = 0; i < this.countIndices / 3; i++) {
@@ -228,6 +230,14 @@ public class NvxFileReader {
 		this.triangles = triangles;
 	}
 
+	public List<short[]> getEdges() {
+		return edges;
+	}
+
+	public void setEdges(List<short[]> edges) {
+		this.edges = edges;
+	}
+
 	public void moveToWriter(NvxFileWriter writer) {
 		writer.setCountVertices(this.countVertices);
 		writer.setCountIndices(this.countIndices);
@@ -238,6 +248,7 @@ public class NvxFileReader {
 		writer.setTypes(this.types);
 		writer.setVertices(this.vertices);
 		writer.setTriangles(this.triangles);
+		writer.setEdges(this.edges);
 	}
 
 	public void close() throws IOException {
