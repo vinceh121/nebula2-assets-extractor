@@ -32,12 +32,6 @@ public class NtxFileWriter {
 
 	public static byte[] imageToRaw(BufferedImage img, BlockFormat fmt) {
 		int[] arr = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
-		System.out.println(arr.length);
-//		for (int x = 0; x < img.getWidth(); x++) {
-//			for (int y = 0; y < img.getWidth(); y++) {
-//				arr[x + y] = img.getRGB(x, y);
-//			}
-//		}
 		return imageToRaw(arr, fmt);
 	}
 
