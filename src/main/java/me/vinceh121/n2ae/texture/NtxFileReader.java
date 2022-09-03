@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.Vector;
 
@@ -173,6 +174,12 @@ public class NtxFileReader {
 
 					final int pixel = alpha << 24 | red << 16 | green << 8 | blue;
 					img.getRaster().getDataBuffer().setElem(i / 2, pixel);
+				}
+			} else if (block.getFormat() == BlockFormat.ARGB8) { // BufferedImage will want pixels packed as ints, not
+																	// bytes
+				final IntBuffer ibuf = ByteBuffer.wrap(buf).asIntBuffer();
+				for (int i = 0; i < ibuf.capacity(); i++) {
+					img.getRaster().getDataBuffer().setElem(i, ibuf.get(i));
 				}
 			} else {
 				for (int i = 0; i < buf.length; i++) {
