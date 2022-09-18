@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae.script;
+package me.vinceh121.n2ae.script.classmodel;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,6 +8,9 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import me.vinceh121.n2ae.script.CmdPrototype;
+import me.vinceh121.n2ae.script.NOBClazz;
 
 public class CommandIdsExtractor {
 	private static final Pattern PATTERN_ADDCMD = Pattern
@@ -35,10 +38,12 @@ public class CommandIdsExtractor {
 		while ((line = read.readLine()) != null) {
 			final Matcher match = CommandIdsExtractor.PATTERN_ADDCMD.matcher(line);
 			while (match.find()) {
-				if (clazz.containsMethod(match.group(2))) {
+				if (clazz.containsMethodByFourcc(match.group(2))) {
 					throw new RuntimeException("method already exists");
 				}
-				clazz.putMethod(match.group(2), new CmdPrototype(match.group(1)));
+				CmdPrototype proto = new CmdPrototype(match.group(1));
+				proto.setFourcc(match.group(2));
+				clazz.putMethod(proto);
 				hasAnything = true;
 			}
 		}

@@ -19,7 +19,7 @@ import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileExtractor;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.script.NOBClazz;
-import me.vinceh121.n2ae.script.NOBScriptReader;
+import me.vinceh121.n2ae.script.NOBScriptDecompiler;
 import me.vinceh121.n2ae.texture.Block;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 import picocli.CommandLine.Command;
@@ -163,7 +163,7 @@ public class CmdFullExtract implements Callable<Integer> {
 
 	private void processScript(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			final NOBScriptReader r = new NOBScriptReader(is);
+			final NOBScriptDecompiler r = new NOBScriptDecompiler(is);
 
 			if (this.clazzModel != null) {
 				final ObjectMapper mapper = new ObjectMapper();

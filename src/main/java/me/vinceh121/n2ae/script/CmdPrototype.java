@@ -5,7 +5,7 @@ import java.util.Vector;
 
 public class CmdPrototype {
 	private final List<NOBType> inArgs = new Vector<>(), returnArgs = new Vector<>();
-	private String name;
+	private String name, fourcc;
 
 	public CmdPrototype() {
 	}
@@ -42,6 +42,14 @@ public class CmdPrototype {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public String getFourcc() {
+		return fourcc;
+	}
+
+	public void setFourcc(String fourcc) {
+		this.fourcc = fourcc;
 	}
 
 	@Override

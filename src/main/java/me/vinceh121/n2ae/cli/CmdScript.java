@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.vinceh121.n2ae.LEDataInputStream;
 import me.vinceh121.n2ae.script.NOBClazz;
-import me.vinceh121.n2ae.script.NOBScriptReader;
+import me.vinceh121.n2ae.script.NOBScriptDecompiler;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -33,7 +33,7 @@ public class CmdScript implements Callable<Integer> {
 		try (OutputStream out = this.outputFile == null ? System.out : new FileOutputStream(this.outputFile);
 				LEDataInputStream in = new LEDataInputStream(new FileInputStream(this.inputFile))) {
 
-			final NOBScriptReader reader = new NOBScriptReader(in);
+			final NOBScriptDecompiler reader = new NOBScriptDecompiler(in);
 
 			if (this.clazzModel != null) {
 				final ObjectMapper mapper = new ObjectMapper();

@@ -3,9 +3,13 @@ package me.vinceh121.n2ae.script;
 import java.util.Hashtable;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class NOBClazz {
+	private final Map<String, CmdPrototype> methodsByFourcc = new Hashtable<>();
+	@JsonIgnore
+	private final Map<String, CmdPrototype> methodsByName = new Hashtable<>();
 	private String name, superclass;
-	private final Map<String, CmdPrototype> methods = new Hashtable<>();
 
 	/**
 	 * @return the name
@@ -30,26 +34,36 @@ public class NOBClazz {
 	}
 
 	/**
-	 * @return the methods
+	 * @return the methods by fourcc
 	 */
 	public Map<String, CmdPrototype> getMethods() {
-		return this.methods;
+		return this.methodsByFourcc;
 	}
 
-	public CmdPrototype getMethod(final String key) {
-		return this.methods.get(key);
+	public CmdPrototype getMethodByFourcc(final String fourcc) {
+		return this.methodsByFourcc.get(fourcc);
 	}
 
-	public CmdPrototype putMethod(final String key, final CmdPrototype value) {
-		return this.methods.put(key, value);
+	public CmdPrototype getMethodByName(final String name) {
+		return this.methodsByName.get(name);
 	}
 
-	public boolean containsMethod(final String key) {
-		return this.methods.containsKey(key);
+	public void putMethod(final CmdPrototype value) {
+		this.methodsByFourcc.put(value.getFourcc(), value);
+		this.methodsByName.put(value.getName(), value);
+	}
+
+	public boolean containsMethodByFourcc(final String fourcc) {
+		return this.methodsByFourcc.containsKey(fourcc);
+	}
+
+	public boolean containsMethodByName(final String name) {
+		return this.methodsByName.containsKey(name);
 	}
 
 	@Override
 	public String toString() {
-		return "NOBClazz [name=" + this.name + ", superclass=" + this.superclass + ", methods=" + this.methods + "]";
+		return "NOBClazz [name=" + this.name + ", superclass=" + this.superclass + ", methods=" + this.methodsByFourcc
+				+ "]";
 	}
 }

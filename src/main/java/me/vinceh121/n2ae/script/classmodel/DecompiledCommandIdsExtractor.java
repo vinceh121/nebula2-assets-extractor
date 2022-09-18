@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae.script;
+package me.vinceh121.n2ae.script.classmodel;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import me.vinceh121.n2ae.FourccUtils;
+import me.vinceh121.n2ae.script.CmdPrototype;
+import me.vinceh121.n2ae.script.NOBClazz;
 
 public class DecompiledCommandIdsExtractor {
 	public static final Pattern PAT_CLASS_INIT = Pattern.compile("__cdecl n_init_([a-zA-Z0-9]+)\\("),
@@ -96,7 +98,8 @@ public class DecompiledCommandIdsExtractor {
 				final int iFourcc = Integer.parseInt(addCmdMatcher.group(2), 16);
 				final String sFourcc = FourccUtils.fourccToString(iFourcc);
 				final CmdPrototype proto = new CmdPrototype(addCmdMatcher.group(1));
-				clazz.putMethod(sFourcc, proto);
+				proto.setFourcc(sFourcc);
+				clazz.putMethod(proto);
 			}
 		}
 	}

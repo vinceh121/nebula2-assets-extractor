@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import me.vinceh121.n2ae.script.DecompiledCommandIdsExtractor;
+import me.vinceh121.n2ae.script.classmodel.DecompiledCommandIdsExtractor;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

@@ -9,9 +9,9 @@ import java.util.Stack;
 import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
 
-public class NOBScriptReader {
+public class NOBScriptDecompiler {
 	public static final String MAGIC_STRING = "NOB0";
-	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBScriptReader.MAGIC_STRING);
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBScriptDecompiler.MAGIC_STRING);
 	private final LEDataInputStream stream;
 	/**
 	 * Stores context of created vars with `_new`. Key: var name Value: var class
@@ -21,13 +21,13 @@ public class NOBScriptReader {
 	private final Stack<String> classStack = new Stack<>();
 	private final boolean ignoreUnknownMethods = true;
 
-	public NOBScriptReader(final InputStream stream) {
+	public NOBScriptDecompiler(final InputStream stream) {
 		this.stream = new LEDataInputStream(stream);
 	}
 
 	public String readHeader() throws IOException {
 		final int magic = this.stream.readIntLE();
-		if (magic != NOBScriptReader.MAGIC_NUMBER) {
+		if (magic != NOBScriptDecompiler.MAGIC_NUMBER) {
 			throw new IOException("Invalid magic number");
 		}
 
@@ -105,8 +105,8 @@ public class NOBScriptReader {
 	}
 
 	public CmdPrototype recursiveGetMethod(final NOBClazz cls, final String fourcc) {
-		if (cls.containsMethod(fourcc)) {
-			return cls.getMethod(fourcc);
+		if (cls.containsMethodByFourcc(fourcc)) {
+			return cls.getMethodByFourcc(fourcc);
 		} else {
 			if (cls.getSuperclass() != null) {
 				final NOBClazz sc = this.clazzes.get(cls.getSuperclass());
