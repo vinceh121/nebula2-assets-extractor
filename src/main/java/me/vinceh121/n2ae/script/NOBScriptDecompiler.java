@@ -17,9 +17,10 @@ public class NOBScriptDecompiler {
 	 * Stores context of created vars with `_new`. Key: var name Value: var class
 	 */
 	private final Map<String, String> context = new Hashtable<>();
-	private Map<String, NOBClazz> clazzes = new Hashtable<>();
 	private final Stack<String> classStack = new Stack<>();
-	private final boolean ignoreUnknownMethods = true;
+	private Map<String, NOBClazz> clazzes = new Hashtable<>();
+	private boolean ignoreUnknownMethods = true;
+	private String indent = "\t";
 
 	public NOBScriptDecompiler(final InputStream stream) {
 		this.stream = new LEDataInputStream(stream);
@@ -47,6 +48,7 @@ public class NOBScriptDecompiler {
 			final String clazz = this.readString();
 			final String name = this.readString();
 			this.context.put(name, clazz);
+			this.writeIndent(sb);
 			this.classStack.push(clazz); // _new automatically cds into created object
 			sb.append("new " + clazz + " " + name + "\n");
 		} else if (cmd == FourccUtils.fourcc("_sel")) {
@@ -54,6 +56,7 @@ public class NOBScriptDecompiler {
 			if ("..".equals(path)) {
 				this.classStack.pop();
 			}
+			this.writeIndent(sb);
 			sb.append("sel " + path + " # " + this.classStack + "\n\n");
 		} else {
 			final NOBClazz cls = this.clazzes.get(this.classStack.peek());
@@ -73,6 +76,7 @@ public class NOBScriptDecompiler {
 							+ " in hiearchy of class " + cls.getName());
 				}
 			}
+			this.writeIndent(sb);
 			sb.append("." + method.getName());
 			final int argCount = method.getInArgs().size();
 			for (int i = 0; i < argCount; i++) {
@@ -125,6 +129,12 @@ public class NOBScriptDecompiler {
 													// the entire engine
 		final int size = this.stream.readUnsignedShortLE();
 		return new String(this.stream.readNBytes(size));
+	}
+	
+	private void writeIndent(StringBuilder sb) {
+		for (int i = 0; i < this.classStack.size(); i++) {
+			sb.append(this.indent);
+		}
 	}
 
 	/**
