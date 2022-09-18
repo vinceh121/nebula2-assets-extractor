@@ -10,7 +10,7 @@ import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
 
 public class NOBScriptDecompiler {
-	public static final String MAGIC_STRING = "NOB0";
+	public static final String MAGIC_STRING = "NOB0", UNKNOWN_COMMAND_PREFIX = "UNK_";
 	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBScriptDecompiler.MAGIC_STRING);
 	private final LEDataInputStream stream;
 	/**
@@ -19,7 +19,7 @@ public class NOBScriptDecompiler {
 	private final Map<String, String> context = new Hashtable<>();
 	private final Stack<String> classStack = new Stack<>();
 	private Map<String, NOBClazz> clazzes = new Hashtable<>();
-	private boolean ignoreUnknownMethods = true;
+	private boolean ignoreUnknownMethods = true, writeUnknownMethods = true;
 	private String indent = "\t";
 
 	public NOBScriptDecompiler(final InputStream stream) {
@@ -67,7 +67,17 @@ public class NOBScriptDecompiler {
 			final CmdPrototype method = this.recursiveGetMethod(cls, fourcc);
 			final short argLength = this.stream.readShortLE();
 			if (method == null) {
-				if (this.ignoreUnknownMethods) {
+				if (this.writeUnknownMethods) {
+					System.err.println("Writing unknown " + Integer.toHexString(cmd) + " " + fourcc + " " + method);
+					final byte[] args = this.stream.readNBytes(argLength);
+					this.writeIndent(sb);
+					sb.append(UNKNOWN_COMMAND_PREFIX);
+					sb.append(fourcc);
+					sb.append(" ");
+					this.writeByteArray(sb, args);
+					sb.append("\n");
+					return sb.toString();
+				} else if (this.ignoreUnknownMethods) {
 					System.err.println("Skipping " + Integer.toHexString(cmd) + " " + fourcc + " " + method);
 					this.stream.skip(argLength);
 					return sb.toString();
@@ -130,10 +140,16 @@ public class NOBScriptDecompiler {
 		final int size = this.stream.readUnsignedShortLE();
 		return new String(this.stream.readNBytes(size));
 	}
-	
+
 	private void writeIndent(StringBuilder sb) {
 		for (int i = 0; i < this.classStack.size(); i++) {
 			sb.append(this.indent);
+		}
+	}
+	
+	private void writeByteArray(StringBuilder sb, byte[] arr) {
+		for (byte b : arr) {
+			sb.append(Integer.toHexString(b));
 		}
 	}
 
@@ -149,5 +165,29 @@ public class NOBScriptDecompiler {
 	 */
 	public void setClazzes(final Map<String, NOBClazz> clazzes) {
 		this.clazzes = clazzes;
+	}
+
+	public boolean isIgnoreUnknownMethods() {
+		return ignoreUnknownMethods;
+	}
+
+	public void setIgnoreUnknownMethods(boolean ignoreUnknownMethods) {
+		this.ignoreUnknownMethods = ignoreUnknownMethods;
+	}
+
+	public boolean isWriteUnknownMethods() {
+		return writeUnknownMethods;
+	}
+
+	public void setWriteUnknownMethods(boolean writeUnknownMethods) {
+		this.writeUnknownMethods = writeUnknownMethods;
+	}
+
+	public String getIndent() {
+		return indent;
+	}
+
+	public void setIndent(String indent) {
+		this.indent = indent;
 	}
 }
