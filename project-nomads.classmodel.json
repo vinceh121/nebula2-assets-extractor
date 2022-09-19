@@ -3043,7 +3043,48 @@
   "nleafrender" : {
     "name" : "nleafrender",
     "superclass" : "nanimnode",
-    "methods" : { }
+    "methods" : {
+      "SWST" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setwindstrength"
+      },
+      "SSIZ" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setsize"
+      },
+      "SMSN" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setmeshnode"
+      },
+      "GWST" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getwindstrength"
+      },
+      "GSIZ" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getsize"
+      },
+      "SWDR" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setwinddir"
+      },
+      "GMSN" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getmeshnode"
+      },
+      "GWDR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getwinddir"
+      }
+    }
   },
   "nnpkfileserver" : {
     "name" : "nnpkfileserver",
@@ -5409,7 +5450,468 @@
   "nrealworld" : {
     "name" : "nrealworld",
     "superclass" : "nroot",
-    "methods" : { }
+    "methods" : {
+      "ISCN" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "isjoined"
+      },
+      "GTOD" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "gettimeofday"
+      },
+      "GALS" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getalias"
+      },
+      "SVPR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "saveprefs"
+      },
+      "COID" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "INT" ],
+        "name" : "countobjectsbyclassid"
+      },
+      "FNCS" : {
+        "inArgs" : [ "OBJECT", "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findnextclanbysymbolicname"
+      },
+      "ICRN" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "iscinematicrunning"
+      },
+      "SVW2" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setviewer2"
+      },
+      "WGAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "contgame"
+      },
+      "XGAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "stopgame"
+      },
+      "CCWN" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "createclanwithname"
+      },
+      "STPR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "stoprecord"
+      },
+      "SUPL" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "setuserclan"
+      },
+      "FOID" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findobjectbyclassid"
+      },
+      "EWMO" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "enterwarpmode"
+      },
+      "SVCS" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setviewercarriersg"
+      },
+      "SGLT" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setglobaltime"
+      },
+      "ISHT" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "ishost"
+      },
+      "FNID" : {
+        "inArgs" : [ "OBJECT", "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findnextobjectbyclassid"
+      },
+      "GTHC" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "gethandcontrol"
+      },
+      "LDRC" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "loadrecord"
+      },
+      "RUCL" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "resetuserclan"
+      },
+      "ISNS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "isnetsession"
+      },
+      "SVCH" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "savecharacter"
+      },
+      "BGCK" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "begincookies"
+      },
+      "LDEN" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "loadencounter"
+      },
+      "GEPR" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "INT" ],
+        "name" : "getpref"
+      },
+      "ADCK" : {
+        "inArgs" : [ "STRING", "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "addcookie"
+      },
+      "LDEA" : {
+        "inArgs" : [ "STRING", "FLOAT", "FLOAT", "FLOAT", "FLOAT", "FLOAT", "FLOAT" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "loadencounterat"
+      },
+      "TCLS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "tclstop"
+      },
+      "LWMO" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "leavewarpmode"
+      },
+      "STOD" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "settimeofday"
+      },
+      "SALS" : {
+        "inArgs" : [ "STRING", "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setalias"
+      },
+      "SALR" : {
+        "inArgs" : [ "BOOL" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setalreadysaved"
+      },
+      "FSYM" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findobjectbysymbolicname"
+      },
+      "GDPD" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getdayperiod"
+      },
+      "ISSS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "issessionstarted"
+      },
+      "EDCK" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "endcookies"
+      },
+      "ANSG" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "announcesavepoint"
+      },
+      "FPAC" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "fastpossessactive"
+      },
+      "GECL" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getenvironmentclan"
+      },
+      "RSBK" : {
+        "inArgs" : [ "STRING", "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "restorebook"
+      },
+      "LDPR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "loadprefs"
+      },
+      "RSTV" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "resetviewer"
+      },
+      "CPLR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "createclan"
+      },
+      "RFDS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "refreshdisplay"
+      },
+      "LBK2" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "loadbook2"
+      },
+      "CLSN" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "closesession"
+      },
+      "STHC" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "sethandcontrol"
+      },
+      "ANLP" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "announceloadsavepoint"
+      },
+      "FNSM" : {
+        "inArgs" : [ "OBJECT", "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findnextobjectbysymbolicname"
+      },
+      "SVGM" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "savegame"
+      },
+      "UTHC" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "unsethandcontrol"
+      },
+      "STAR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "startrecord"
+      },
+      "CGAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "closegame"
+      },
+      "SEPR" : {
+        "inArgs" : [ "STRING", "INT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setpref"
+      },
+      "LDCH" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "loadcharacter"
+      },
+      "LDCA" : {
+        "inArgs" : [ "STRING", "FLOAT", "FLOAT", "FLOAT" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "loadcharacterat"
+      },
+      "ISRC" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "isrecording"
+      },
+      "KLGM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "killgame"
+      },
+      "STSN" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "startsession"
+      },
+      "OPSN" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "opensession"
+      },
+      "GVWC" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getviewercarrier"
+      },
+      "SDPD" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setdayperiod"
+      },
+      "APPR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "applyprefs"
+      },
+      "GVW2" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getviewer2"
+      },
+      "ISWM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "iswarpmode"
+      },
+      "SCOW" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setcontrolowner"
+      },
+      "GUPL" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getuserclan"
+      },
+      "SVRC" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "saverecord"
+      },
+      "ACFP" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "activatefastpossess"
+      },
+      "PLSN" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "playsound"
+      },
+      "FCSM" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findclanbysymbolicname"
+      },
+      "SVEN" : {
+        "inArgs" : [ "OBJECT", "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "saveencounter"
+      },
+      "CSCN" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "createandselclanwithname"
+      },
+      "SCIC" : {
+        "inArgs" : [ "INT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setclanidcount"
+      },
+      "RPLR" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "releaseclan"
+      },
+      "CSCL" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "createandselclan"
+      },
+      "ISPS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "ispaused"
+      },
+      "OGAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "opengame"
+      },
+      "FNDV" : {
+        "inArgs" : [ "OBJECT", "STRING", "FLOAT", "BOOL", "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "findvehicle"
+      },
+      "PGAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "pausegame"
+      },
+      "BALS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "beginaliases"
+      },
+      "ISPL" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "isplaying"
+      },
+      "LDGM" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "loadgame"
+      },
+      "DAFP" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "deactivatefastpossess"
+      },
+      "CPCL" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "copyclan"
+      },
+      "LDMG" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "loadmultiplayergame"
+      },
+      "SGAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "startgame"
+      },
+      "CNCT" : {
+        "inArgs" : [ "INT" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "joinsession"
+      },
+      "EALS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "endaliases"
+      },
+      "SVWC" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setviewercarrier"
+      }
+    }
   },
   "nservicedata" : {
     "name" : "nservicedata",
@@ -8969,7 +9471,48 @@
   "ngrassrender" : {
     "name" : "ngrassrender",
     "superclass" : "nanimnode",
-    "methods" : { }
+    "methods" : {
+      "SWST" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setwindstrength"
+      },
+      "GMSH" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getmeshnode"
+      },
+      "SSZE" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setsize"
+      },
+      "GWST" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getwindstrength"
+      },
+      "GSZE" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getsize"
+      },
+      "SWDR" : {
+        "inArgs" : [ "FLOAT" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setwinddir"
+      },
+      "GWDR" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "FLOAT" ],
+        "name" : "getwinddir"
+      },
+      "SMSH" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setmeshnode"
+      }
+    }
   },
   "nindexbuffer" : {
     "name" : "nindexbuffer",

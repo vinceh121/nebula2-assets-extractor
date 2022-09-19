@@ -18,12 +18,19 @@ public class CmdExtractClasses implements Callable<Integer> {
 	@Option(names = { "-o", "--output" }, required = true)
 	private File output;
 
+	@Option(names = { "--no-pretty-print" })
+	private boolean noPrettyPrint;
+
 	@Override
 	public Integer call() throws Exception {
 		final ObjectMapper mapper = new ObjectMapper();
 		final DecompiledCommandIdsExtractor ex = new DecompiledCommandIdsExtractor();
 		ex.readRecurse(this.input);
-		mapper.writeValue(this.output, ex.getClazzes());
+		if (this.noPrettyPrint) {
+			mapper.writeValue(this.output, ex.getClazzes());
+		} else {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(this.output, ex.getClazzes());
+		}
 		return 0;
 	}
 }

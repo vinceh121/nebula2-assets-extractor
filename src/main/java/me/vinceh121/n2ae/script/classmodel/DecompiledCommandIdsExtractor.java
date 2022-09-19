@@ -20,9 +20,10 @@ public class DecompiledCommandIdsExtractor {
 	public static final Pattern PAT_CLASS_INIT = Pattern.compile("__cdecl n_init_([a-zA-Z0-9]+)\\("),
 			PAT_SUPERCLASS = Pattern.compile(Pattern.quote("(**(code **)(*param_2 + ") + "[0-9a-fx]+"
 					+ Pattern.quote("))(\"") + "([a-zA-Z0-9]+)\"[,\\)]"),
-			PAT_INIT_CMDS_CALL = Pattern.compile("uVar1 = FUN_([0-9a-zA-Z]+)\\(param_1\\)"),
 			PAT_ADDCMD = Pattern.compile("nClass::AddCmd\\(param_1,\"([_a-zA-Z0-9]+)\",0x([0-9a-z]+),"),
 			PAT_CLASS_MANUAL_INIT = Pattern.compile("__cdecl ([a-zA-Z0-9]+)_init\\(");
+	public static final Pattern[] PAT_INIT_CMDS = { Pattern.compile("uVar1 = FUN_([0-9a-zA-Z]+)\\(param_1\\)"),
+			Pattern.compile("FUN_([0-9a-zA-Z]+)\\(param_1\\)") };
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
 	public void readRecurse(final File file) throws IOException {
@@ -46,8 +47,8 @@ public class DecompiledCommandIdsExtractor {
 			final String line = lines.get(i);
 			final Matcher initMatcher;
 			if ((initMatcher = this
-					.tryMatchers(new Matcher[] { DecompiledCommandIdsExtractor.PAT_CLASS_INIT.matcher(line),
-							DecompiledCommandIdsExtractor.PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
+				.tryMatchers(new Matcher[] { DecompiledCommandIdsExtractor.PAT_CLASS_INIT.matcher(line),
+						DecompiledCommandIdsExtractor.PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
 				final String className = initMatcher.group(1);
 
 				final NOBClazz clazz = new NOBClazz(); // we register classes even if they don't have methods
@@ -57,20 +58,14 @@ public class DecompiledCommandIdsExtractor {
 				while (!(callLine = lines.get(i++)).contains("return")) { // if we reach a return, this init doesn't
 																			// have n_initcmds nor superclass
 					final Matcher superClassMatcher = DecompiledCommandIdsExtractor.PAT_SUPERCLASS.matcher(callLine);
-					final Matcher callMatcher = DecompiledCommandIdsExtractor.PAT_INIT_CMDS_CALL.matcher(callLine);
 
 					if (superClassMatcher.find()) {
 						final String superClass = superClassMatcher.group(1);
 						clazz.setSuperclass(superClass);
 					}
 
-					if (callMatcher.find()) { // we've found our n_initcmds
-						final int funPos = this.findNInitCmds(lines, callMatcher.group(1));
-
-						if (funPos != -1) {
-							this.readCmds(lines, clazz, funPos);
-						}
-						break; // no need to search more
+					if (this.findNInitCmdsCall(callLine, lines, clazz)) {
+						break;
 					}
 				}
 			}
@@ -86,6 +81,21 @@ public class DecompiledCommandIdsExtractor {
 		return null;
 	}
 
+	private boolean findNInitCmdsCall(CharSequence callLine, List<String> lines, NOBClazz clazz) {
+		for (Pattern patInit : DecompiledCommandIdsExtractor.PAT_INIT_CMDS) {
+			final Matcher callMatcher = patInit.matcher(callLine);
+			if (callMatcher.find()) { // we've found our n_initcmds
+				final int funPos = this.findNInitCmds(lines, callMatcher.group(1));
+
+				if (funPos != -1) {
+					this.readCmds(lines, clazz, funPos);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	private void readCmds(final List<String> lines, final NOBClazz clazz, final int funPos) {
 		for (int i = funPos; i < lines.size(); i++) {
 			final String line = lines.get(i);

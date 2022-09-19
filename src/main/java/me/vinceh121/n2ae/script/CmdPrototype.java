@@ -3,6 +3,8 @@ package me.vinceh121.n2ae.script;
 import java.util.List;
 import java.util.Vector;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class CmdPrototype {
 	private final List<NOBType> inArgs = new Vector<>(), returnArgs = new Vector<>();
 	private String name, fourcc;
@@ -43,11 +45,11 @@ public class CmdPrototype {
 	public void setName(final String name) {
 		this.name = name;
 	}
-
+	@JsonIgnore
 	public String getFourcc() {
 		return fourcc;
 	}
-
+@JsonIgnore
 	public void setFourcc(String fourcc) {
 		this.fourcc = fourcc;
 	}
