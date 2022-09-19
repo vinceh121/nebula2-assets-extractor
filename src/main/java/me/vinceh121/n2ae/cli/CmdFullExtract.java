@@ -88,8 +88,8 @@ public class CmdFullExtract implements Callable<Integer> {
 		final String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1);
 
 		final String outPath = file.toPath()
-				.resolveSibling(file.getName().substring(0, file.getName().length() - extension.length() - 1))
-				.toString();
+			.resolveSibling(file.getName().substring(0, file.getName().length() - extension.length() - 1))
+			.toString();
 
 		switch (extension) {
 		case "nvx":

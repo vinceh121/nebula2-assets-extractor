@@ -32,7 +32,7 @@ public class NvxFileWriter {
 	}
 
 	public void writeData() throws IOException {
-		this.out.write(new byte[(int) (this.dataStart - 7 * 4)]);
+		this.out.write(new byte[this.dataStart - 7 * 4]);
 
 		for (int i = 0; i < this.countVertices; i++) {
 			final Vertex vertex = this.vertices.get(i);
@@ -77,93 +77,93 @@ public class NvxFileWriter {
 		}
 	}
 
-	private void writeUnsignedShortArrayLE(int[] a) throws IOException {
-		for (int i : a) {
+	private void writeUnsignedShortArrayLE(final int[] a) throws IOException {
+		for (final int i : a) {
 			this.out.writeUnsignedShortLE(i);
 		}
 	}
 
-	private void writeShortArrayLE(short[] a) throws IOException {
-		for (short s : a) {
+	private void writeShortArrayLE(final short[] a) throws IOException {
+		for (final short s : a) {
 			this.out.writeShortLE(s);
 		}
 	}
 
-	private void writeFloatArrayLE(float[] a) throws IOException {
-		for (float f : a) {
+	private void writeFloatArrayLE(final float[] a) throws IOException {
+		for (final float f : a) {
 			this.out.writeFloatLE(f);
 		}
 	}
 
 	public int getCountVertices() {
-		return countVertices;
+		return this.countVertices;
 	}
 
-	public void setCountVertices(int countVertices) {
+	public void setCountVertices(final int countVertices) {
 		this.countVertices = countVertices;
 	}
 
 	public int getCountIndices() {
-		return countIndices;
+		return this.countIndices;
 	}
 
-	public void setCountIndices(int countIndices) {
+	public void setCountIndices(final int countIndices) {
 		this.countIndices = countIndices;
 	}
 
 	public int getCountEdges() {
-		return countEdges;
+		return this.countEdges;
 	}
 
-	public void setCountEdges(int countEdges) {
+	public void setCountEdges(final int countEdges) {
 		this.countEdges = countEdges;
 	}
 
 	public int getDataStart() {
-		return dataStart;
+		return this.dataStart;
 	}
 
-	public void setDataStart(int dataStart) {
+	public void setDataStart(final int dataStart) {
 		this.dataStart = dataStart;
 	}
 
 	public int getDataSize() {
-		return dataSize;
+		return this.dataSize;
 	}
 
-	public void setDataSize(int dataSize) {
+	public void setDataSize(final int dataSize) {
 		this.dataSize = dataSize;
 	}
 
 	public List<VertexType> getTypes() {
-		return types;
+		return this.types;
 	}
 
-	public void setTypes(List<VertexType> types) {
+	public void setTypes(final List<VertexType> types) {
 		this.types = types;
 	}
 
 	public List<Vertex> getVertices() {
-		return vertices;
+		return this.vertices;
 	}
 
-	public void setVertices(List<Vertex> vertices) {
+	public void setVertices(final List<Vertex> vertices) {
 		this.vertices = vertices;
 	}
 
 	public List<int[]> getTriangles() {
-		return triangles;
+		return this.triangles;
 	}
 
-	public void setTriangles(List<int[]> triangles) {
+	public void setTriangles(final List<int[]> triangles) {
 		this.triangles = triangles;
 	}
 
 	public List<short[]> getEdges() {
-		return edges;
+		return this.edges;
 	}
 
-	public void setEdges(List<short[]> edges) {
+	public void setEdges(final List<short[]> edges) {
 		this.edges = edges;
 	}
 

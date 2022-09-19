@@ -15,21 +15,21 @@ public class NnpkFileWriter {
 	private int bufferSize = 1048576;
 	private TableOfContents tableOfContents;
 
-	public NnpkFileWriter(OutputStream out) {
+	public NnpkFileWriter(final OutputStream out) {
 		this(new LEDataOutputStream(out));
 	}
 
-	public NnpkFileWriter(LEDataOutputStream out) {
+	public NnpkFileWriter(final LEDataOutputStream out) {
 		this.out = out;
 	}
 
-	public void writeArchive(File root) throws IOException {
-		TableOfContentsBuilder tocBuilder = new TableOfContentsBuilder();
+	public void writeArchive(final File root) throws IOException {
+		final TableOfContentsBuilder tocBuilder = new TableOfContentsBuilder();
 		tocBuilder.buildTableOfContents(root);
 		this.tableOfContents = tocBuilder.getTableOfContents();
 
-		ByteArrayOutputStream tocBuffer = new ByteArrayOutputStream();
-		NnpkFileWriter tocWriter = new NnpkFileWriter(tocBuffer);
+		final ByteArrayOutputStream tocBuffer = new ByteArrayOutputStream();
+		final NnpkFileWriter tocWriter = new NnpkFileWriter(tocBuffer);
 		tocWriter.writeToc(tocBuilder.getTableOfContents());
 
 		this.writeHeader(4, 4 * 3 + tocBuffer.size());
@@ -40,15 +40,15 @@ public class NnpkFileWriter {
 		this.writeArchiveFile(tocBuilder.getTableOfContents(), root.toPath().getParent());
 	}
 
-	private void writeArchiveFile(TableOfContents toc, Path folder) throws IOException {
+	private void writeArchiveFile(final TableOfContents toc, final Path folder) throws IOException {
 		if (toc.isDirectory()) {
-			for (TableOfContents c : toc.getEntries().values()) {
+			for (final TableOfContents c : toc.getEntries().values()) {
 				this.writeArchiveFile(c, folder.resolve(toc.getName()));
 			}
 		} else if (toc.isFile()) {
-			FileInputStream in = new FileInputStream(folder.resolve(toc.getName()).toFile());
+			final FileInputStream in = new FileInputStream(folder.resolve(toc.getName()).toFile());
 
-			byte[] buf = new byte[this.bufferSize];
+			final byte[] buf = new byte[this.bufferSize];
 			int read;
 			while ((read = in.read(buf)) != -1) {
 				this.out.write(buf, 0, read);
@@ -60,19 +60,19 @@ public class NnpkFileWriter {
 		this.writeHeader(4, 0);
 	}
 
-	public void writeHeader(int blockLength, int dataBlockStart) throws IOException {
+	public void writeHeader(final int blockLength, final int dataBlockStart) throws IOException {
 		this.out.writeIntLE(NnpkFileReader.MAGIC_NUMBER);
 		this.out.writeIntLE(blockLength);
 		this.out.writeIntLE(dataBlockStart);
 	}
 
-	public void writeToc(TableOfContents toc) throws IOException {
+	public void writeToc(final TableOfContents toc) throws IOException {
 		if (toc.isDirectory()) {
 			this.out.writeIntLE(NpkEntryType.DIR.getStartInt());
 			this.out.writeIntLE(4); // blockLen
 			this.writeString(toc.getName());
 
-			for (TableOfContents c : toc.getEntries().values()) {
+			for (final TableOfContents c : toc.getEntries().values()) {
 				this.writeToc(c);
 			}
 
@@ -88,8 +88,8 @@ public class NnpkFileWriter {
 		}
 	}
 
-	private void writeString(String s) throws IOException {
-		out.writeShortLE((short) s.length());
+	private void writeString(final String s) throws IOException {
+		this.out.writeShortLE((short) s.length());
 		this.out.write(s.getBytes(Charset.forName("US-ASCII")));
 	}
 
@@ -98,14 +98,14 @@ public class NnpkFileWriter {
 	}
 
 	public TableOfContents getTableOfContents() {
-		return tableOfContents;
+		return this.tableOfContents;
 	}
 
 	public int getBufferSize() {
-		return bufferSize;
+		return this.bufferSize;
 	}
 
-	public void setBufferSize(int bufferSize) {
+	public void setBufferSize(final int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
 }

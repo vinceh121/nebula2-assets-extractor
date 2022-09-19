@@ -71,7 +71,7 @@ public class NOBScriptDecompiler {
 					System.err.println("Writing unknown " + Integer.toHexString(cmd) + " " + fourcc + " " + method);
 					final byte[] args = this.stream.readNBytes(argLength);
 					this.writeIndent(sb);
-					sb.append(UNKNOWN_COMMAND_PREFIX);
+					sb.append(NOBScriptDecompiler.UNKNOWN_COMMAND_PREFIX);
 					sb.append(fourcc);
 					sb.append(" ");
 					this.writeByteArray(sb, args);
@@ -141,14 +141,14 @@ public class NOBScriptDecompiler {
 		return new String(this.stream.readNBytes(size));
 	}
 
-	private void writeIndent(StringBuilder sb) {
-		for (int i = 0; i < this.classStack.size(); i++) {
+	private void writeIndent(final StringBuilder sb) {
+		for (final String element : this.classStack) {
 			sb.append(this.indent);
 		}
 	}
-	
-	private void writeByteArray(StringBuilder sb, byte[] arr) {
-		for (byte b : arr) {
+
+	private void writeByteArray(final StringBuilder sb, final byte[] arr) {
+		for (final byte b : arr) {
 			sb.append(Integer.toHexString(b));
 		}
 	}
@@ -168,26 +168,26 @@ public class NOBScriptDecompiler {
 	}
 
 	public boolean isIgnoreUnknownMethods() {
-		return ignoreUnknownMethods;
+		return this.ignoreUnknownMethods;
 	}
 
-	public void setIgnoreUnknownMethods(boolean ignoreUnknownMethods) {
+	public void setIgnoreUnknownMethods(final boolean ignoreUnknownMethods) {
 		this.ignoreUnknownMethods = ignoreUnknownMethods;
 	}
 
 	public boolean isWriteUnknownMethods() {
-		return writeUnknownMethods;
+		return this.writeUnknownMethods;
 	}
 
-	public void setWriteUnknownMethods(boolean writeUnknownMethods) {
+	public void setWriteUnknownMethods(final boolean writeUnknownMethods) {
 		this.writeUnknownMethods = writeUnknownMethods;
 	}
 
 	public String getIndent() {
-		return indent;
+		return this.indent;
 	}
 
-	public void setIndent(String indent) {
+	public void setIndent(final String indent) {
 		this.indent = indent;
 	}
 }

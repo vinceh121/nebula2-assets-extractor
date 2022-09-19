@@ -23,7 +23,7 @@ public class CmdPack implements Callable<Integer> {
 		try (final FileOutputStream os = new FileOutputStream(this.outputFile)) {
 			final NnpkFileWriter writer = new NnpkFileWriter(os);
 			writer.writeArchive(this.inputFolder);
-			
+
 			NnpkFileReader.printToc(writer.getTableOfContents(), System.out);
 		}
 		return 0;

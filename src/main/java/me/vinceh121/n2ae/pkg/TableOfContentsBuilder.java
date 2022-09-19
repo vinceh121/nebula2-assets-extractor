@@ -9,33 +9,33 @@ public class TableOfContentsBuilder {
 	private final TableOfContents toc = new TableOfContents();
 	private int fileOffset;
 
-	public void buildTableOfContents(File root) throws IOException {
+	public void buildTableOfContents(final File root) throws IOException {
 		if (!root.isDirectory()) {
 			throw new IllegalArgumentException("root isn't a directory");
 		}
 		this.toc.setName(root.getName());
 		this.toc.setDirectory(true);
 
-		File[] list = root.listFiles();
+		final File[] list = root.listFiles();
 		Arrays.sort(list, (f1, f2) -> f1.getName().compareTo(f2.getName()));
-		for (File child : list) {
-			buildTableOfContents(child, this.toc);
+		for (final File child : list) {
+			this.buildTableOfContents(child, this.toc);
 		}
 	}
 
-	private void buildTableOfContents(File file, TableOfContents toc) throws IOException {
+	private void buildTableOfContents(final File file, final TableOfContents toc) throws IOException {
 		if (file.isDirectory()) {
-			TableOfContents dtoc = new TableOfContents();
+			final TableOfContents dtoc = new TableOfContents();
 			dtoc.setDirectory(true);
 			dtoc.setName(file.getName());
-			File[] list = file.listFiles();
+			final File[] list = file.listFiles();
 			Arrays.sort(list, (f1, f2) -> f1.getName().compareTo(f2.getName()));
-			for (File child : list) {
-				buildTableOfContents(child, dtoc);
+			for (final File child : list) {
+				this.buildTableOfContents(child, dtoc);
 			}
 			toc.put(dtoc.getName(), dtoc);
 		} else if (file.isFile()) {
-			TableOfContents ftoc = new TableOfContents();
+			final TableOfContents ftoc = new TableOfContents();
 			ftoc.setFile(true);
 			ftoc.setName(file.getName());
 			ftoc.setLength((int) Files.size(file.toPath()));
@@ -48,10 +48,10 @@ public class TableOfContentsBuilder {
 	}
 
 	public int getOffset() {
-		return fileOffset;
+		return this.fileOffset;
 	}
 
-	public void setOffset(int offset) {
+	public void setOffset(final int offset) {
 		this.fileOffset = offset;
 	}
 

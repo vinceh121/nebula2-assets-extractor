@@ -10,7 +10,7 @@ public enum NpkEntryType {
 
 	NpkEntryType() {
 		this.start = this.name();
-		this.fourcc = FourccUtils.fourcc(start);
+		this.fourcc = FourccUtils.fourcc(this.start);
 	}
 
 	NpkEntryType(final String start) {

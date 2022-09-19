@@ -149,10 +149,10 @@ public class NvxFileReader {
 		}
 
 		for (int i = 0; i < this.countEdges; i++) {
-			short e0 = this.in.readShortLE();
-			short e1 = this.in.readShortLE();
-			short e2 = this.in.readShortLE();
-			short e3 = this.in.readShortLE();
+			final short e0 = this.in.readShortLE();
+			final short e1 = this.in.readShortLE();
+			final short e2 = this.in.readShortLE();
+			final short e3 = this.in.readShortLE();
 
 			this.edges.add(new short[] { e0, e1, e2, e3 });
 		}
@@ -231,14 +231,14 @@ public class NvxFileReader {
 	}
 
 	public List<short[]> getEdges() {
-		return edges;
+		return this.edges;
 	}
 
-	public void setEdges(List<short[]> edges) {
+	public void setEdges(final List<short[]> edges) {
 		this.edges = edges;
 	}
 
-	public void moveToWriter(NvxFileWriter writer) {
+	public void moveToWriter(final NvxFileWriter writer) {
 		writer.setCountVertices(this.countVertices);
 		writer.setCountIndices(this.countIndices);
 		writer.setCountEdges(this.countEdges);

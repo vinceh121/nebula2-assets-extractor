@@ -45,12 +45,14 @@ public class CmdPrototype {
 	public void setName(final String name) {
 		this.name = name;
 	}
+
 	@JsonIgnore
 	public String getFourcc() {
-		return fourcc;
+		return this.fourcc;
 	}
-@JsonIgnore
-	public void setFourcc(String fourcc) {
+
+	@JsonIgnore
+	public void setFourcc(final String fourcc) {
 		this.fourcc = fourcc;
 	}
 

@@ -8,7 +8,8 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL41;
 
 public enum BlockFormat {
-	NONE(0, 0, 0, 0), RGB8(BufferedImage.TYPE_INT_RGB, GL20.GL_UNSIGNED_INT, GL20.GL_RGB, GL30.GL_RGB8UI),
+	NONE(0, 0, 0, 0),
+	RGB8(BufferedImage.TYPE_INT_RGB, GL20.GL_UNSIGNED_INT, GL20.GL_RGB, GL30.GL_RGB8UI),
 	/**
 	 * OpenGL: swap alpha
 	 */

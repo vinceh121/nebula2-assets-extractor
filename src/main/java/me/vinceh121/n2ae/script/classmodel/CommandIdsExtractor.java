@@ -14,7 +14,7 @@ import me.vinceh121.n2ae.script.NOBClazz;
 
 public class CommandIdsExtractor {
 	private static final Pattern PATTERN_ADDCMD = Pattern
-			.compile("AddCmd[ ]*\\([ ]*\"([_\\-0-9a-zA-Z]+)\",[ \t]*\\'([A-Z0-9_\\-]+)\\'[ ]*,");
+		.compile("AddCmd[ ]*\\([ ]*\"([_\\-0-9a-zA-Z]+)\",[ \t]*\\'([A-Z0-9_\\-]+)\\'[ ]*,");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
 	public void readRecurse(final File file) throws IOException {
@@ -41,7 +41,7 @@ public class CommandIdsExtractor {
 				if (clazz.containsMethodByFourcc(match.group(2))) {
 					throw new RuntimeException("method already exists");
 				}
-				CmdPrototype proto = new CmdPrototype(match.group(1));
+				final CmdPrototype proto = new CmdPrototype(match.group(1));
 				proto.setFourcc(match.group(2));
 				clazz.putMethod(proto);
 				hasAnything = true;

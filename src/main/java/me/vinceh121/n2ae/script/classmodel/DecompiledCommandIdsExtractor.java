@@ -81,8 +81,8 @@ public class DecompiledCommandIdsExtractor {
 		return null;
 	}
 
-	private boolean findNInitCmdsCall(CharSequence callLine, List<String> lines, NOBClazz clazz) {
-		for (Pattern patInit : DecompiledCommandIdsExtractor.PAT_INIT_CMDS) {
+	private boolean findNInitCmdsCall(final CharSequence callLine, final List<String> lines, final NOBClazz clazz) {
+		for (final Pattern patInit : DecompiledCommandIdsExtractor.PAT_INIT_CMDS) {
 			final Matcher callMatcher = patInit.matcher(callLine);
 			if (callMatcher.find()) { // we've found our n_initcmds
 				final int funPos = this.findNInitCmds(lines, callMatcher.group(1));
@@ -95,7 +95,7 @@ public class DecompiledCommandIdsExtractor {
 		}
 		return false;
 	}
-	
+
 	private void readCmds(final List<String> lines, final NOBClazz clazz, final int funPos) {
 		for (int i = funPos; i < lines.size(); i++) {
 			final String line = lines.get(i);

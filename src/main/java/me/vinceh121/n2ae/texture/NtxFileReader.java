@@ -161,7 +161,7 @@ public class NtxFileReader {
 			} else if (block.getFormat() == BlockFormat.ARGB4) {
 				for (int i = 0; i < buf.length; i += 2) {
 					// this one is little endian for some reason
-					int pixel4 = Short.reverseBytes((short) ((buf[i] & 0xFF) << 8 | buf[i + 1] & 0xFF));
+					final int pixel4 = Short.reverseBytes((short) ((buf[i] & 0xFF) << 8 | buf[i + 1] & 0xFF));
 					int alpha = pixel4 >> 12 & 0xF;
 					int red = pixel4 >> 8 & 0xF;
 					int green = pixel4 >> 4 & 0xF;

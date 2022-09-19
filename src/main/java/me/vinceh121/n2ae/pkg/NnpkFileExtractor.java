@@ -66,7 +66,8 @@ public class NnpkFileExtractor {
 		final byte[] buf = new byte[NnpkFileExtractor.BUFFER_SIZE];
 		int totalRead = 0;
 		while (totalRead < length) { // maybe <= ?
-			final int read = this.in.read(buf, 0,
+			final int read = this.in.read(buf,
+					0,
 					totalRead + NnpkFileExtractor.BUFFER_SIZE > length ? length - totalRead
 							: NnpkFileExtractor.BUFFER_SIZE);
 			totalRead += read;

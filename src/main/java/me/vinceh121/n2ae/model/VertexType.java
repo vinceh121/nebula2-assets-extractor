@@ -37,7 +37,7 @@ public enum VertexType {
 
 	public static int getTypes(final List<VertexType> types) {
 		int mask = 0;
-		for (VertexType t : types) {
+		for (final VertexType t : types) {
 			mask |= t.getMask();
 		}
 		return mask;

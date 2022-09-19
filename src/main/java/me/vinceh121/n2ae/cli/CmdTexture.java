@@ -51,13 +51,13 @@ public class CmdTexture implements Callable<Integer> {
 			System.out.println();
 			System.out.println("Common image formats:");
 			System.out.println();
-			for (String n : ImageIO.getWriterFormatNames()) {
+			for (final String n : ImageIO.getWriterFormatNames()) {
 				System.out.println("\t" + n);
 			}
 			return 0;
 		}
 
-		if (inputFile == null) {
+		if (this.inputFile == null) {
 			throw new ParameterException(this.spec.commandLine(), "Missing required argument -i, --input=<inputFile>");
 		}
 
@@ -91,7 +91,7 @@ public class CmdTexture implements Callable<Integer> {
 				return 0;
 			} else if ("raw".equals(this.format)) {
 				reader.readAllRaws();
-				byte[] raw = reader.getRaws().get(this.block == -1 ? 0 : this.block);
+				final byte[] raw = reader.getRaws().get(this.block == -1 ? 0 : this.block);
 				os.write(raw);
 				return 0;
 			}
