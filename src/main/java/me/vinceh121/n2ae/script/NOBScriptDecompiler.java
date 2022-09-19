@@ -142,7 +142,7 @@ public class NOBScriptDecompiler {
 	}
 
 	private void writeIndent(final StringBuilder sb) {
-		for (final String element : this.classStack) {
+		for (int i = 0; i < this.classStack.size(); i++) {
 			sb.append(this.indent);
 		}
 	}
