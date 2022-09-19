@@ -43,8 +43,7 @@ public class CmdImg2Ntx implements Callable<Integer> {
 		}
 		try (FileOutputStream out = new FileOutputStream(this.outputFile)) {
 			BufferedImage img = ImageIO.read(this.inputFile);
-			final BlockFormat fmt = img.getAlphaRaster() == null ? BlockFormat.ARGB4 : BlockFormat.ARGB4;
-			byte[] data = NtxFileWriter.imageToRaw(img, img.getWidth(), img.getHeight(), fmt);
+			byte[] data = NtxFileWriter.imageToRaw(img, img.getWidth(), img.getHeight(), this.format);
 			final ByteArrayOutputStream mipmaps = new ByteArrayOutputStream(img.getHeight() * img.getWidth() * 2);
 			mipmaps.write(data);
 
@@ -55,10 +54,10 @@ public class CmdImg2Ntx implements Callable<Integer> {
 			b.setHeight(img.getHeight());
 			b.setDataOffset(offset);
 			b.setDataLength(data.length);
-			b.setFormat(fmt);
+			b.setFormat(this.format);
 			b.setMipmapLevel(0);
 			b.setDepth(1);
-			b.setType(BlockType.TEXTURE_2D);
+			b.setType(this.type);
 
 			offset += data.length;
 
@@ -72,7 +71,7 @@ public class CmdImg2Ntx implements Callable<Integer> {
 					final AffineTransformOp op = new AffineTransformOp(ts, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 					img = op.filter(img, null);
 				}
-				data = NtxFileWriter.imageToRaw(img, img.getWidth(), img.getHeight(), fmt);
+				data = NtxFileWriter.imageToRaw(img, img.getWidth(), img.getHeight(), this.format);
 				mipmaps.write(data);
 
 				b = new Block();
@@ -80,10 +79,10 @@ public class CmdImg2Ntx implements Callable<Integer> {
 				b.setHeight(img.getHeight());
 				b.setDataOffset(offset);
 				b.setDataLength(data.length);
-				b.setFormat(fmt);
+				b.setFormat(this.format);
 				b.setMipmapLevel(i);
 				b.setDepth(1);
-				b.setType(BlockType.TEXTURE_2D);
+				b.setType(this.type);
 				writer.writeBlock(b);
 
 				offset += data.length;
