@@ -17,8 +17,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Spec;
 
-@Command(name = "texture", description = { "Convert an NTX file to an image" })
-public class CmdTexture implements Callable<Integer> {
+@Command(name = "ntx2img", description = { "Convert an NTX1 file to an image" })
+public class CmdNtx2Img implements Callable<Integer> {
 	@Spec
 	private CommandSpec spec;
 
