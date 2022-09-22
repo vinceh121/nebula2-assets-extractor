@@ -37,6 +37,11 @@ public class LEDataInputStream extends DataInputStream {
 		return this.readShortLE() & 0xFFFF;
 	}
 
+	public String readString() throws IOException {
+		final int size = this.readUnsignedShortLE();
+		return new String(this.readNBytes(size));
+	}
+
 	public long getReadBytes() {
 		return this.readBytes;
 	}
