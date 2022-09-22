@@ -7,25 +7,25 @@ public class SelCommandCall implements ICommandCall {
 	public SelCommandCall() {
 	}
 
-	public SelCommandCall(NOBClazz clazz, String path) {
+	public SelCommandCall(final NOBClazz clazz, final String path) {
 		this.clazz = clazz;
 		this.path = path;
 	}
 
 	@Override
 	public NOBClazz getClazz() {
-		return clazz;
+		return this.clazz;
 	}
 
-	public void setClazz(NOBClazz clazz) {
+	public void setClazz(final NOBClazz clazz) {
 		this.clazz = clazz;
 	}
 
 	public String getPath() {
-		return path;
+		return this.path;
 	}
 
-	public void setPath(String path) {
+	public void setPath(final String path) {
 		this.path = path;
 	}
 

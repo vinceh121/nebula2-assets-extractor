@@ -11,34 +11,34 @@ public class ClassCommandCall implements ICommandCall {
 	public ClassCommandCall() {
 	}
 
-	public ClassCommandCall(CmdPrototype prototype, NOBClazz clazz, Object[] arguments) {
+	public ClassCommandCall(final CmdPrototype prototype, final NOBClazz clazz, final Object[] arguments) {
 		this.prototype = prototype;
 		this.clazz = clazz;
 		this.arguments = arguments;
 	}
 
 	public CmdPrototype getPrototype() {
-		return prototype;
+		return this.prototype;
 	}
 
-	public void setPrototype(CmdPrototype prototype) {
+	public void setPrototype(final CmdPrototype prototype) {
 		this.prototype = prototype;
 	}
 
 	@Override
 	public NOBClazz getClazz() {
-		return clazz;
+		return this.clazz;
 	}
 
-	public void setClazz(NOBClazz clazz) {
+	public void setClazz(final NOBClazz clazz) {
 		this.clazz = clazz;
 	}
 
 	public Object[] getArguments() {
-		return arguments;
+		return this.arguments;
 	}
 
-	public void setArguments(Object[] arguments) {
+	public void setArguments(final Object[] arguments) {
 		this.arguments = arguments;
 	}
 
@@ -46,27 +46,30 @@ public class ClassCommandCall implements ICommandCall {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.deepHashCode(arguments);
-		result = prime * result + Objects.hash(clazz, prototype);
+		result = prime * result + Arrays.deepHashCode(this.arguments);
+		result = prime * result + Objects.hash(this.clazz, this.prototype);
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (this.getClass() != obj.getClass()) {
 			return false;
-		ClassCommandCall other = (ClassCommandCall) obj;
-		return Arrays.deepEquals(arguments, other.arguments) && Objects.equals(clazz, other.clazz)
-				&& Objects.equals(prototype, other.prototype);
+		}
+		final ClassCommandCall other = (ClassCommandCall) obj;
+		return Arrays.deepEquals(this.arguments, other.arguments) && Objects.equals(this.clazz, other.clazz)
+				&& Objects.equals(this.prototype, other.prototype);
 	}
 
 	@Override
 	public String toString() {
-		return "ClassCommandCall [prototype=" + prototype + ", clazz=" + clazz + ", arguments="
-				+ Arrays.toString(arguments) + "]";
+		return "ClassCommandCall [prototype=" + this.prototype + ", clazz=" + this.clazz + ", arguments="
+				+ Arrays.toString(this.arguments) + "]";
 	}
 }

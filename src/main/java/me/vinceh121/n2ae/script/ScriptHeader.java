@@ -13,13 +13,13 @@ public class ScriptHeader {
 	 *         "nbinscriptserver"
 	 */
 	public String getParser() {
-		return parser;
+		return this.parser;
 	}
 
 	/**
 	 * @return The name of the root class to use for this script
 	 */
 	public String getRootClass() {
-		return rootClass;
+		return this.rootClass;
 	}
 }

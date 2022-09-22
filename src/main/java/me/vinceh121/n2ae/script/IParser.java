@@ -7,11 +7,11 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public interface IParser {
-	default void read(String script) throws IOException {
+	default void read(final String script) throws IOException {
 		this.read(script.getBytes());
 	}
 
-	default void read(byte[] bytes) throws IOException {
+	default void read(final byte[] bytes) throws IOException {
 		this.read(new ByteArrayInputStream(bytes));
 	}
 

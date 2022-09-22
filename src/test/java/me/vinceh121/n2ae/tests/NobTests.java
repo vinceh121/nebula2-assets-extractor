@@ -18,15 +18,15 @@ class NobTests {
 
 	@Test
 	void test() throws IOException {
-		final Map<String, NOBClazz> model = mapper.readValue(new File("./project-nomads.classmodel.json"),
+		final Map<String, NOBClazz> model = this.mapper.readValue(new File("./project-nomads.classmodel.json"),
 				new TypeReference<Map<String, NOBClazz>>() {
 				});
 
-		NOBParser parse = new NOBParser();
+		final NOBParser parse = new NOBParser();
 		parse.setClassModel(model);
 		parse.read(NobTests.class.getClassLoader().getResourceAsStream("if_hilfe.n"));
 
-		TCLWriter writer = new TCLWriter();
+		final TCLWriter writer = new TCLWriter();
 		writer.setHeader(parse.getHeader());
 		writer.setCalls(parse.getCalls());
 		writer.write(System.out);

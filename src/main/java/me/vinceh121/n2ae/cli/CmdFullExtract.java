@@ -19,7 +19,8 @@ import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileExtractor;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.script.NOBClazz;
-import me.vinceh121.n2ae.script.NOBScriptDecompiler;
+import me.vinceh121.n2ae.script.NOBParser;
+import me.vinceh121.n2ae.script.TCLWriter;
 import me.vinceh121.n2ae.texture.Block;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 import picocli.CommandLine.Command;
@@ -163,24 +164,21 @@ public class CmdFullExtract implements Callable<Integer> {
 
 	private void processScript(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			final NOBScriptDecompiler r = new NOBScriptDecompiler(is);
+			final NOBParser parser = new NOBParser();
+			parser.read(is);
 
 			if (this.clazzModel != null) {
 				final ObjectMapper mapper = new ObjectMapper();
 				final Map<String, NOBClazz> model = mapper.readValue(this.clazzModel,
 						new TypeReference<Map<String, NOBClazz>>() {
 						});
-				r.setClazzes(model);
-
-				final NOBClazz nroot = new NOBClazz();
-				nroot.setName("nroot");
-				model.put(nroot.getName(), nroot);
+				parser.setClassModel(model);
 			}
 
-			os.write(r.readHeader().getBytes());
-			while (is.available() > 0) {
-				os.write(r.readBlock().getBytes());
-			}
+			final TCLWriter writer = new TCLWriter();
+			writer.setHeader(parser.getHeader());
+			writer.setCalls(parser.getCalls());
+			writer.write(os);
 		}
 	}
 

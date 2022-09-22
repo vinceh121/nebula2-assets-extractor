@@ -3,16 +3,15 @@ package me.vinceh121.n2ae.cli;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import me.vinceh121.n2ae.LEDataInputStream;
 import me.vinceh121.n2ae.script.NOBClazz;
-import me.vinceh121.n2ae.script.NOBScriptDecompiler;
+import me.vinceh121.n2ae.script.NOBParser;
+import me.vinceh121.n2ae.script.TCLWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -30,23 +29,23 @@ public class CmdScript implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		try (OutputStream out = this.outputFile == null ? System.out : new FileOutputStream(this.outputFile);
-				LEDataInputStream in = new LEDataInputStream(new FileInputStream(this.inputFile))) {
-
-			final NOBScriptDecompiler reader = new NOBScriptDecompiler(in);
+		try (FileInputStream is = new FileInputStream(this.inputFile);
+				FileOutputStream os = new FileOutputStream(this.outputFile)) {
+			final NOBParser parser = new NOBParser();
+			parser.read(is);
 
 			if (this.clazzModel != null) {
 				final ObjectMapper mapper = new ObjectMapper();
 				final Map<String, NOBClazz> model = mapper.readValue(this.clazzModel,
 						new TypeReference<Map<String, NOBClazz>>() {
 						});
-				reader.setClazzes(model);
+				parser.setClassModel(model);
 			}
 
-			out.write(reader.readHeader().getBytes());
-			while (in.available() > 0) {
-				out.write(reader.readBlock().getBytes());
-			}
+			final TCLWriter writer = new TCLWriter();
+			writer.setHeader(parser.getHeader());
+			writer.setCalls(parser.getCalls());
+			writer.write(os);
 		}
 		return 0;
 	}

@@ -17,7 +17,7 @@ import me.vinceh121.n2ae.LEDataInputStream;
 public class NOBParser implements IParser {
 	public static final Pattern PAT_HEADER = Pattern.compile("\\$parser\\:([a-z]+)\\$ \\$class\\:([a-z]+)\\$");
 	public static final String MAGIC_STRING = "NOB0";
-	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBScriptDecompiler.MAGIC_STRING);
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBParser.MAGIC_STRING);
 	private static final int _NEW = FourccUtils.fourcc("_new"), _SEL = FourccUtils.fourcc("_sel");
 	/**
 	 * Stores context of created vars with `_new`. Key: var name Value: var class
@@ -45,18 +45,16 @@ public class NOBParser implements IParser {
 	private ICommandCall readBlock(final LEDataInputStream stream) throws IOException {
 		final int cmdFourcc = stream.readIntLE();
 
-		if (cmdFourcc == _NEW) {
+		if (cmdFourcc == NOBParser._NEW) {
 			final String clazzName = stream.readString();
 			final NOBClazz clazz = this.getClazzByName(clazzName);
 			final String name = stream.readString();
 			this.context.put(name, clazzName);
 			this.classStack.push(clazzName); // _new automatically cds into created object
 
-			final NewCommandCall call = new NewCommandCall(this.getLastClazz(),
-					clazz,
-					name);
+			final NewCommandCall call = new NewCommandCall(this.getLastClazz(), clazz, name);
 			return call;
-		} else if (cmdFourcc == _SEL) {
+		} else if (cmdFourcc == NOBParser._SEL) {
 			final String path = stream.readString();
 			final SelCommandCall call = new SelCommandCall(this.getLastClazz(), path);
 			if ("..".equals(path)) {
@@ -76,8 +74,9 @@ public class NOBParser implements IParser {
 				if (this.keepUnknownCommands) {
 					System.err.println("Writing unknown " + Integer.toHexString(cmdFourcc) + " " + fourcc);
 					final byte[] args = stream.readNBytes(argLength);
-					final UnknownClassCommandCall call = new UnknownClassCommandCall(this
-						.getLastClazz(), FourccUtils.fourccToString(cmdFourcc), args);
+					final UnknownClassCommandCall call = new UnknownClassCommandCall(this.getLastClazz(),
+							FourccUtils.fourccToString(cmdFourcc),
+							args);
 					return call;
 				} else {
 					throw new IllegalStateException("Couldn't find method " + Integer.toHexString(cmdFourcc) + " "
@@ -121,22 +120,22 @@ public class NOBParser implements IParser {
 
 	private void readHeader(final LEDataInputStream stream) throws IOException {
 		final int magic = stream.readIntLE();
-		if (magic != NOBScriptDecompiler.MAGIC_NUMBER) {
+		if (magic != NOBParser.MAGIC_NUMBER) {
 			throw new IOException("Invalid magic number");
 		}
 
 		final String headerString = stream.readString();
-		final Matcher match = PAT_HEADER.matcher(headerString);
+		final Matcher match = NOBParser.PAT_HEADER.matcher(headerString);
 		match.find();
 		this.header = new ScriptHeader(match.group(1), match.group(2));
 	}
-	
+
 	private NOBClazz getLastClazz() {
 		return this.getClazzByName(this.classStack.peek());
 	}
 
-	private NOBClazz getClazzByName(String name) {
-		for (NOBClazz cls : this.clazzes.values()) {
+	private NOBClazz getClazzByName(final String name) {
+		for (final NOBClazz cls : this.clazzes.values()) {
 			if (name.equals(cls.getName())) {
 				return cls;
 			}
@@ -171,7 +170,7 @@ public class NOBParser implements IParser {
 	}
 
 	@Override
-	public void setClassModel(Map<String, NOBClazz> classModel) {
+	public void setClassModel(final Map<String, NOBClazz> classModel) {
 		this.clazzes = classModel;
 	}
 
@@ -179,7 +178,7 @@ public class NOBParser implements IParser {
 		return this.keepUnknownCommands;
 	}
 
-	public void setKeepUnknownCommands(boolean keepUnknownCommands) {
+	public void setKeepUnknownCommands(final boolean keepUnknownCommands) {
 		this.keepUnknownCommands = keepUnknownCommands;
 	}
 }

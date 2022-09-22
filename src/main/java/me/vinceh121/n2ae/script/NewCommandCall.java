@@ -7,7 +7,7 @@ public class NewCommandCall implements ICommandCall {
 	public NewCommandCall() {
 	}
 
-	public NewCommandCall(NOBClazz clazz, NOBClazz newClazz, String varName) {
+	public NewCommandCall(final NOBClazz clazz, final NOBClazz newClazz, final String varName) {
 		this.clazz = clazz;
 		this.newClazz = newClazz;
 		this.varName = varName;
@@ -23,18 +23,18 @@ public class NewCommandCall implements ICommandCall {
 	}
 
 	public NOBClazz getNewClazz() {
-		return newClazz;
+		return this.newClazz;
 	}
 
-	public void setNewClazz(NOBClazz newClazz) {
+	public void setNewClazz(final NOBClazz newClazz) {
 		this.newClazz = newClazz;
 	}
 
 	public String getVarName() {
-		return varName;
+		return this.varName;
 	}
 
-	public void setVarName(String varName) {
+	public void setVarName(final String varName) {
 		this.varName = varName;
 	}
 

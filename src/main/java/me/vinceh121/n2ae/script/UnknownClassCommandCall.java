@@ -11,7 +11,7 @@ public class UnknownClassCommandCall implements ICommandCall {
 	public UnknownClassCommandCall() {
 	}
 
-	public UnknownClassCommandCall(NOBClazz clazz, String fourcc, byte[] arguments) {
+	public UnknownClassCommandCall(final NOBClazz clazz, final String fourcc, final byte[] arguments) {
 		this.clazz = clazz;
 		this.fourcc = fourcc;
 		this.arguments = arguments;
@@ -22,23 +22,23 @@ public class UnknownClassCommandCall implements ICommandCall {
 		return this.clazz;
 	}
 
-	public void setClazz(NOBClazz clazz) {
+	public void setClazz(final NOBClazz clazz) {
 		this.clazz = clazz;
 	}
 
 	public String getFourcc() {
-		return fourcc;
+		return this.fourcc;
 	}
 
-	public void setFourcc(String fourcc) {
+	public void setFourcc(final String fourcc) {
 		this.fourcc = fourcc;
 	}
 
 	public byte[] getArguments() {
-		return arguments;
+		return this.arguments;
 	}
 
-	public void setArguments(byte[] arguments) {
+	public void setArguments(final byte[] arguments) {
 		this.arguments = arguments;
 	}
 
@@ -46,27 +46,30 @@ public class UnknownClassCommandCall implements ICommandCall {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(arguments);
-		result = prime * result + Objects.hash(clazz, fourcc);
+		result = prime * result + Arrays.hashCode(this.arguments);
+		result = prime * result + Objects.hash(this.clazz, this.fourcc);
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (this.getClass() != obj.getClass()) {
 			return false;
-		UnknownClassCommandCall other = (UnknownClassCommandCall) obj;
-		return Arrays.equals(arguments, other.arguments) && Objects.equals(clazz, other.clazz)
-				&& Objects.equals(fourcc, other.fourcc);
+		}
+		final UnknownClassCommandCall other = (UnknownClassCommandCall) obj;
+		return Arrays.equals(this.arguments, other.arguments) && Objects.equals(this.clazz, other.clazz)
+				&& Objects.equals(this.fourcc, other.fourcc);
 	}
 
 	@Override
 	public String toString() {
-		return "UnknownClassCommandCall [clazz=" + clazz + ", fourcc=" + fourcc + ", arguments="
-				+ Arrays.toString(arguments) + "]";
+		return "UnknownClassCommandCall [clazz=" + this.clazz + ", fourcc=" + this.fourcc + ", arguments="
+				+ Arrays.toString(this.arguments) + "]";
 	}
 }
