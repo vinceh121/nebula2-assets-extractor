@@ -1,4 +1,9 @@
 {
+  "nroot": {
+    "name" : "nroot",
+    "superclass" : null,
+    "methods" : { }
+  },
   "ncritterdamage" : {
     "name" : "ncritterdamage",
     "superclass" : "nservice",
