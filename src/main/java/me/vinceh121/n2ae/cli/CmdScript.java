@@ -9,9 +9,10 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
-import me.vinceh121.n2ae.script.NOBParser;
-import me.vinceh121.n2ae.script.TCLWriter;
+import me.vinceh121.n2ae.script.nob.NOBParser;
+import me.vinceh121.n2ae.script.tcl.TCLWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -31,7 +32,7 @@ public class CmdScript implements Callable<Integer> {
 	public Integer call() throws Exception {
 		try (FileInputStream is = new FileInputStream(this.inputFile);
 				FileOutputStream os = new FileOutputStream(this.outputFile)) {
-			final NOBParser parser = new NOBParser();
+			final IParser parser = new NOBParser();
 			parser.read(is);
 
 			if (this.clazzModel != null) {

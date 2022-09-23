@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae.script;
+package me.vinceh121.n2ae.script.nob;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +13,22 @@ import java.util.regex.Pattern;
 
 import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
+import me.vinceh121.n2ae.script.ClassCommandCall;
+import me.vinceh121.n2ae.script.CmdPrototype;
+import me.vinceh121.n2ae.script.ICommandCall;
+import me.vinceh121.n2ae.script.IParser;
+import me.vinceh121.n2ae.script.NOBClazz;
+import me.vinceh121.n2ae.script.NOBType;
+import me.vinceh121.n2ae.script.NewCommandCall;
+import me.vinceh121.n2ae.script.ScriptHeader;
+import me.vinceh121.n2ae.script.SelCommandCall;
+import me.vinceh121.n2ae.script.UnknownClassCommandCall;
 
 public class NOBParser implements IParser {
 	public static final Pattern PAT_HEADER = Pattern.compile("\\$parser\\:([a-z]+)\\$ \\$class\\:([a-z]+)\\$");
 	public static final String MAGIC_STRING = "NOB0";
-	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBParser.MAGIC_STRING);
-	private static final int _NEW = FourccUtils.fourcc("_new"), _SEL = FourccUtils.fourcc("_sel");
+	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBParser.MAGIC_STRING),
+			_NEW = FourccUtils.fourcc("_new"), _SEL = FourccUtils.fourcc("_sel");
 	/**
 	 * Stores context of created vars with `_new`. Key: var name Value: var class
 	 */
@@ -174,10 +184,12 @@ public class NOBParser implements IParser {
 		this.clazzes = classModel;
 	}
 
+	@Override
 	public boolean isKeepUnknownCommands() {
 		return this.keepUnknownCommands;
 	}
 
+	@Override
 	public void setKeepUnknownCommands(final boolean keepUnknownCommands) {
 		this.keepUnknownCommands = keepUnknownCommands;
 	}

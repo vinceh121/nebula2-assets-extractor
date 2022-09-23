@@ -22,4 +22,8 @@ public interface IParser {
 	LinkedList<ICommandCall> getCalls();
 
 	void setClassModel(Map<String, NOBClazz> classModel);
+
+	void setKeepUnknownCommands(final boolean keepUnknownCommands);
+
+	boolean isKeepUnknownCommands();
 }

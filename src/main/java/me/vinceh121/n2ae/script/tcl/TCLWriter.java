@@ -1,14 +1,23 @@
-package me.vinceh121.n2ae.script;
+package me.vinceh121.n2ae.script.tcl;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 
+import me.vinceh121.n2ae.script.ClassCommandCall;
+import me.vinceh121.n2ae.script.ICommandCall;
+import me.vinceh121.n2ae.script.IWriter;
+import me.vinceh121.n2ae.script.NewCommandCall;
+import me.vinceh121.n2ae.script.ScriptHeader;
+import me.vinceh121.n2ae.script.SelCommandCall;
+import me.vinceh121.n2ae.script.UnknownClassCommandCall;
+
 public class TCLWriter implements IWriter {
 	private ScriptHeader header;
 	private LinkedList<ICommandCall> calls;
 	private String indent = "\t";
+	private boolean keepUnknownCommands;
 	private int depth;
 
 	@Override
@@ -96,6 +105,9 @@ public class TCLWriter implements IWriter {
 			}
 			writer.println();
 		} else if (call instanceof UnknownClassCommandCall) {
+			if (!this.keepUnknownCommands) {
+				throw new IllegalStateException("Trying to write unknown class call " + call);
+			}
 			final UnknownClassCommandCall clsCall = (UnknownClassCommandCall) call;
 			writer.print("UNK_");
 			writer.print(clsCall.getFourcc());
@@ -122,18 +134,22 @@ public class TCLWriter implements IWriter {
 		}
 	}
 
+	@Override
 	public ScriptHeader getHeader() {
 		return this.header;
 	}
 
+	@Override
 	public void setHeader(final ScriptHeader header) {
 		this.header = header;
 	}
 
+	@Override
 	public LinkedList<ICommandCall> getCalls() {
 		return this.calls;
 	}
 
+	@Override
 	public void setCalls(final LinkedList<ICommandCall> calls) {
 		this.calls = calls;
 	}
@@ -152,5 +168,15 @@ public class TCLWriter implements IWriter {
 
 	public void setDepth(final int depth) {
 		this.depth = depth;
+	}
+
+	@Override
+	public void setKeepUnknownCommands(final boolean keepUnknownCommands) {
+		this.keepUnknownCommands = keepUnknownCommands;
+	}
+
+	@Override
+	public boolean isKeepUnknownCommands() {
+		return this.keepUnknownCommands;
 	}
 }

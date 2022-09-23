@@ -43,6 +43,12 @@ public class LEDataOutputStream extends DataOutputStream {
 		this.writeShortLE((short) us);
 	}
 
+	public void writeString(final String str) throws IOException {
+		this.writeUnsignedShortLE(str.length());
+		final byte[] bytes = str.getBytes("US-ASCII");
+		this.write(bytes);
+	}
+
 	public long getWrittenBytes() {
 		return this.writtenBytes;
 	}

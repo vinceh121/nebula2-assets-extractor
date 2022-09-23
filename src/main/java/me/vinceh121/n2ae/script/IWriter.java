@@ -12,4 +12,16 @@ public interface IWriter {
 	void writeCalls(OutputStream out, LinkedList<ICommandCall> calls) throws IOException;
 
 	void writeCall(OutputStream out, ICommandCall call) throws IOException;
+
+	void setKeepUnknownCommands(boolean keepUnknownCommands);
+
+	boolean isKeepUnknownCommands();
+
+	void setCalls(LinkedList<ICommandCall> calls);
+
+	LinkedList<ICommandCall> getCalls();
+
+	void setHeader(ScriptHeader header);
+
+	ScriptHeader getHeader();
 }

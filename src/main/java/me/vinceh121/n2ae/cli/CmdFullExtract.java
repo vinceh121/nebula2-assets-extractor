@@ -18,9 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileExtractor;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
+import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
-import me.vinceh121.n2ae.script.NOBParser;
-import me.vinceh121.n2ae.script.TCLWriter;
+import me.vinceh121.n2ae.script.nob.NOBParser;
+import me.vinceh121.n2ae.script.tcl.TCLWriter;
 import me.vinceh121.n2ae.texture.Block;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 import picocli.CommandLine.Command;
@@ -164,7 +165,7 @@ public class CmdFullExtract implements Callable<Integer> {
 
 	private void processScript(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			final NOBParser parser = new NOBParser();
+			final IParser parser = new NOBParser();
 			parser.read(is);
 
 			if (this.clazzModel != null) {
