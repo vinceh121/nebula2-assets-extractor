@@ -72,7 +72,7 @@ public class NOBParser implements IParser {
 			}
 			return call;
 		} else {
-			final NOBClazz cls = this.clazzes.get(this.classStack.peek());
+			final NOBClazz cls = this.getClazzByName(this.classStack.peek());
 			if (cls == null) {
 				throw new IllegalStateException("Unknown nscript class " + this.classStack.peek());
 			}
