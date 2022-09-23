@@ -5,7 +5,7 @@ Implemented formats (Reading/Writing):
   - NPK0 archives (RW)
   - NTX1 textures (RW)
   - NVX1 models (R)
-  - NOB0 scripts (R)
+  - NOB0 scripts (RW)
 
 ## Usage
 
