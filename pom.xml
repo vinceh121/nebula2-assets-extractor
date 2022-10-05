@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.2.2</version>
+			<version>2.13.4</version>
 		</dependency>
 
 		<!-- Just for glType and glFormat constants -->
@@ -64,7 +64,7 @@
 				<version>2.22.2</version>
 				<configuration>
 					<excludes>
-						<exclude />
+						<exclude/>
 					</excludes>
 				</configuration>
 			</plugin>
