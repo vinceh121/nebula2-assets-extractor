@@ -1,4 +1,4 @@
-package me.vinceh121.n2ae.script.tcl;
+package me.vinceh121.n2ae.script.nob;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import me.vinceh121.n2ae.script.NewCommandCall;
 import me.vinceh121.n2ae.script.ScriptHeader;
 import me.vinceh121.n2ae.script.SelCommandCall;
 import me.vinceh121.n2ae.script.UnknownClassCommandCall;
-import me.vinceh121.n2ae.script.nob.NOBParser;
 
 public class NOBWriter implements IWriter {
 	private ScriptHeader header;

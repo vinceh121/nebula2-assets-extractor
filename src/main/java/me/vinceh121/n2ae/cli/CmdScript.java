@@ -13,7 +13,7 @@ import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.IWriter;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.nob.NOBParser;
-import me.vinceh121.n2ae.script.tcl.NOBWriter;
+import me.vinceh121.n2ae.script.nob.NOBWriter;
 import me.vinceh121.n2ae.script.tcl.TCLWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
