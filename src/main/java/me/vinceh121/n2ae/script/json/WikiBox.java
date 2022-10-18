@@ -13,7 +13,16 @@ public enum WikiBox {
 			/*
 			 * Can't have barrel count because single-barrel towers don't have that property
 			 * , { "guns", "/turret/vhcl/normal/gun" }
-			 */ });
+			 */ }),
+	GUNTOWER_FIREMISSILE("Guntower Firemissile infobox",
+			new String[][] { { "cost", "/vhcl/setartefactuseenergy" },
+					{ "buildtime", "/vhcl/bauphase/statewatch/settimeout" }, { "health", "/vhcl/setenergy" },
+					{ "damage", "/weapon/vhcl/explode/explo/setenergy" },
+					{ "delay", "/turret/vhcl/normal/weapon/setshotdelay" },
+					{ "speed", "/turret/vhcl/normal/weapon/setstartspeed" }
+			// Can't have barrel count because it is multiple calls
+			});
+	;
 
 	private final String templateName;
 	private final Map<String, JsonPointer> properties = new Hashtable<>();
