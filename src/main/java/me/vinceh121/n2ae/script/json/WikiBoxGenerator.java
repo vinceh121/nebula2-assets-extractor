@@ -1,6 +1,7 @@
 package me.vinceh121.n2ae.script.json;
 
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +22,12 @@ public class WikiBoxGenerator {
 			out.print("| ");
 			out.print(prop);
 			out.print("=");
-			out.println(val);
+			if (val.isFloat()) {
+				// use default decimal format to print decimal part only when required
+				out.println(new DecimalFormat().format(val.asDouble()));
+			} else {
+				out.println(val);
+			}
 		}
 		out.println("}}");
 	}
