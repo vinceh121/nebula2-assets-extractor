@@ -22,7 +22,6 @@ public enum WikiBox {
 					{ "speed", "/turret/vhcl/normal/weapon/setstartspeed" }
 			// Can't have barrel count because it is multiple calls
 			});
-	;
 
 	private final String templateName;
 	private final Map<String, JsonPointer> properties = new Hashtable<>();
