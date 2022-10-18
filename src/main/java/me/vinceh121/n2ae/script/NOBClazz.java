@@ -3,12 +3,8 @@ package me.vinceh121.n2ae.script;
 import java.util.Hashtable;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class NOBClazz {
 	private final Map<String, CmdPrototype> methodsByFourcc = new Hashtable<>();
-	@JsonIgnore
-	private final Map<String, CmdPrototype> methodsByName = new Hashtable<>();
 	private String name, superclass;
 
 	/**
@@ -45,12 +41,16 @@ public class NOBClazz {
 	}
 
 	public CmdPrototype getMethodByName(final String name) {
-		return this.methodsByName.get(name);
+		for (final CmdPrototype proto : this.methodsByFourcc.values()) {
+			if (proto.getName().equals(name)) {
+				return proto;
+			}
+		}
+		return null;
 	}
 
 	public void putMethod(final CmdPrototype value) {
 		this.methodsByFourcc.put(value.getFourcc(), value);
-		this.methodsByName.put(value.getName(), value);
 	}
 
 	public boolean containsMethodByFourcc(final String fourcc) {
@@ -58,7 +58,12 @@ public class NOBClazz {
 	}
 
 	public boolean containsMethodByName(final String name) {
-		return this.methodsByName.containsKey(name);
+		for (final CmdPrototype proto : this.methodsByFourcc.values()) {
+			if (proto.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

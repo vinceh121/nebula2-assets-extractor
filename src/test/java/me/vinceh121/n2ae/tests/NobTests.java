@@ -16,6 +16,7 @@ import me.vinceh121.n2ae.script.IWriter;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 import me.vinceh121.n2ae.script.nob.NOBWriter;
+import me.vinceh121.n2ae.script.tcl.TCLParser;
 import me.vinceh121.n2ae.script.tcl.TCLWriter;
 
 class NobTests {
@@ -58,5 +59,28 @@ class NobTests {
 		writer.write(out);
 
 		Assertions.assertArrayEquals(orig, out.toByteArray());
+	}
+
+	@Test
+	void tclSymetry() throws IOException {
+		final Map<String, NOBClazz> model = this.mapper.readValue(new File("./project-nomads.classmodel.json"),
+				new TypeReference<Map<String, NOBClazz>>() {
+				});
+
+		final String orig = new String(
+				NobTests.class.getClassLoader().getResourceAsStream("if_hilfe.tcl").readAllBytes());
+
+		final IParser parse = new TCLParser();
+		parse.setClassModel(model);
+		parse.read(orig);
+
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		final IWriter writer = new TCLWriter();
+		writer.setHeader(parse.getHeader());
+		writer.setCalls(parse.getCalls());
+		writer.write(out);
+
+		Assertions.assertEquals(orig, new String(out.toByteArray()));
 	}
 }

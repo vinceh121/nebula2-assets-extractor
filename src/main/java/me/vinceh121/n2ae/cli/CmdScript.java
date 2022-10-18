@@ -14,6 +14,7 @@ import me.vinceh121.n2ae.script.IWriter;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 import me.vinceh121.n2ae.script.nob.NOBWriter;
+import me.vinceh121.n2ae.script.tcl.TCLParser;
 import me.vinceh121.n2ae.script.tcl.TCLWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -90,7 +91,7 @@ public class CmdScript implements Callable<Integer> {
 			if ("nob0".equals(this.from)) {
 				parser = new NOBParser();
 			} else if ("tcl".equals(this.from)) {
-				throw new UnsupportedOperationException("TCL Parser not yet implemented");
+				parser = new TCLParser();
 			} else {
 				throw new RuntimeException("Unknown from " + this.from);
 			}

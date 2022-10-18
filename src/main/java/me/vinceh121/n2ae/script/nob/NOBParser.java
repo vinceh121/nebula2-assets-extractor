@@ -29,10 +29,6 @@ public class NOBParser implements IParser {
 	public static final String MAGIC_STRING = "NOB0";
 	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NOBParser.MAGIC_STRING),
 			_NEW = FourccUtils.fourcc("_new"), _SEL = FourccUtils.fourcc("_sel");
-	/**
-	 * Stores context of created vars with `_new`. Key: var name Value: var class
-	 */
-	private final Map<String, String> context = new Hashtable<>();
 	private final Stack<String> classStack = new Stack<>();
 	private final LinkedList<ICommandCall> calls = new LinkedList<>();
 	private Map<String, NOBClazz> clazzes = new Hashtable<>();
@@ -45,7 +41,6 @@ public class NOBParser implements IParser {
 	}
 
 	public void read(final LEDataInputStream stream) throws IOException {
-		this.calls.clear();
 		this.readHeader(stream);
 		while (stream.available() > 0) {
 			this.calls.add(this.readBlock(stream));
@@ -59,7 +54,6 @@ public class NOBParser implements IParser {
 			final String clazzName = stream.readString();
 			final NOBClazz clazz = this.getClazzByName(clazzName);
 			final String name = stream.readString();
-			this.context.put(name, clazzName);
 			this.classStack.push(clazzName); // _new automatically cds into created object
 
 			final NewCommandCall call = new NewCommandCall(this.getLastClazz(), clazz, name);
