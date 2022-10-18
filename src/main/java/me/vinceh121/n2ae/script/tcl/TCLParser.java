@@ -45,7 +45,7 @@ public class TCLParser implements IParser {
 		do {
 			line = line.strip();
 			// comment
-			if (line.startsWith("#")) {
+			if (line.startsWith("#") || line.isEmpty()) {
 				continue;
 			}
 
@@ -98,7 +98,8 @@ public class TCLParser implements IParser {
 				case STRING:
 				case USTRING:
 				case CODE:
-					final String rawStr = scan.next();
+					// ASCII between quotes, but doesn't contain quotes either
+					final String rawStr = scan.findInLine("\"[\\p{ASCII}&&[^\"]]*\"");
 					if (!rawStr.startsWith("\"") || !rawStr.endsWith("\"")) {
 						throw new IOException("Missing String quotes");
 					}
