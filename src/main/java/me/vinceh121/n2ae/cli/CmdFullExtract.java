@@ -76,7 +76,7 @@ public class CmdFullExtract implements Callable<Integer> {
 		} else {
 			try {
 				this.processFile(file);
-			} catch (final IOException e) {
+			} catch (final Exception e) {
 				System.err.println("Failed to process " + file.getPath());
 				e.printStackTrace();
 			}
@@ -166,7 +166,6 @@ public class CmdFullExtract implements Callable<Integer> {
 	private void processScript(final File fileIn, final File fileOut) throws IOException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
 			final IParser parser = new NOBParser();
-			parser.read(is);
 
 			if (this.clazzModel != null) {
 				final ObjectMapper mapper = new ObjectMapper();
@@ -175,6 +174,8 @@ public class CmdFullExtract implements Callable<Integer> {
 						});
 				parser.setClassModel(model);
 			}
+
+			parser.read(is);
 
 			final TCLWriter writer = new TCLWriter();
 			writer.setHeader(parser.getHeader());
