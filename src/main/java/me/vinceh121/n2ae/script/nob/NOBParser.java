@@ -52,7 +52,7 @@ public class NOBParser implements IParser {
 
 		if (cmdFourcc == NOBParser._NEW) {
 			final String clazzName = stream.readString();
-			final NOBClazz clazz = this.getClazzByName(clazzName);
+			final NOBClazz clazz = this.clazzes.get(clazzName);
 			final String name = stream.readString();
 			this.classStack.push(clazzName); // _new automatically cds into created object
 
@@ -66,7 +66,7 @@ public class NOBParser implements IParser {
 			}
 			return call;
 		} else {
-			final NOBClazz cls = this.getClazzByName(this.classStack.peek());
+			final NOBClazz cls = this.clazzes.get(this.classStack.peek());
 			if (cls == null) {
 				throw new IllegalStateException("Unknown nscript class " + this.classStack.peek());
 			}
@@ -135,16 +135,7 @@ public class NOBParser implements IParser {
 	}
 
 	private NOBClazz getLastClazz() {
-		return this.getClazzByName(this.classStack.peek());
-	}
-
-	private NOBClazz getClazzByName(final String name) {
-		for (final NOBClazz cls : this.clazzes.values()) {
-			if (name.equals(cls.getName())) {
-				return cls;
-			}
-		}
-		return null;
+		return this.clazzes.get(this.classStack.peek());
 	}
 
 	public CmdPrototype recursiveGetMethod(final NOBClazz cls, final String fourcc) {
