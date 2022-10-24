@@ -2,6 +2,7 @@ package me.vinceh121.n2ae.script.json;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,20 +45,35 @@ public class JsonScriptGenerator {
 				return i;
 			} else if (call instanceof ClassCommandCall) {
 				final ClassCommandCall clsCall = (ClassCommandCall) call;
-				if (clsCall.getArguments().length == 0) {
-					node.put(clsCall.getPrototype().getName(), true);
-				} else if (clsCall.getArguments().length == 1) {
-					this.putObject(node, clsCall.getPrototype().getName(), clsCall.getArguments()[0]);
-				} else {
+				final String prop = clsCall.getPrototype().getName();
+				final Object val = this.getValueForCall(clsCall);
+				
+				if (node.has(prop)) {
+					final JsonNode oldVal = node.get(prop);
 					final ArrayNode arr = this.mapper.createArrayNode();
-					for (final Object obj : clsCall.getArguments()) {
-						this.addObject(arr, obj);
-					}
-					node.set(clsCall.getPrototype().getName(), arr);
+					arr.add(oldVal);
+					this.addObject(arr, val);
+					node.set(prop, arr);
+				} else {
+					this.putObject(node, prop, val);
 				}
 			}
 		}
 		return -1;
+	}
+	
+	private Object getValueForCall(final ClassCommandCall clsCall) {
+		if (clsCall.getArguments().length == 0) {
+			return true;
+		} else if (clsCall.getArguments().length == 1) {
+			return clsCall.getArguments()[0];
+		} else {
+			final ArrayNode arr = this.mapper.createArrayNode();
+			for (final Object obj : clsCall.getArguments()) {
+				this.addObject(arr, obj);
+			}
+			return arr;
+		}
 	}
 
 	private void addObject(final ArrayNode node, final Object value) {
@@ -69,6 +85,8 @@ public class JsonScriptGenerator {
 			node.add((String) value);
 		} else if (value instanceof Boolean) {
 			node.add((boolean) value);
+		} else if (value instanceof JsonNode) {
+			node.add((JsonNode) value);
 		} else {
 			throw new IllegalArgumentException("Cannot add type " + value.getClass());
 		}
@@ -83,6 +101,8 @@ public class JsonScriptGenerator {
 			node.put(propertyName, (String) value);
 		} else if (value instanceof Boolean) {
 			node.put(propertyName, (boolean) value);
+		} else if (value instanceof JsonNode) {
+			node.set(propertyName, (JsonNode) value);
 		} else {
 			throw new IllegalArgumentException("Cannot put type " + value.getClass());
 		}
