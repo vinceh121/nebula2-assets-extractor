@@ -42,6 +42,9 @@ public class CmdWikiBox implements Callable<Integer> {
 	@Option(names = { "-l", "--list-boxes" })
 	private boolean list;
 
+	@Option(names = { "-j", "--json" })
+	private boolean json;
+
 	@Override
 	public Integer call() throws Exception {
 		if (this.list) {
@@ -55,7 +58,7 @@ public class CmdWikiBox implements Callable<Integer> {
 			throw new ParameterException(this.spec.commandLine(), "Missing required argument -i, --input=<input>");
 		}
 
-		if (this.box == null) {
+		if (this.box == null && !this.json) {
 			throw new ParameterException(this.spec.commandLine(), "Missing required argument -b, --box=<box>");
 		}
 
@@ -78,6 +81,10 @@ public class CmdWikiBox implements Callable<Integer> {
 			parser.read(in);
 			final JsonScriptGenerator json = new JsonScriptGenerator(this.mapper);
 			final ObjectNode node = json.generateJson(parser.getCalls());
+			if (this.json) {
+				this.mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, node);
+				return 0;
+			}
 			final WikiBoxGenerator gen = new WikiBoxGenerator();
 			gen.write(System.out, this.box, node);
 		}
