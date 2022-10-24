@@ -19,7 +19,7 @@ public enum WikiBox {
 					{ "buildtime", "/vhcl/bauphase/statewatch/settimeout" }, { "health", "/vhcl/setenergy" },
 					{ "damage", "/weapon/vhcl/explode/explo/setenergy" },
 					{ "delay", "/turret/vhcl/normal/weapon/setshotdelay" },
-					{ "speed", "/turret/vhcl/normal/weapon/setstartspeed" }
+					{ "speed", "/turret/vhcl/normal/weapon/setstartspeed" }, { "armor", "/vhcl/setarmor/0/1" }
 			// Can't have barrel count because it is multiple calls
 			});
 
