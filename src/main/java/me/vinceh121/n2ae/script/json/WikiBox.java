@@ -9,7 +9,8 @@ public enum WikiBox {
 	GUNTOWER_MACHINEGUN("Guntower Machinegun infobox",
 			new String[][] { { "cost", "/vhcl/setartefactuseenergy" },
 					{ "buildtime", "/vhcl/bauphase/statewatch/settimeout" }, { "health", "/vhcl/setenergy" },
-					{ "damage", "/turret/vhcl/normal/gun/setdamage" }, { "rate", "/turret/vhcl/normal/gun/setmgspeed" }
+					{ "damage", "/turret/vhcl/normal/gun/setdamage" }, { "rate", "/turret/vhcl/normal/gun/setmgspeed" },
+					{ "armor", "/vhcl/setarmor/0/1" }
 			/*
 			 * Can't have barrel count because single-barrel towers don't have that property
 			 * , { "guns", "/turret/vhcl/normal/gun" }
