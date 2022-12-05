@@ -52,4 +52,8 @@ public class LEDataOutputStream extends DataOutputStream {
 	public long getWrittenBytes() {
 		return this.writtenBytes;
 	}
+	
+	public OutputStream getUnderlyingOutputStream() {
+		return this.out;
+	}
 }
