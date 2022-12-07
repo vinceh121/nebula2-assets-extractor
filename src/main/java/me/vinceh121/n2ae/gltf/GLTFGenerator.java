@@ -32,7 +32,8 @@ public class GLTFGenerator {
 
 	public static void main(String[] args) throws StreamReadException, DatabindException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		GLTFGenerator gen = new GLTFGenerator(new FileOutputStream("/tmp/owo.bin"));
+		FileOutputStream out = new FileOutputStream("/tmp/owo.bin");
+		GLTFGenerator gen = new GLTFGenerator(out);
 
 		TCLParser parser = new TCLParser();
 		parser.setClassModel(mapper.readValue(new File("./project-nomads.classmodel.json"),
@@ -51,8 +52,11 @@ public class GLTFGenerator {
 		gen.addMesh("skin", modelReader.getTypes(), modelReader.getVertices(), modelReader.getTriangles(), 0);
 
 		gen.buildBuffer("owo.bin");
+		out.flush();
+		out.close();
 
 		mapper.writerWithDefaultPrettyPrinter().writeValue(new File("/tmp/owo.gltf"), gen.getGltf());
+		mapper.writerWithDefaultPrettyPrinter().writeValue(new File("/tmp/owo.json"), gen.getGltf());
 	}
 
 	public GLTFGenerator(OutputStream packedBinary) {
@@ -65,6 +69,9 @@ public class GLTFGenerator {
 		mesh.setName(name);
 		Primitive prim = new Primitive();
 		mesh.getPrimitives().add(prim);
+
+		float[] maxCoord = vertices.get(0).getCoord();
+		float[] minCoord = vertices.get(0).getCoord();
 
 		int positionCount = 0;
 		int normalCount = 0;
@@ -86,6 +93,8 @@ public class GLTFGenerator {
 		for (Vertex v : vertices) {
 			if (types.contains(VertexType.COORD)) {
 				positionCount++;
+				minCoord = min(v.getCoord(), minCoord);
+				maxCoord = max(v.getCoord(), maxCoord);
 				for (float f : v.getCoord()) {
 					positionBuf.writeFloatLE(f);
 				}
@@ -129,11 +138,16 @@ public class GLTFGenerator {
 
 			if (types.contains(VertexType.JOINTS_WEIGHTS)) {
 				jointWeightsCount++;
-				for (short s : v.getJointIndices()) {
-					jointBuf.writeShortLE(s);
-				}
-				for (float f : v.getWeights()) {
-					weightsBuf.writeFloatLE(f);
+				float[] w = normalize(v.getWeights());
+				for (int i = 0; i < 4; i++) {
+					// useless joints that don't have weights should use joint 0
+					if (w[i] == 0) {
+						jointBuf.writeUnsignedShortLE(0);
+					} else {
+						// NVX1 uses -1 for unused indices, glTF uses 0
+						jointBuf.writeUnsignedShortLE(v.getJointIndices()[i] == -1 ? 0 : v.getJointIndices()[i]);
+					}
+					weightsBuf.writeFloatLE(w[i]);
 				}
 			}
 		}
@@ -155,6 +169,8 @@ public class GLTFGenerator {
 			accessor.setType(Type.VEC3);
 			accessor.setComponentType(Accessor.FLOAT);
 			accessor.setCount(positionCount);
+			accessor.setMax(maxCoord);
+			accessor.setMin(minCoord);
 			this.gltf.getAccessors().add(accessor);
 			attributes.put("POSITION", this.gltf.getAccessors().indexOf(accessor));
 
@@ -216,7 +232,7 @@ public class GLTFGenerator {
 			Accessor accessor = new Accessor();
 			accessor.setBufferView(this.gltf.getBufferViews().indexOf(view));
 			accessor.setType(Type.VEC4);
-			accessor.setComponentType(Accessor.FLOAT);
+			accessor.setComponentType(Accessor.UNSIGNED_SHORT);
 			accessor.setCount(jointWeightsCount);
 			this.gltf.getAccessors().add(accessor);
 			attributes.put("JOINTS_0", this.gltf.getAccessors().indexOf(accessor));
@@ -235,10 +251,10 @@ public class GLTFGenerator {
 			accessor = new Accessor();
 			accessor.setBufferView(this.gltf.getBufferViews().indexOf(view));
 			accessor.setType(Type.VEC4);
-			accessor.setComponentType(Accessor.SHORT);
+			accessor.setComponentType(Accessor.FLOAT);
 			accessor.setCount(jointWeightsCount);
 			this.gltf.getAccessors().add(accessor);
-			attributes.put("JOINTS_0", this.gltf.getAccessors().indexOf(accessor));
+			attributes.put("WEIGHTS_0", this.gltf.getAccessors().indexOf(accessor));
 
 			this.bufferSize += bufWeights.length;
 			this.packedBinary.write(bufWeights);
@@ -286,6 +302,46 @@ public class GLTFGenerator {
 		this.gltf.getNodes().add(node);
 	}
 
+	private float[] normalize(float[] a) {
+		float sum = 0;
+		for (float f : a) {
+			sum += f;
+		}
+
+		if (sum == 1) {
+			return a;
+		}
+
+		float[] out = new float[a.length];
+		for (int i = 0; i < a.length; i++) {
+			out[i] = a[i] * 1 / sum;
+		}
+
+		return out;
+	}
+
+	private float[] max(float[] a, float[] b) {
+		if (a.length != b.length) {
+			throw new IllegalArgumentException("a.length != b.length");
+		}
+		float[] m = new float[a.length];
+		for (int i = 0; i < a.length; i++) {
+			m[i] = Math.max(a[i], b[i]);
+		}
+		return m;
+	}
+
+	private float[] min(float[] a, float[] b) {
+		if (a.length != b.length) {
+			throw new IllegalArgumentException("a.length != b.length");
+		}
+		float[] m = new float[a.length];
+		for (int i = 0; i < a.length; i++) {
+			m[i] = Math.min(a[i], b[i]);
+		}
+		return m;
+	}
+
 	public void buildBasicScene(String name, int rootNode) {
 		final Scene sc = new Scene();
 		sc.setName(name);
@@ -323,6 +379,7 @@ public class GLTFGenerator {
 
 		Skin skin = new Skin();
 		skin.setName("rig");
+		skin.setSkeleton(0);
 		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
 			skin.getJoints().add(i);
 		}
