@@ -16,7 +16,12 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.vinceh121.n2ae.LEDataOutputStream;
+import me.vinceh121.n2ae.animation.Curve;
+import me.vinceh121.n2ae.animation.Interpolation;
+import me.vinceh121.n2ae.animation.NaxFileReader;
 import me.vinceh121.n2ae.gltf.Accessor.Type;
+import me.vinceh121.n2ae.gltf.ChannelTarget.TargetPath;
+import me.vinceh121.n2ae.gltf.Sampler.GltfInterpolation;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.model.Vertex;
 import me.vinceh121.n2ae.model.VertexType;
@@ -27,7 +32,7 @@ import me.vinceh121.n2ae.script.tcl.TCLParser;
 
 public class GLTFGenerator {
 	private final GLTF gltf = new GLTF();
-	private final OutputStream packedBinary;
+	private final LEDataOutputStream packedBinary;
 	private int bufferSize;
 
 	public static void main(String[] args) throws StreamReadException, DatabindException, IOException {
@@ -51,6 +56,11 @@ public class GLTFGenerator {
 
 		gen.addMesh("skin", modelReader.getTypes(), modelReader.getVertices(), modelReader.getTriangles(), 0);
 
+		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
+				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/character.nax"));
+
+		gen.addCurves(animReader.readAll());
+
 		gen.buildBuffer("owo.bin");
 		out.flush();
 		out.close();
@@ -60,7 +70,116 @@ public class GLTFGenerator {
 	}
 
 	public GLTFGenerator(OutputStream packedBinary) {
-		this.packedBinary = packedBinary;
+		this.packedBinary = new LEDataOutputStream(packedBinary);
+	}
+
+	public void addCurves(List<Curve> curves) throws IOException {
+		for (Curve c : curves) {
+			this.addCurve(c);
+		}
+	}
+
+	public void addCurve(Curve c) throws IOException {
+		if (!c.isRotation() && !c.isTranslation()) {
+			throw new IllegalArgumentException("Curve (named " + c.getName() + ") is neither rotation or translation");
+		}
+		Animation anim = new Animation();
+		anim.setName(c.getName());
+		this.gltf.getAnimations().add(anim);
+
+		// input buffer and accessor: array of floats for the timing of each key
+		// NAX0 already guarantees uniform linear keys, so just write a key every delay
+		BufferView bufInput = new BufferView();
+		bufInput.setByteOffset(this.bufferSize);
+		bufInput.setByteLength(c.getNumKeys() * 4);
+		bufInput.setBuffer(0);
+		this.gltf.getBufferViews().add(bufInput);
+
+		for (int i = 0; i < c.getNumKeys(); i++) {
+			this.packedBinary.writeFloatLE(c.getKeysPerSec() * i);
+		}
+		this.bufferSize += bufInput.getByteLength();
+
+		Accessor accessorInput = new Accessor();
+		accessorInput.setBufferView(this.gltf.getBufferViews().indexOf(bufInput));
+		accessorInput.setComponentType(Accessor.FLOAT);
+		accessorInput.setCount(c.getNumKeys());
+		accessorInput.setType(Type.SCALAR);
+		accessorInput.setMax(new float[] { c.getKeysPerSec() * (c.getNumKeys() - 1) });
+		accessorInput.setMin(new float[] { 0 });
+		this.gltf.getAccessors().add(accessorInput);
+
+		// output buffer and accessor: value of keys; vec3 for translation, quaternions
+		// for rotation
+		BufferView bufOutput = new BufferView();
+		bufOutput.setByteOffset(this.bufferSize);
+		bufOutput.setBuffer(0);
+		if (c.isRotation()) {
+			bufOutput.setByteLength(c.getNumKeys() * 4 * 2); // 4 16-bit shorts
+		} else if (c.isTranslation()) {
+			bufOutput.setByteLength(c.getNumKeys() * 3 * 4); // 3 32-bit floats
+		}
+		this.gltf.getBufferViews().add(bufOutput);
+
+		Accessor accessorOutput = new Accessor();
+		accessorOutput.setBufferView(this.gltf.getBufferViews().indexOf(bufOutput));
+		accessorOutput.setCount(c.getNumKeys());
+		if (c.isRotation()) {
+			accessorOutput.setComponentType(Accessor.UNSIGNED_SHORT);
+			accessorOutput.setType(Type.VEC4);
+		} else if (c.isTranslation()) {
+			accessorOutput.setComponentType(Accessor.FLOAT);
+			accessorOutput.setType(Type.VEC3);
+		}
+		this.gltf.getAccessors().add(accessorOutput);
+
+		this.bufferSize += bufOutput.getByteLength();
+
+		if (c.isRotation()) {
+			for (short s : c.getPackedCurve()) {
+				this.packedBinary.writeUnsignedShortLE(s);
+			}
+		} else if (c.isTranslation()) {
+			for (float f : c.getVanillaCurve()) {
+				this.packedBinary.writeFloatLE(f);
+			}
+		}
+
+		// now that buffers are ready, make the animation sampler
+		Sampler sampler = new Sampler();
+		sampler.setInput(this.gltf.getAccessors().indexOf(accessorInput));
+		sampler.setOutput(this.gltf.getAccessors().indexOf(accessorOutput));
+		if (c.isRotation()) {
+			sampler.setInterpolation(GltfInterpolation.LINEAR);
+		} else if (c.isTranslation() && c.getInterpolation() == Interpolation.LINEAR) {
+			sampler.setInterpolation(GltfInterpolation.LINEAR);
+		} else if (c.isTranslation() && c.getInterpolation() == Interpolation.STEP) {
+			sampler.setInterpolation(GltfInterpolation.STEP);
+		}
+		anim.getSamplers().add(sampler);
+
+		// then the channel
+		Channel chan = new Channel();
+		chan.setSampler(anim.getSamplers().indexOf(sampler));
+		ChannelTarget target = new ChannelTarget();
+		target.setNode(this.getNodeIdxByName(c.getBoneName()));
+		if (c.isRotation()) {
+			target.setPath(TargetPath.rotation);
+		} else if (c.isTranslation()) {
+			target.setPath(TargetPath.translation);
+		}
+		chan.setTarget(target);
+		anim.getChannels().add(chan);
+	}
+
+	private int getNodeIdxByName(String name) {
+		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
+			Node node = this.gltf.getNodes().get(i);
+			if (name.equals(node.getName())) {
+				return i;
+			}
+		}
+		throw new IllegalStateException();
 	}
 
 	public void addMesh(String name, List<VertexType> types, List<Vertex> vertices, List<int[]> triangles, int skinIdx)

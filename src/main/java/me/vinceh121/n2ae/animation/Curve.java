@@ -1,6 +1,7 @@
 package me.vinceh121.n2ae.animation;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class Curve {
 	private int startKey, numKeys;
@@ -83,13 +84,26 @@ public class Curve {
 	public void setPackedCurve(short[] packedCurve) {
 		this.packedCurve = packedCurve;
 	}
-	
+
 	public boolean isRotation() {
 		return this.name.contains("_rot_");
 	}
-	
+
 	public boolean isTranslation() {
 		return this.name.contains("_trans_");
+	}
+
+	public String getBoneName() {
+		final String nameSplit;
+		if (this.isRotation()) {
+			nameSplit = "_rot_";
+		} else if (this.isTranslation()) {
+			nameSplit = "_trans_";
+		} else {
+			throw new IllegalStateException("Curve neither rotation nor translation");
+		}
+		final String[] split = this.getName().split(Pattern.quote(nameSplit));
+		return split[split.length - 1];
 	}
 
 	@Override
