@@ -1,5 +1,7 @@
 package me.vinceh121.n2ae.animation;
 
+import java.util.Arrays;
+
 public class Curve {
 	private int startKey, numKeys;
 	private float keysPerSec;
@@ -81,11 +83,20 @@ public class Curve {
 	public void setPackedCurve(short[] packedCurve) {
 		this.packedCurve = packedCurve;
 	}
+	
+	public boolean isRotation() {
+		return this.name.contains("_rot_");
+	}
+	
+	public boolean isTranslation() {
+		return this.name.contains("_trans_");
+	}
 
 	@Override
 	public String toString() {
 		return "Curve [startKey=" + startKey + ", numKeys=" + numKeys + ", keysPerSec=" + keysPerSec
 				+ ", interpolation=" + interpolation + ", repeat=" + repeat + ", type=" + type + ", name=" + name
-				+ ", vanillaCurve=" + vanillaCurve + ", packedCurve=" + packedCurve + "]";
+				+ ", vanillaCurve=" + Arrays.toString(vanillaCurve) + ", packedCurve=" + Arrays.toString(packedCurve)
+				+ "]";
 	}
 }
