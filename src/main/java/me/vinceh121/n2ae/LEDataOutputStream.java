@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class LEDataOutputStream extends DataOutputStream {
-	private long writtenBytes = 0;
 
 	public LEDataOutputStream(final OutputStream out) {
 		super(out);
@@ -14,13 +13,11 @@ public class LEDataOutputStream extends DataOutputStream {
 	@Override
 	public synchronized void write(final int b) throws IOException {
 		super.write(b);
-		this.written++;
 	}
 
 	@Override
 	public synchronized void write(final byte[] b, final int off, final int len) throws IOException {
 		super.write(b, off, len);
-		this.written += len;
 	}
 
 	public void writeIntLE(final int i) throws IOException {
@@ -50,7 +47,7 @@ public class LEDataOutputStream extends DataOutputStream {
 	}
 
 	public long getWrittenBytes() {
-		return this.writtenBytes;
+		return this.written;
 	}
 	
 	public OutputStream getUnderlyingOutputStream() {

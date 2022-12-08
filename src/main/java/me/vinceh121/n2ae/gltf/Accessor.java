@@ -12,6 +12,7 @@ public class Accessor {
 	private Type type;
 	private float[] min;
 	private float[] max;
+	private boolean normalized;
 
 	public int getBufferView() {
 		return bufferView;
@@ -59,6 +60,14 @@ public class Accessor {
 
 	public void setMax(float[] max) {
 		this.max = max;
+	}
+
+	public boolean isNormalized() {
+		return normalized;
+	}
+
+	public void setNormalized(boolean normalized) {
+		this.normalized = normalized;
 	}
 
 	public enum Type {

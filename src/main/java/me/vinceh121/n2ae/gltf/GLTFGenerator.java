@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +60,9 @@ public class GLTFGenerator {
 		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
 				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/character.nax"));
 
-		gen.addCurves(animReader.readAll());
+		List<Curve> curves = animReader.readAll();
+		curves.removeIf(c -> c.isTranslation() || !c.getName().startsWith("landen"));
+		gen.addCurves(curves);
 
 		gen.buildBuffer("owo.bin");
 		out.flush();
@@ -94,7 +97,6 @@ public class GLTFGenerator {
 		bufInput.setByteLength(c.getNumKeys() * 4);
 		bufInput.setBuffer(0);
 		this.gltf.getBufferViews().add(bufInput);
-
 		for (int i = 0; i < c.getNumKeys(); i++) {
 			this.packedBinary.writeFloatLE(c.getKeysPerSec() * i);
 		}
@@ -115,7 +117,7 @@ public class GLTFGenerator {
 		bufOutput.setByteOffset(this.bufferSize);
 		bufOutput.setBuffer(0);
 		if (c.isRotation()) {
-			bufOutput.setByteLength(c.getNumKeys() * 4 * 2); // 4 16-bit shorts
+			bufOutput.setByteLength(c.getNumKeys() * 4 * 4); // 4 32-bit float
 		} else if (c.isTranslation()) {
 			bufOutput.setByteLength(c.getNumKeys() * 3 * 4); // 3 32-bit floats
 		}
@@ -125,7 +127,7 @@ public class GLTFGenerator {
 		accessorOutput.setBufferView(this.gltf.getBufferViews().indexOf(bufOutput));
 		accessorOutput.setCount(c.getNumKeys());
 		if (c.isRotation()) {
-			accessorOutput.setComponentType(Accessor.UNSIGNED_SHORT);
+			accessorOutput.setComponentType(Accessor.FLOAT);
 			accessorOutput.setType(Type.VEC4);
 		} else if (c.isTranslation()) {
 			accessorOutput.setComponentType(Accessor.FLOAT);
@@ -136,12 +138,21 @@ public class GLTFGenerator {
 		this.bufferSize += bufOutput.getByteLength();
 
 		if (c.isRotation()) {
-			for (short s : c.getPackedCurve()) {
-				this.packedBinary.writeUnsignedShortLE(s);
+			for (int i = 0; i < c.getPackedCurve().length; i += 4) {
+				short[] quat = new short[4];
+				System.arraycopy(c.getPackedCurve(), i, quat, 0, 4);
+				float[] quatNorm = this.normalizeShort(quat);
+				for (float comp : quatNorm) {
+					this.packedBinary.writeFloatLE(comp);
+				}
 			}
 		} else if (c.isTranslation()) {
-			for (float f : c.getVanillaCurve()) {
-				this.packedBinary.writeFloatLE(f);
+			// NAX0 stores translations as VEC4 with 4th component being always 0
+			final float[] v = c.getVanillaCurve();
+			for (int i = 0; i < c.getVanillaCurve().length; i += 4) {
+				this.packedBinary.writeFloatLE(v[0]);
+				this.packedBinary.writeFloatLE(v[1]);
+				this.packedBinary.writeFloatLE(v[2]);
 			}
 		}
 
@@ -170,6 +181,21 @@ public class GLTFGenerator {
 		}
 		chan.setTarget(target);
 		anim.getChannels().add(chan);
+	}
+
+	private float[] normalizeShort(short[] a) {
+		final float shortMax = (int) (Math.pow(2, 16) - 1);
+		int sum = 0;
+		for (short s : a) {
+			sum += s;
+		}
+
+		float[] norm = new float[a.length];
+		for (int i = 0; i < a.length; i++) {
+			norm[i] = (float) (a[i] * shortMax / sum) / shortMax;
+		}
+
+		return norm;
 	}
 
 	private int getNodeIdxByName(String name) {
