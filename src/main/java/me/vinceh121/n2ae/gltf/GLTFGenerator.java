@@ -185,14 +185,14 @@ public class GLTFGenerator {
 
 	private float[] normalizeShort(short[] a) {
 		final float shortMax = (int) (Math.pow(2, 16) - 1);
-		int sum = 0;
+		float sum = 0;
 		for (short s : a) {
-			sum += s;
+			sum += Short.toUnsignedInt(s);
 		}
 
 		float[] norm = new float[a.length];
 		for (int i = 0; i < a.length; i++) {
-			norm[i] = (float) (a[i] * shortMax / sum) / shortMax;
+			norm[i] = (float) (Short.toUnsignedInt(a[i]) * shortMax / sum) / shortMax;
 		}
 
 		return norm;
