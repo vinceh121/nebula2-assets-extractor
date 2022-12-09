@@ -98,7 +98,7 @@ public class GLTFGenerator {
 		bufInput.setBuffer(0);
 		this.gltf.getBufferViews().add(bufInput);
 		for (int i = 0; i < c.getNumKeys(); i++) {
-			this.packedBinary.writeFloatLE(c.getKeysPerSec() * i);
+			this.packedBinary.writeFloatLE(1f / c.getKeysPerSec() * i);
 		}
 		this.bufferSize += bufInput.getByteLength();
 
