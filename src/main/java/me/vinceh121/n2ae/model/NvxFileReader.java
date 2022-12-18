@@ -46,6 +46,19 @@ public class NvxFileReader {
 				out.printf("vn %.6f %.6f %.6f\n", v.getNormal()[0], v.getNormal()[1], v.getNormal()[2]);
 			}
 		}
+		if (this.types.contains(VertexType.JOINTS_WEIGHTS)) {
+			for (final Vertex v : this.getVertices()) {
+				out.printf("jw4 %d %.6f %d %.6f %d %.6f %d %.6f\n",
+						v.getJointIndices()[0],
+						v.getWeights()[0],
+						v.getJointIndices()[1],
+						v.getWeights()[1],
+						v.getJointIndices()[2],
+						v.getWeights()[2],
+						v.getJointIndices()[3],
+						v.getWeights()[3]);
+			}
+		}
 
 		for (int i = 0; i < this.getTriangles().size(); i++) {
 			final int[] t = this.getTriangles().get(i);
