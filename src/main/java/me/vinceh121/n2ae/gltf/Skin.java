@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 public class Skin {
 	private final List<Integer> joints = new ArrayList<>();
 	private String name;
-	@JsonInclude(valueFilter = NotMinusOne.class)
-	private int skeleton;
+	@JsonInclude(value = Include.CUSTOM, valueFilter = NotMinusOne.class)
+	private int skeleton = -1;
+	@JsonInclude(value = Include.CUSTOM, valueFilter = NotMinusOne.class)
+	private int inverseBindMatrices = -1;
 
 	public String getName() {
 		return name;
@@ -29,5 +32,13 @@ public class Skin {
 
 	public void setSkeleton(int skeleton) {
 		this.skeleton = skeleton;
+	}
+
+	public int getInverseBindMatrices() {
+		return inverseBindMatrices;
+	}
+
+	public void setInverseBindMatrices(int inverseBindMatrices) {
+		this.inverseBindMatrices = inverseBindMatrices;
 	}
 }

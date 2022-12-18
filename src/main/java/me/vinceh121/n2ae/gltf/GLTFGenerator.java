@@ -7,10 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -46,23 +49,24 @@ public class GLTFGenerator {
 				new TypeReference<Map<String, NOBClazz>>() {
 				}));
 		parser.read(new FileInputStream(
-				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/_main.tcl"));
+				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_susie.n/_main.tcl"));
 
 		gen.addBones(parser.getCalls());
-		gen.buildBasicScene("owo", 0);
+
+		gen.buildBasicScene("owo", gen.getGltf().getNodes().size());
 
 		NvxFileReader modelReader = new NvxFileReader(new FileInputStream(
-				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/skin.nvx"));
+				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_susie.n/skin.nvx"));
 		modelReader.readAll();
 
 		gen.addMesh("skin", modelReader.getTypes(), modelReader.getVertices(), modelReader.getTriangles(), 0);
 
-		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
-				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/character.nax"));
+//		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
+//				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/character.nax"));
 
-		List<Curve> curves = animReader.readAll();
-		curves.removeIf(c -> c.isTranslation() || !c.getName().startsWith("landen"));
-		gen.addCurves(curves);
+//		List<Curve> curves = animReader.readAll();
+//		curves.removeIf(c -> c.isTranslation() || !c.getName().startsWith("landen"));
+//		gen.addCurves(curves);
 
 		gen.buildBuffer("owo.bin");
 		out.flush();
@@ -107,7 +111,7 @@ public class GLTFGenerator {
 		accessorInput.setComponentType(Accessor.FLOAT);
 		accessorInput.setCount(c.getNumKeys());
 		accessorInput.setType(Type.SCALAR);
-		accessorInput.setMax(new float[] { c.getKeysPerSec() * (c.getNumKeys() - 1) });
+		accessorInput.setMax(new float[] { 1 / c.getKeysPerSec() * (c.getNumKeys() - 1) });
 		accessorInput.setMin(new float[] { 0 });
 		this.gltf.getAccessors().add(accessorInput);
 
@@ -139,12 +143,11 @@ public class GLTFGenerator {
 
 		if (c.isRotation()) {
 			for (int i = 0; i < c.getPackedCurve().length; i += 4) {
-				short[] quat = new short[4];
-				System.arraycopy(c.getPackedCurve(), i, quat, 0, 4);
-				float[] quatNorm = this.normalizeShort(quat);
-				for (float comp : quatNorm) {
-					this.packedBinary.writeFloatLE(comp);
-				}
+				short[] quatPack = new short[4];
+				System.arraycopy(c.getPackedCurve(), i, quatPack, 0, 4);
+				float[] quat = new float[4];
+				NaxFileReader.unpackCurve(quatPack, quat);
+//				quat = normalize(quat);
 			}
 		} else if (c.isTranslation()) {
 			// NAX0 stores translations as VEC4 with 4th component being always 0
@@ -181,21 +184,6 @@ public class GLTFGenerator {
 		}
 		chan.setTarget(target);
 		anim.getChannels().add(chan);
-	}
-
-	private float[] normalizeShort(short[] a) {
-		final float shortMax = (int) (Math.pow(2, 16) - 1);
-		float sum = 0;
-		for (short s : a) {
-			sum += Short.toUnsignedInt(s);
-		}
-
-		float[] norm = new float[a.length];
-		for (int i = 0; i < a.length; i++) {
-			norm[i] = (float) (Short.toUnsignedInt(a[i]) * shortMax / sum) / shortMax;
-		}
-
-		return norm;
 	}
 
 	private int getNodeIdxByName(String name) {
@@ -283,16 +271,19 @@ public class GLTFGenerator {
 
 			if (types.contains(VertexType.JOINTS_WEIGHTS)) {
 				jointWeightsCount++;
-				float[] w = normalize(v.getWeights());
+				float[] w = this.normalize(v.getWeights());
+				short[] j = v.getJointIndices();
+
 				for (int i = 0; i < 4; i++) {
-					// useless joints that don't have weights should use joint 0
-					if (w[i] == 0) {
+					// 1. NVX1 uses -1 for unused indices, glTF uses 0
+					// 2. useless joints that don't have weights should use joint 0
+					if (j[i] == -1 || w[i] == 0) {
 						jointBuf.writeUnsignedShortLE(0);
+						weightsBuf.writeFloatLE(0);
 					} else {
-						// NVX1 uses -1 for unused indices, glTF uses 0
-						jointBuf.writeUnsignedShortLE(v.getJointIndices()[i] == -1 ? 0 : v.getJointIndices()[i]);
+						jointBuf.writeUnsignedShortLE(j[i]);
+						weightsBuf.writeFloatLE(w[i]);
 					}
-					weightsBuf.writeFloatLE(w[i]);
 				}
 			}
 		}
@@ -453,9 +444,9 @@ public class GLTFGenerator {
 			sum += f;
 		}
 
-		if (sum == 1) {
-			return a;
-		}
+//		if (sum == 1) {
+//			return a;
+//		}
 
 		float[] out = new float[a.length];
 		for (int i = 0; i < a.length; i++) {
@@ -490,18 +481,42 @@ public class GLTFGenerator {
 	public void buildBasicScene(String name, int rootNode) {
 		final Scene sc = new Scene();
 		sc.setName(name);
+		sc.getNodes().add(0);
 		sc.getNodes().add(rootNode);
 		gltf.getScenes().add(sc);
 	}
 
-	public void addBones(List<ICommandCall> calls) {
+	public void addBones(List<ICommandCall> calls) throws IOException {
+		Skin skin = new Skin();
+		skin.setName("rig");
+		skin.setSkeleton(0);
+
+		List<Matrix4> invBindMats = new Vector<>();
+
 		for (ICommandCall cmd : calls) {
 			if (!(cmd instanceof ClassCommandCall)) {
 				continue;
 			}
 			ClassCommandCall cmdCls = (ClassCommandCall) cmd;
 			if ("addjoint".equals(cmdCls.getPrototype().getName())) {
-				this.addBones(cmdCls);
+				Node bone = this.buildBones(cmdCls);
+				gltf.getNodes().add(bone);
+
+				// calculate inverse bind matrix
+				Matrix4 mat = new Matrix4(
+						new Vector3(bone.getTranslation()[0], bone.getTranslation()[1], bone.getTranslation()[2]),
+						new Quaternion(bone.getRotation()[0],
+								bone.getRotation()[1],
+								bone.getRotation()[2],
+								bone.getRotation()[3]),
+						new Vector3(1, 1, 1));
+
+				int parentIdx = (int) cmdCls.getArguments()[2];
+				if (parentIdx != -1) {
+					mat.mul(invBindMats.get(parentIdx));
+				}
+
+				invBindMats.add(mat);
 			}
 		}
 
@@ -513,31 +528,59 @@ public class GLTFGenerator {
 					|| !"addjoint".equals(((ClassCommandCall) cmd).getPrototype().getName())) {
 				continue;
 			}
+
 			Object[] args = ((ClassCommandCall) cmd).getArguments();
 			int idx = (int) args[0];
 			int parent = (int) args[2];
+
+			skin.getJoints().add(idx);
 			if (parent == -1) {
 				continue;
 			}
 			this.gltf.getNodes().get(parent).getChildren().add(idx);
 		}
 
-		Skin skin = new Skin();
-		skin.setName("rig");
-		skin.setSkeleton(0);
-		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
-			skin.getJoints().add(i);
-		}
 		this.gltf.getSkins().add(skin);
+
+		// build inverse bind matrices buffer view
+		LEDataOutputStream inv = new LEDataOutputStream(new ByteArrayOutputStream());
+		for (int i = 0; i < invBindMats.size(); i++) {
+			Matrix4 mat = invBindMats.get(i);
+			mat.inv();
+			for (int j = 0; j < 4 * 4; j++) {
+				inv.writeFloatLE(mat.val[j]);
+			}
+		}
+
+		byte[] invBuf = ((ByteArrayOutputStream) inv.getUnderlyingOutputStream()).toByteArray();
+
+		BufferView invView = new BufferView();
+		invView.setBuffer(0);
+		invView.setByteOffset(this.bufferSize);
+		invView.setByteLength(invBuf.length);
+		this.gltf.getBufferViews().add(invView);
+
+		Accessor invAcc = new Accessor();
+		invAcc.setBufferView(this.gltf.getBufferViews().indexOf(invView));
+		invAcc.setComponentType(Accessor.FLOAT);
+		invAcc.setCount(skin.getJoints().size());
+		invAcc.setType(Type.MAT4);
+		this.gltf.getAccessors().add(invAcc);
+
+		this.packedBinary.write(invBuf);
+		this.bufferSize += invView.getByteLength();
+
+		skin.setInverseBindMatrices(this.gltf.getAccessors().indexOf(invAcc));
 	}
 
-	public void addBones(ClassCommandCall cmd) {
+	public Node buildBones(ClassCommandCall cmd) {
 		Object[] args = cmd.getArguments();
 		Node bone = new Node();
 		bone.setName((String) args[1]);
 		bone.setTranslation(new float[] { (float) args[3], (float) args[4], (float) args[5] });
 		bone.setRotation(new float[] { (float) args[6], (float) args[7], (float) args[8], (float) args[9] });
-		gltf.getNodes().add(bone);
+		bone.setScale(new float[] { 1, 1, 1 });
+		return bone;
 	}
 
 	/**

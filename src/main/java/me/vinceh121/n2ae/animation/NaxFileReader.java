@@ -116,4 +116,17 @@ public class NaxFileReader {
 	public int getCurvesCount() {
 		return this.curvesCount;
 	}
+
+	// https://github.com/dgiunchi/m-nebula/blob/master/code/inc/anim/nanimcurve.h#L181
+	public static void unpackCurve(short[] packed, float[] dst) {
+		if (packed.length != dst.length) {
+			throw new IllegalArgumentException("packed source and unpacked destination must be the same length");
+		}
+
+		final float fact = 1f / 32767.5f;
+
+		for (int i = 0; i < packed.length; i++) {
+			dst[i] = ((float) Short.toUnsignedInt(packed[i])) * fact - 1f;
+		}
+	}
 }
