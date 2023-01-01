@@ -37,7 +37,7 @@ public class NnpkFileWriter {
 		this.out.writeIntLE(NpkEntryType.DATA.getStartInt());
 		this.out.writeIntLE(4); // blockLen
 
-		this.writeArchiveFile(tocBuilder.getTableOfContents(), root.getParentFile().toPath());
+		this.writeArchiveFile(tocBuilder.getTableOfContents(), root.getAbsoluteFile().getParentFile().toPath());
 	}
 
 	private void writeArchiveFile(final TableOfContents toc, final Path folder) throws IOException {
