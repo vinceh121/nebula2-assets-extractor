@@ -126,7 +126,7 @@ public class NaxFileReader {
 		final float fact = 1f / 32767.5f;
 
 		for (int i = 0; i < packed.length; i++) {
-			dst[i] = ((float) Short.toUnsignedInt(packed[i])) * fact - 1f;
+			dst[i] = ((float) packed[i]) * fact - 1f;
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package me.vinceh121.n2ae.gltf;
 
+import static com.badlogic.gdx.math.Matrix4.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -22,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.vinceh121.n2ae.LEDataOutputStream;
 import me.vinceh121.n2ae.animation.Curve;
 import me.vinceh121.n2ae.animation.Interpolation;
-import me.vinceh121.n2ae.animation.NaxFileReader;
 import me.vinceh121.n2ae.gltf.Accessor.Type;
 import me.vinceh121.n2ae.gltf.ChannelTarget.TargetPath;
 import me.vinceh121.n2ae.gltf.Sampler.GltfInterpolation;
@@ -40,6 +42,8 @@ public class GLTFGenerator {
 	private int bufferSize;
 
 	public static void main(String[] args) throws StreamReadException, DatabindException, IOException {
+		final String obj = "char_susie.n";
+
 		ObjectMapper mapper = new ObjectMapper();
 		FileOutputStream out = new FileOutputStream("/tmp/owo.bin");
 		GLTFGenerator gen = new GLTFGenerator(out);
@@ -49,23 +53,22 @@ public class GLTFGenerator {
 				new TypeReference<Map<String, NOBClazz>>() {
 				}));
 		parser.read(new FileInputStream(
-				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_susie.n/_main.tcl"));
+				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/" + obj + "/_main.tcl"));
 
 		gen.addBones(parser.getCalls());
 
 		gen.buildBasicScene("owo", gen.getGltf().getNodes().size());
 
 		NvxFileReader modelReader = new NvxFileReader(new FileInputStream(
-				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_susie.n/skin.nvx"));
+				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/" + obj + "/skin.nvx"));
 		modelReader.readAll();
 
 		gen.addMesh("skin", modelReader.getTypes(), modelReader.getVertices(), modelReader.getTriangles(), 0);
 
 //		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
-//				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/char_goliath.n/character.nax"));
-
+//				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/" + obj + "/character.nax"));
+//
 //		List<Curve> curves = animReader.readAll();
-//		curves.removeIf(c -> c.isTranslation() || !c.getName().startsWith("landen"));
 //		gen.addCurves(curves);
 
 		gen.buildBuffer("owo.bin");
@@ -105,6 +108,7 @@ public class GLTFGenerator {
 			this.packedBinary.writeFloatLE(1f / c.getKeysPerSec() * i);
 		}
 		this.bufferSize += bufInput.getByteLength();
+		this.checkBufferSize();
 
 		Accessor accessorInput = new Accessor();
 		accessorInput.setBufferView(this.gltf.getBufferViews().indexOf(bufInput));
@@ -146,8 +150,14 @@ public class GLTFGenerator {
 				short[] quatPack = new short[4];
 				System.arraycopy(c.getPackedCurve(), i, quatPack, 0, 4);
 				float[] quat = new float[4];
-				NaxFileReader.unpackCurve(quatPack, quat);
+//				NaxFileReader.unpackCurve(quatPack, quat);
+				for (int j = 0; j < 4; j++) {
+					quat[j] = (float) Short.toUnsignedInt(quatPack[j]) / 65535f;
+				}
 //				quat = normalize(quat);
+				for (float f : quat) {
+					this.packedBinary.writeFloatLE(f);
+				}
 			}
 		} else if (c.isTranslation()) {
 			// NAX0 stores translations as VEC4 with 4th component being always 0
@@ -158,6 +168,7 @@ public class GLTFGenerator {
 				this.packedBinary.writeFloatLE(v[2]);
 			}
 		}
+		this.checkBufferSize();
 
 		// now that buffers are ready, make the animation sampler
 		Sampler sampler = new Sampler();
@@ -312,6 +323,7 @@ public class GLTFGenerator {
 
 			this.bufferSize += buf.length;
 			this.packedBinary.write(buf);
+			this.checkBufferSize();
 		}
 
 		if (types.contains(VertexType.NORM)) {
@@ -333,6 +345,7 @@ public class GLTFGenerator {
 
 			this.bufferSize += buf.length;
 			this.packedBinary.write(buf);
+			this.checkBufferSize();
 		}
 
 		if (types.contains(VertexType.UV0)) {
@@ -354,6 +367,7 @@ public class GLTFGenerator {
 
 			this.bufferSize += buf.length;
 			this.packedBinary.write(buf);
+			this.checkBufferSize();
 		}
 
 		if (types.contains(VertexType.JOINTS_WEIGHTS)) {
@@ -375,6 +389,7 @@ public class GLTFGenerator {
 
 			this.bufferSize += bufJoints.length;
 			this.packedBinary.write(bufJoints);
+			this.checkBufferSize();
 
 			byte[] bufWeights = ((ByteArrayOutputStream) weightsBuf.getUnderlyingOutputStream()).toByteArray();
 
@@ -394,6 +409,7 @@ public class GLTFGenerator {
 
 			this.bufferSize += bufWeights.length;
 			this.packedBinary.write(bufWeights);
+			this.checkBufferSize();
 		}
 
 		// indices
@@ -427,6 +443,7 @@ public class GLTFGenerator {
 
 			this.bufferSize += buf.length;
 			this.packedBinary.write(buf);
+			this.checkBufferSize();
 		}
 
 		this.gltf.getMeshes().add(mesh);
@@ -444,9 +461,9 @@ public class GLTFGenerator {
 			sum += f;
 		}
 
-//		if (sum == 1) {
-//			return a;
-//		}
+		if (sum == 1) {
+			return a;
+		}
 
 		float[] out = new float[a.length];
 		for (int i = 0; i < a.length; i++) {
@@ -491,7 +508,19 @@ public class GLTFGenerator {
 		skin.setName("rig");
 		skin.setSkeleton(0);
 
+		List<Quaternion> rots = new Vector<>();
 		List<Matrix4> invBindMats = new Vector<>();
+
+		for (ICommandCall cmd : calls) {
+			if (!(cmd instanceof ClassCommandCall)) {
+				continue;
+			}
+			ClassCommandCall cmdCls = (ClassCommandCall) cmd;
+			if ("addjoint".equals(cmdCls.getPrototype().getName())) {
+				invBindMats.add(null);
+				rots.add(null);
+			}
+		}
 
 		for (ICommandCall cmd : calls) {
 			if (!(cmd instanceof ClassCommandCall)) {
@@ -502,21 +531,25 @@ public class GLTFGenerator {
 				Node bone = this.buildBones(cmdCls);
 				gltf.getNodes().add(bone);
 
-				// calculate inverse bind matrix
-				Matrix4 mat = new Matrix4(
-						new Vector3(bone.getTranslation()[0], bone.getTranslation()[1], bone.getTranslation()[2]),
-						new Quaternion(bone.getRotation()[0],
-								bone.getRotation()[1],
-								bone.getRotation()[2],
-								bone.getRotation()[3]),
-						new Vector3(1, 1, 1));
-
+				int idx = (int) cmdCls.getArguments()[0];
 				int parentIdx = (int) cmdCls.getArguments()[2];
+
+				Quaternion rot = new Quaternion(bone.getRotation()[0],
+						bone.getRotation()[1],
+						bone.getRotation()[2],
+						bone.getRotation()[3]);
+
+				// calculate inverse bind matrix
+				Matrix4 mat = new Matrix4(new Vector3(bone.getTranslation()), rot, new Vector3(1, 1, 1));
+
 				if (parentIdx != -1) {
-					mat.mul(invBindMats.get(parentIdx));
+					mult_simple(mat, invBindMats.get(parentIdx));
 				}
 
-				invBindMats.add(mat);
+				if (invBindMats.get(idx) != null) {
+					throw new IllegalStateException("Inverse bind matrix " + idx + " is already assigned");
+				}
+				invBindMats.set(idx, mat.cpy());
 			}
 		}
 
@@ -547,6 +580,7 @@ public class GLTFGenerator {
 		for (int i = 0; i < invBindMats.size(); i++) {
 			Matrix4 mat = invBindMats.get(i);
 			mat.inv();
+
 			for (int j = 0; j < 4 * 4; j++) {
 				inv.writeFloatLE(mat.val[j]);
 			}
@@ -569,8 +603,51 @@ public class GLTFGenerator {
 
 		this.packedBinary.write(invBuf);
 		this.bufferSize += invView.getByteLength();
+		this.checkBufferSize();
 
 		skin.setInverseBindMatrices(this.gltf.getAccessors().indexOf(invAcc));
+	}
+
+	/**
+	 * https://github.com/dgiunchi/m-nebula/blob/master/code/inc/mathlib/matrix.h#L836
+	 *
+	 * @param m  Matrix to be multiplied, results stored in place
+	 * @param m1 Matrix to multiply with
+	 */
+	private void mult_simple(Matrix4 m, Matrix4 m1) {
+		// It seems this assertion is never true. Which was the source of this bug that
+		// took me a while to fix.
+		// Using a normal matrix multiplication instead of this one, results in an
+		// incorrect bind pose for all Nomads main characters, except Susie.
+		// Goliath only has the 3 right breast bones broken, and John is all mangled.
+		// Is this algorithm just flawed and Nebula made the flaw consistent through the engine?
+//		assert isAllEqual(1E-4f, 0f, m.val[M03], m.val[M13], m.val[M23], m1.val[M03], m1.val[M13], m1.val[M23])
+//				&& isAllEqual(1E-4f, 1f, m.val[M33], m1.val[M33]);
+
+		for (int i = 0; i < 4; i++) {
+			float mi0 = m.val[0 + 4 * i];
+			float mi1 = m.val[1 + 4 * i];
+			float mi2 = m.val[2 + 4 * i];
+			m.val[0 + 4 * i] = mi0 * m1.val[M00] + mi1 * m1.val[M01] + mi2 * m1.val[M02];
+			m.val[1 + 4 * i] = mi0 * m1.val[M10] + mi1 * m1.val[M11] + mi2 * m1.val[M12];
+			m.val[2 + 4 * i] = mi0 * m1.val[M20] + mi1 * m1.val[M21] + mi2 * m1.val[M22];
+		}
+		m.val[M03] += m1.val[M03];
+		m.val[M13] += m1.val[M13];
+		m.val[M23] += m1.val[M23];
+		m.val[M30] = 0;
+		m.val[M31] = 0;
+		m.val[M32] = 0;
+		m.val[M33] = 1;
+	}
+
+	private boolean isAllEqual(float tolerance, float... vals) {
+		for (int i = 0; i < vals.length - 1; i++) {
+			if (!MathUtils.isEqual(vals[i], vals[i + 1], tolerance)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public Node buildBones(ClassCommandCall cmd) {
@@ -591,6 +668,12 @@ public class GLTFGenerator {
 		buf.setUri(uri);
 		buf.setByteLength(this.bufferSize);
 		this.gltf.getBuffers().add(buf);
+	}
+
+	private void checkBufferSize() {
+		if (this.bufferSize != this.packedBinary.getWrittenBytes()) {
+			throw new IllegalStateException("Expected buffer size and real buffer size are off");
+		}
 	}
 
 	public GLTF getGltf() {
