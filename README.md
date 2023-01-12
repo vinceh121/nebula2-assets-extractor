@@ -4,8 +4,9 @@ Extracts and converts assets (packs) for the Nebula Device 2 engine.
 Implemented formats (Reading/Writing):
   - NPK0 archives (RW)
   - NTX1 textures (RW)
-  - NVX1 models (R)
   - NOB0 scripts (RW)
+  - NVX1 models (R)
+  - NAX0 animations (R)
 
 ## Usage
 
