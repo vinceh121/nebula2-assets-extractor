@@ -8,14 +8,14 @@ public class Primitive {
 	private int indices = -1;
 
 	public int getIndices() {
-		return indices;
+		return this.indices;
 	}
 
-	public void setIndices(int indices) {
+	public void setIndices(final int indices) {
 		this.indices = indices;
 	}
 
 	public Map<String, Integer> getAttributes() {
-		return attributes;
+		return this.attributes;
 	}
 }

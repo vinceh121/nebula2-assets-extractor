@@ -5,18 +5,18 @@ public class ChannelTarget {
 	private TargetPath path;
 
 	public int getNode() {
-		return node;
+		return this.node;
 	}
 
-	public void setNode(int node) {
+	public void setNode(final int node) {
 		this.node = node;
 	}
 
 	public TargetPath getPath() {
-		return path;
+		return this.path;
 	}
 
-	public void setPath(TargetPath path) {
+	public void setPath(final TargetPath path) {
 		this.path = path;
 	}
 

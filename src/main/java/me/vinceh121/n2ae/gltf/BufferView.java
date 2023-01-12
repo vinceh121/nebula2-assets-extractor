@@ -5,26 +5,26 @@ public class BufferView {
 	private long byteLength, byteOffset;
 
 	public int getBuffer() {
-		return buffer;
+		return this.buffer;
 	}
 
-	public void setBuffer(int buffer) {
+	public void setBuffer(final int buffer) {
 		this.buffer = buffer;
 	}
 
 	public long getByteLength() {
-		return byteLength;
+		return this.byteLength;
 	}
 
-	public void setByteLength(long byteLength) {
+	public void setByteLength(final long byteLength) {
 		this.byteLength = byteLength;
 	}
 
 	public long getByteOffset() {
-		return byteOffset;
+		return this.byteOffset;
 	}
 
-	public void setByteOffset(long byteOffset) {
+	public void setByteOffset(final long byteOffset) {
 		this.byteOffset = byteOffset;
 	}
 }

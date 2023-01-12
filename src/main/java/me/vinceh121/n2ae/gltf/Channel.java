@@ -5,18 +5,18 @@ public class Channel {
 	private ChannelTarget target;
 
 	public int getSampler() {
-		return sampler;
+		return this.sampler;
 	}
 
-	public void setSampler(int sampler) {
+	public void setSampler(final int sampler) {
 		this.sampler = sampler;
 	}
 
 	public ChannelTarget getTarget() {
-		return target;
+		return this.target;
 	}
 
-	public void setTarget(ChannelTarget target) {
+	public void setTarget(final ChannelTarget target) {
 		this.target = target;
 	}
 }

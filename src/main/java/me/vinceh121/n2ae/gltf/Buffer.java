@@ -5,18 +5,18 @@ public class Buffer {
 	private String uri;
 
 	public long getByteLength() {
-		return byteLength;
+		return this.byteLength;
 	}
 
-	public void setByteLength(long byteLength) {
+	public void setByteLength(final long byteLength) {
 		this.byteLength = byteLength;
 	}
 
 	public String getUri() {
-		return uri;
+		return this.uri;
 	}
 
-	public void setUri(String uri) {
+	public void setUri(final String uri) {
 		this.uri = uri;
 	}
 }

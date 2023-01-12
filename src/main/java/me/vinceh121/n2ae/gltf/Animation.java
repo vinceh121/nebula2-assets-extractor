@@ -9,19 +9,19 @@ public class Animation {
 	private String name;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public List<Channel> getChannels() {
-		return channels;
+		return this.channels;
 	}
 
 	public List<Sampler> getSamplers() {
-		return samplers;
+		return this.samplers;
 	}
 
 }

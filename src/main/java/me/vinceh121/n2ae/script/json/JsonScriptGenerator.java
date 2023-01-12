@@ -47,7 +47,7 @@ public class JsonScriptGenerator {
 				final ClassCommandCall clsCall = (ClassCommandCall) call;
 				final String prop = clsCall.getPrototype().getName();
 				final Object val = this.getValueForCall(clsCall);
-				
+
 				if (node.has(prop)) {
 					final JsonNode oldVal = node.get(prop);
 					final ArrayNode arr = this.mapper.createArrayNode();
@@ -61,7 +61,7 @@ public class JsonScriptGenerator {
 		}
 		return -1;
 	}
-	
+
 	private Object getValueForCall(final ClassCommandCall clsCall) {
 		if (clsCall.getArguments().length == 0) {
 			return true;

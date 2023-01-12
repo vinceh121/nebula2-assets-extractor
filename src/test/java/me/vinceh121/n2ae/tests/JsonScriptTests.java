@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,7 +33,7 @@ class JsonScriptTests {
 
 		final String actual = this.mapper.writeValueAsString(gen.generateJson(parser.getCalls()));
 
-		assertEquals(
+		Assertions.assertEquals(
 				"{\"visual\":{\"plane\":{\"txyz\":[1.0,-0.5,-1.5],\"mesh\":"
 						+ "{\"setfilename\":\"data:if_hilfe.n/plane.nvx\"},\"shader\":{\"settarget\":"
 						+ "\"/data/shaders/if_hilfe\"},\"tex\":{\"settexture\":[0,\"data:"

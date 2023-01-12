@@ -5,18 +5,18 @@ public class Asset {
 	private String generator = "nebula2-assets-extractor";
 
 	public String getVersion() {
-		return version;
+		return this.version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(final String version) {
 		this.version = version;
 	}
 
 	public String getGenerator() {
-		return generator;
+		return this.generator;
 	}
 
-	public void setGenerator(String generator) {
+	public void setGenerator(final String generator) {
 		this.generator = generator;
 	}
 }

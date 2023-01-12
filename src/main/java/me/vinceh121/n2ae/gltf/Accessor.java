@@ -15,58 +15,58 @@ public class Accessor {
 	private boolean normalized;
 
 	public int getBufferView() {
-		return bufferView;
+		return this.bufferView;
 	}
 
-	public void setBufferView(int bufferView) {
+	public void setBufferView(final int bufferView) {
 		this.bufferView = bufferView;
 	}
 
 	public int getComponentType() {
-		return componentType;
+		return this.componentType;
 	}
 
-	public void setComponentType(int componentType) {
+	public void setComponentType(final int componentType) {
 		this.componentType = componentType;
 	}
 
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
-	public void setCount(int count) {
+	public void setCount(final int count) {
 		this.count = count;
 	}
 
 	public Type getType() {
-		return type;
+		return this.type;
 	}
 
-	public void setType(Type type) {
+	public void setType(final Type type) {
 		this.type = type;
 	}
 
 	public float[] getMin() {
-		return min;
+		return this.min;
 	}
 
-	public void setMin(float[] min) {
+	public void setMin(final float[] min) {
 		this.min = min;
 	}
 
 	public float[] getMax() {
-		return max;
+		return this.max;
 	}
 
-	public void setMax(float[] max) {
+	public void setMax(final float[] max) {
 		this.max = max;
 	}
 
 	public boolean isNormalized() {
-		return normalized;
+		return this.normalized;
 	}
 
-	public void setNormalized(boolean normalized) {
+	public void setNormalized(final boolean normalized) {
 		this.normalized = normalized;
 	}
 

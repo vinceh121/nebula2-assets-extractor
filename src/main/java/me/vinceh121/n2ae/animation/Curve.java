@@ -14,74 +14,74 @@ public class Curve {
 	private short[] packedCurve;
 
 	public int getStartKey() {
-		return startKey;
+		return this.startKey;
 	}
 
-	public void setStartKey(int startKey) {
+	public void setStartKey(final int startKey) {
 		this.startKey = startKey;
 	}
 
 	public int getNumKeys() {
-		return numKeys;
+		return this.numKeys;
 	}
 
-	public void setNumKeys(int numKeys) {
+	public void setNumKeys(final int numKeys) {
 		this.numKeys = numKeys;
 	}
 
 	public float getKeysPerSec() {
-		return keysPerSec;
+		return this.keysPerSec;
 	}
 
-	public void setKeysPerSec(float keysPerSec) {
+	public void setKeysPerSec(final float keysPerSec) {
 		this.keysPerSec = keysPerSec;
 	}
 
 	public Interpolation getInterpolation() {
-		return interpolation;
+		return this.interpolation;
 	}
 
-	public void setInterpolation(Interpolation interpolation) {
+	public void setInterpolation(final Interpolation interpolation) {
 		this.interpolation = interpolation;
 	}
 
 	public RepeatType getRepeat() {
-		return repeat;
+		return this.repeat;
 	}
 
-	public void setRepeat(RepeatType repeat) {
+	public void setRepeat(final RepeatType repeat) {
 		this.repeat = repeat;
 	}
 
 	public KeyType getType() {
-		return type;
+		return this.type;
 	}
 
-	public void setType(KeyType type) {
+	public void setType(final KeyType type) {
 		this.type = type;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public float[] getVanillaCurve() {
-		return vanillaCurve;
+		return this.vanillaCurve;
 	}
 
-	public void setVanillaCurve(float[] vanillaCurve) {
+	public void setVanillaCurve(final float[] vanillaCurve) {
 		this.vanillaCurve = vanillaCurve;
 	}
 
 	public short[] getPackedCurve() {
-		return packedCurve;
+		return this.packedCurve;
 	}
 
-	public void setPackedCurve(short[] packedCurve) {
+	public void setPackedCurve(final short[] packedCurve) {
 		this.packedCurve = packedCurve;
 	}
 
@@ -108,9 +108,9 @@ public class Curve {
 
 	@Override
 	public String toString() {
-		return "Curve [startKey=" + startKey + ", numKeys=" + numKeys + ", keysPerSec=" + keysPerSec
-				+ ", interpolation=" + interpolation + ", repeat=" + repeat + ", type=" + type + ", name=" + name
-				+ ", vanillaCurve=" + Arrays.toString(vanillaCurve) + ", packedCurve=" + Arrays.toString(packedCurve)
+		return "Curve [startKey=" + this.startKey + ", numKeys=" + this.numKeys + ", keysPerSec=" + this.keysPerSec
+				+ ", interpolation=" + this.interpolation + ", repeat=" + this.repeat + ", type=" + this.type + ", name=" + this.name
+				+ ", vanillaCurve=" + Arrays.toString(this.vanillaCurve) + ", packedCurve=" + Arrays.toString(this.packedCurve)
 				+ "]";
 	}
 }

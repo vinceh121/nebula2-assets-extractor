@@ -41,7 +41,7 @@ public class NaxFileReader {
 	}
 
 	public List<Curve> readCurves() throws IOException {
-		List<Curve> curves = new ArrayList<>(this.curvesCount);
+		final List<Curve> curves = new ArrayList<>(this.curvesCount);
 		for (int i = 0; i < this.curvesCount; i++) {
 			curves.add(this.readCurve());
 		}
@@ -54,7 +54,7 @@ public class NaxFileReader {
 			throw new IOException("Invalid curve magic number");
 		}
 
-		Curve c = new Curve();
+		final Curve c = new Curve();
 
 		this.blockLength = this.input.readIntLE(); // why is the header overwritten?
 		final int startKey = this.input.readIntLE();
@@ -100,13 +100,13 @@ public class NaxFileReader {
 		final byte[] data = this.input.readNBytes(dataSize);
 
 		if (keyTypeMagic == KeyType.VANILLA) {
-			FloatBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
-			float[] vanillaCurve = new float[buf.remaining()];
+			final FloatBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
+			final float[] vanillaCurve = new float[buf.remaining()];
 			buf.get(vanillaCurve);
 			c.setVanillaCurve(vanillaCurve);
 		} else if (keyTypeMagic == KeyType.PACKED) {
-			ShortBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
-			short[] packedCurve = new short[buf.remaining()];
+			final ShortBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
+			final short[] packedCurve = new short[buf.remaining()];
 			buf.get(packedCurve);
 			c.setPackedCurve(packedCurve);
 		}
@@ -119,7 +119,7 @@ public class NaxFileReader {
 	}
 
 	// https://github.com/dgiunchi/m-nebula/blob/master/code/inc/anim/nanimcurve.h#L181
-	public static void unpackCurve(short[] packed, float[] dst) {
+	public static void unpackCurve(final short[] packed, final float[] dst) {
 		if (packed.length != dst.length) {
 			throw new IllegalArgumentException("packed source and unpacked destination must be the same length");
 		}
@@ -127,7 +127,7 @@ public class NaxFileReader {
 		final float fact = 1f / 32767.5f;
 
 		for (int i = 0; i < packed.length; i++) {
-			dst[i] = ((float) Short.toUnsignedInt(packed[i])) * fact - 1f;
+			dst[i] = Short.toUnsignedInt(packed[i]) * fact - 1f;
 		}
 	}
 }

@@ -15,30 +15,30 @@ public class Skin {
 	private int inverseBindMatrices = -1;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public List<Integer> getJoints() {
-		return joints;
+		return this.joints;
 	}
 
 	public int getSkeleton() {
-		return skeleton;
+		return this.skeleton;
 	}
 
-	public void setSkeleton(int skeleton) {
+	public void setSkeleton(final int skeleton) {
 		this.skeleton = skeleton;
 	}
 
 	public int getInverseBindMatrices() {
-		return inverseBindMatrices;
+		return this.inverseBindMatrices;
 	}
 
-	public void setInverseBindMatrices(int inverseBindMatrices) {
+	public void setInverseBindMatrices(final int inverseBindMatrices) {
 		this.inverseBindMatrices = inverseBindMatrices;
 	}
 }

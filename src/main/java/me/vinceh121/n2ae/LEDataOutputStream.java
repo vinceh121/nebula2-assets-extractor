@@ -49,7 +49,7 @@ public class LEDataOutputStream extends DataOutputStream {
 	public long getWrittenBytes() {
 		return this.written;
 	}
-	
+
 	public OutputStream getUnderlyingOutputStream() {
 		return this.out;
 	}

@@ -5,26 +5,26 @@ public class Sampler {
 	private GltfInterpolation interpolation;
 
 	public int getInput() {
-		return input;
+		return this.input;
 	}
 
-	public void setInput(int input) {
+	public void setInput(final int input) {
 		this.input = input;
 	}
 
 	public int getOutput() {
-		return output;
+		return this.output;
 	}
 
-	public void setOutput(int output) {
+	public void setOutput(final int output) {
 		this.output = output;
 	}
 
 	public GltfInterpolation getInterpolation() {
-		return interpolation;
+		return this.interpolation;
 	}
 
-	public void setInterpolation(GltfInterpolation interpolation) {
+	public void setInterpolation(final GltfInterpolation interpolation) {
 		this.interpolation = interpolation;
 	}
 

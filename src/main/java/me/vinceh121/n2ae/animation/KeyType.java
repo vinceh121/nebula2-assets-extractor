@@ -7,16 +7,16 @@ public enum KeyType {
 
 	private int fourcc;
 
-	private KeyType(String fourcc) {
+	KeyType(final String fourcc) {
 		this.fourcc = FourccUtils.fourcc(fourcc);
 	}
 
 	public int getFourcc() {
-		return fourcc;
+		return this.fourcc;
 	}
 
-	public static KeyType get(int fourcc) {
-		for (KeyType t : KeyType.values()) {
+	public static KeyType get(final int fourcc) {
+		for (final KeyType t : KeyType.values()) {
 			if (t.getFourcc() == fourcc) {
 				return t;
 			}

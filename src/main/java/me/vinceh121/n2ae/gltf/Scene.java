@@ -8,14 +8,14 @@ public class Scene {
 	private final List<Integer> nodes = new ArrayList<>();
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public List<Integer> getNodes() {
-		return nodes;
+		return this.nodes;
 	}
 }

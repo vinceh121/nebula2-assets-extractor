@@ -20,46 +20,46 @@ public class GLTF {
 	private final List<Buffer> buffers = new ArrayList<>();
 
 	public int getScene() {
-		return scene;
+		return this.scene;
 	}
 
-	public void setScene(int scene) {
+	public void setScene(final int scene) {
 		this.scene = scene;
 	}
 
 	public Asset getAsset() {
-		return asset;
+		return this.asset;
 	}
 
 	public List<Scene> getScenes() {
-		return scenes;
+		return this.scenes;
 	}
 
 	public List<Node> getNodes() {
-		return nodes;
+		return this.nodes;
 	}
 
 	public List<Mesh> getMeshes() {
-		return meshes;
+		return this.meshes;
 	}
 
 	public List<Animation> getAnimations() {
-		return animations;
+		return this.animations;
 	}
 
 	public List<Skin> getSkins() {
-		return skins;
+		return this.skins;
 	}
 
 	public List<Accessor> getAccessors() {
-		return accessors;
+		return this.accessors;
 	}
 
 	public List<BufferView> getBufferViews() {
-		return bufferViews;
+		return this.bufferViews;
 	}
 
 	public List<Buffer> getBuffers() {
-		return buffers;
+		return this.buffers;
 	}
 }

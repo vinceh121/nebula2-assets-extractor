@@ -18,54 +18,54 @@ public class Node {
 	private final List<Integer> children = new ArrayList<>();
 
 	public int getMesh() {
-		return mesh;
+		return this.mesh;
 	}
 
-	public void setMesh(int mesh) {
+	public void setMesh(final int mesh) {
 		this.mesh = mesh;
 	}
 
 	public int getSkin() {
-		return skin;
+		return this.skin;
 	}
 
-	public void setSkin(int skin) {
+	public void setSkin(final int skin) {
 		this.skin = skin;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public float[] getRotation() {
-		return rotation;
+		return this.rotation;
 	}
 
-	public void setRotation(float[] rotation) {
+	public void setRotation(final float[] rotation) {
 		this.rotation = rotation;
 	}
 
 	public float[] getTranslation() {
-		return translation;
+		return this.translation;
 	}
 
-	public void setTranslation(float[] translation) {
+	public void setTranslation(final float[] translation) {
 		this.translation = translation;
 	}
 
 	public float[] getScale() {
-		return scale;
+		return this.scale;
 	}
 
-	public void setScale(float[] scale) {
+	public void setScale(final float[] scale) {
 		this.scale = scale;
 	}
 
 	public List<Integer> getChildren() {
-		return children;
+		return this.children;
 	}
 }
