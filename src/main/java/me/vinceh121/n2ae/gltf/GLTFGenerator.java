@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.vinceh121.n2ae.LEDataOutputStream;
 import me.vinceh121.n2ae.animation.Curve;
 import me.vinceh121.n2ae.animation.Interpolation;
+import me.vinceh121.n2ae.animation.NaxFileReader;
 import me.vinceh121.n2ae.gltf.Accessor.Type;
 import me.vinceh121.n2ae.gltf.ChannelTarget.TargetPath;
 import me.vinceh121.n2ae.gltf.Sampler.GltfInterpolation;
@@ -65,11 +66,12 @@ public class GLTFGenerator {
 
 		gen.addMesh("skin", modelReader.getTypes(), modelReader.getVertices(), modelReader.getTriangles(), 0);
 
-//		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
-//				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/" + obj + "/character.nax"));
-//
-//		List<Curve> curves = animReader.readAll();
-//		gen.addCurves(curves);
+		NaxFileReader animReader = new NaxFileReader(new FileInputStream(
+				"/home/vincent/wanderer-workspace/wanderer/android/assets/orig/" + obj + "/character.nax"));
+
+		List<Curve> curves = animReader.readAll();
+		curves.removeIf(c -> !c.getName().contains("landen"));
+		gen.addCurves(curves);
 
 		gen.buildBuffer("owo.bin");
 		out.flush();
@@ -150,11 +152,13 @@ public class GLTFGenerator {
 				short[] quatPack = new short[4];
 				System.arraycopy(c.getPackedCurve(), i, quatPack, 0, 4);
 				float[] quat = new float[4];
-//				NaxFileReader.unpackCurve(quatPack, quat);
-				for (int j = 0; j < 4; j++) {
-					quat[j] = (float) Short.toUnsignedInt(quatPack[j]) / 65535f;
-				}
-//				quat = normalize(quat);
+				NaxFileReader.unpackCurve(quatPack, quat);
+
+				// conjugate quaternion
+				quat[0] = -quat[0];
+				quat[1] = -quat[1];
+				quat[2] = -quat[2];
+
 				for (float f : quat) {
 					this.packedBinary.writeFloatLE(f);
 				}
@@ -620,7 +624,8 @@ public class GLTFGenerator {
 		// Using a normal matrix multiplication instead of this one, results in an
 		// incorrect bind pose for all Nomads main characters, except Susie.
 		// Goliath only has the 3 right breast bones broken, and John is all mangled.
-		// Is this algorithm just flawed and Nebula made the flaw consistent through the engine?
+		// Is this algorithm just flawed and Nebula made the flaw consistent through the
+		// engine?
 //		assert isAllEqual(1E-4f, 0f, m.val[M03], m.val[M13], m.val[M23], m1.val[M03], m1.val[M13], m1.val[M23])
 //				&& isAllEqual(1E-4f, 1f, m.val[M33], m1.val[M33]);
 

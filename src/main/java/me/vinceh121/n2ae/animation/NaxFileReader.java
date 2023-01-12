@@ -3,6 +3,7 @@ package me.vinceh121.n2ae.animation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
@@ -99,12 +100,12 @@ public class NaxFileReader {
 		final byte[] data = this.input.readNBytes(dataSize);
 
 		if (keyTypeMagic == KeyType.VANILLA) {
-			FloatBuffer buf = ByteBuffer.wrap(data).asFloatBuffer();
+			FloatBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
 			float[] vanillaCurve = new float[buf.remaining()];
 			buf.get(vanillaCurve);
 			c.setVanillaCurve(vanillaCurve);
 		} else if (keyTypeMagic == KeyType.PACKED) {
-			ShortBuffer buf = ByteBuffer.wrap(data).asShortBuffer();
+			ShortBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 			short[] packedCurve = new short[buf.remaining()];
 			buf.get(packedCurve);
 			c.setPackedCurve(packedCurve);
@@ -126,7 +127,7 @@ public class NaxFileReader {
 		final float fact = 1f / 32767.5f;
 
 		for (int i = 0; i < packed.length; i++) {
-			dst[i] = ((float) packed[i]) * fact - 1f;
+			dst[i] = ((float) Short.toUnsignedInt(packed[i])) * fact - 1f;
 		}
 	}
 }
