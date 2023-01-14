@@ -42,7 +42,7 @@ public class TextureViewer extends JPanel {
 			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 					boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				this.setText("Block " + index);
+				this.setText("Block " + blocks.indexOf(value)); // because index might be -1
 				return this;
 			}
 		});
