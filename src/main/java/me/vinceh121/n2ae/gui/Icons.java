@@ -23,7 +23,7 @@ public final class Icons {
 
 	static {
 		final String[] loadList = { "bricks", "chart_line", "database", "folder", "image", "page_white_error",
-				"page_white_text", "script" };
+				"page_white_text", "script", "cross" };
 
 		for (final String img : loadList) {
 			ICONS.put(img, new ImageIcon(Icons.class.getClassLoader().getResource("icons/" + img + ".png")));

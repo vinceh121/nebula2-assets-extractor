@@ -2,24 +2,30 @@ package me.vinceh121.n2ae.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.CompletableFuture;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -32,10 +38,12 @@ import javax.swing.tree.DefaultTreeModel;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
 import me.vinceh121.n2ae.pkg.TableOfContents;
+import me.vinceh121.n2ae.texture.NtxFileReader;
 
 public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private final JTree tree;
+	private final JTabbedPane tabbed;
 	private File openedNpk;
 	private TableOfContents toc;
 
@@ -56,16 +64,39 @@ public class ExtractorFrame extends JFrame {
 		this.setTitle("Nebula 2 Assets Extractor");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setIconImage(Icons.getImage("bricks"));
-		this.setSize(500, 400);
+		this.setSize(800, 700);
+		this.setExtendedState(MAXIMIZED_BOTH);
 		this.setLayout(new BorderLayout());
 
 		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		this.add(new JScrollPane(split), BorderLayout.CENTER);
+		split.setResizeWeight(0.33);
+		this.add(split, BorderLayout.CENTER);
 
 		this.tree = new JTree(new DefaultMutableTreeNode());
 		this.tree.setEnabled(false);
 		this.tree.setCellRenderer(new NpkTreeCellRenderer());
 		this.tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
+						return;
+					}
+
+					TableOfContents sel = (TableOfContents) node.getUserObject();
+					final String ext = sel.getName().substring(sel.getName().lastIndexOf('.') + 1);
+					switch (ext) {
+					case "ntx":
+						openTexture(sel);
+						break;
+					default:
+						JOptionPane.showMessageDialog(null, "Cannot open file " + sel.getName());
+						break;
+					}
+				}
+			}
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				this.popup(e);
@@ -89,7 +120,10 @@ public class ExtractorFrame extends JFrame {
 				}
 			}
 		});
-		split.setLeftComponent(this.tree);
+		split.setLeftComponent(new JScrollPane(this.tree));
+
+		tabbed = new JTabbedPane();
+		split.setRightComponent(tabbed);
 
 		JMenuBar bar = new JMenuBar();
 		this.setJMenuBar(bar);
@@ -101,7 +135,7 @@ public class ExtractorFrame extends JFrame {
 		JMenuItem mntOpen = new JMenuItem("Open NPK0");
 		mntOpen.setMnemonic('o');
 		mntOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
-		mntOpen.addActionListener(e -> this.openFile());
+		mntOpen.addActionListener(e -> this.openNPK());
 		mnFile.add(mntOpen);
 
 		JMenuItem mntQuit = new JMenuItem("Quit");
@@ -111,7 +145,20 @@ public class ExtractorFrame extends JFrame {
 		mnFile.add(mntQuit);
 	}
 
-	private void openFile() {
+	public void openTexture(TableOfContents toc) {
+		NtxFileReader read = new NtxFileReader(new ByteArrayInputStream(toc.getData()));
+		try {
+			read.readHeader();
+			read.readAllTextures();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TextureViewer(read.getBlocks(), read.getTextures()));
+		this.ensureTabsCloseable();
+	}
+
+	private void openNPK() {
 		JFileChooser fc = new JFileChooser();
 		fc.addChoosableFileFilter(new FileFilter() {
 			@Override
@@ -161,10 +208,6 @@ public class ExtractorFrame extends JFrame {
 		}
 	}
 
-	public void repaintTree() {
-		this.tree.invalidate();
-	}
-
 	private void updateTreeModel() {
 		final DefaultMutableTreeNode root = new DefaultMutableTreeNode(this.toc);
 		this.buildTreeNodes(toc, root);
@@ -181,6 +224,31 @@ public class ExtractorFrame extends JFrame {
 			}
 		} else if (toc.isFile()) {
 			node.setUserObject(toc);
+		}
+	}
+
+	private void ensureTabsCloseable() {
+		for (int i = 0; i < this.tabbed.getTabCount(); i++) {
+			if (!(this.tabbed.getTabComponentAt(i) instanceof TabCloseButton)) {
+				this.tabbed.setTabComponentAt(i, new TabCloseButton(tabbed, this.tabbed.getComponentAt(i)));
+			}
+		}
+	}
+
+	private static class TabCloseButton extends JPanel {
+		private static final long serialVersionUID = 1L;
+
+		public TabCloseButton(JTabbedPane tabs, Component tabComp) {
+			this.setLayout(new FlowLayout(FlowLayout.LEADING));
+			this.setOpaque(false);
+
+			JLabel lblTitle = new JLabel(tabs.getTitleAt(tabs.indexOfComponent(tabComp)));
+			this.add(lblTitle);
+
+			JButton btnClose = new JButton();
+			btnClose.setIcon(Icons.get("cross"));
+			btnClose.addActionListener(e -> tabs.removeTabAt(tabs.indexOfComponent(tabComp)));
+			this.add(btnClose);
 		}
 	}
 
