@@ -82,8 +82,9 @@ public class ExtractorFrame extends JFrame {
 					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 						return;
 					}
-					TableOfContents selectedToc = (TableOfContents) node.getUserObject();
-					TableOfContentPopupMenu pop = new TableOfContentPopupMenu(selectedToc);
+
+					TableOfContentPopupMenu pop = new TableOfContentPopupMenu((DefaultTreeModel) tree.getModel(),
+							tree.getSelectionPath());
 					pop.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
