@@ -18,6 +18,12 @@ public class NnpkFileExtractor {
 		this.in = in;
 	}
 
+	/**
+	 * Extracts the table of contents to the file system
+	 *
+	 * @param toc
+	 * @throws IOException
+	 */
 	public void extractAllFiles(final TableOfContents toc) throws IOException {
 		if (!this.output.isDirectory()) {
 			throw new IllegalStateException("output must be a folder");

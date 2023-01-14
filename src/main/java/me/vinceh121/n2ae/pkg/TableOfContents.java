@@ -5,10 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TableOfContents {
+	private final Map<String, TableOfContents> entries = new LinkedHashMap<>();
 	private boolean directory, file;
 	private int offset, length;
 	private String name;
-	private final Map<String, TableOfContents> entries = new LinkedHashMap<>();
+	private byte[] data;
 
 	public boolean isDirectory() {
 		return this.directory;
@@ -52,6 +53,14 @@ public class TableOfContents {
 
 	public Map<String, TableOfContents> getEntries() {
 		return this.entries;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(final byte[] data) {
+		this.data = data;
 	}
 
 	public TableOfContents get(final String key) {
