@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import me.vinceh121.n2ae.LEDataOutputStream;
 
@@ -38,6 +39,31 @@ public class NnpkFileWriter {
 		this.out.writeIntLE(4); // blockLen
 
 		this.writeArchiveFile(tocBuilder.getTableOfContents(), root.getAbsoluteFile().getParentFile().toPath());
+	}
+
+	public void writeFromMemory() throws IOException {
+		Objects.nonNull(this.tableOfContents);
+
+		final ByteArrayOutputStream tocBuffer = new ByteArrayOutputStream();
+		final NnpkFileWriter tocWriter = new NnpkFileWriter(tocBuffer);
+		tocWriter.writeToc(this.tableOfContents);
+
+		this.writeHeader(4, 4 * 3 + tocBuffer.size());
+		this.out.write(tocBuffer.toByteArray());
+		this.out.writeIntLE(NpkEntryType.DATA.getStartInt());
+		this.out.writeIntLE(4); // blockLen
+
+		this.writeInMemoryFile(this.tableOfContents);
+	}
+
+	private void writeInMemoryFile(final TableOfContents toc) throws IOException {
+		if (toc.isDirectory()) {
+			for (final TableOfContents child : toc.getEntries().values()) {
+				this.writeInMemoryFile(child);
+			}
+		} else if (toc.isFile()) {
+			this.out.write(toc.getData());
+		}
 	}
 
 	private void writeArchiveFile(final TableOfContents toc, final Path folder) throws IOException {
@@ -99,6 +125,10 @@ public class NnpkFileWriter {
 
 	public TableOfContents getTableOfContents() {
 		return this.tableOfContents;
+	}
+
+	public void setTableOfContents(TableOfContents tableOfContents) {
+		this.tableOfContents = tableOfContents;
 	}
 
 	public int getBufferSize() {
