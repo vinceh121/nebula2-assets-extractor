@@ -16,13 +16,13 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import me.vinceh121.n2ae.texture.Block;
 
-public class TextureViewer extends JPanel {
+public class TexturePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private final List<Block> blocks;
 	private final List<BufferedImage> imgs;
 	private final JLabel lblBlockInfo, lblViewLabel;
 
-	public TextureViewer(List<Block> blocks, List<BufferedImage> imgs) {
+	public TexturePanel(List<Block> blocks, List<BufferedImage> imgs) {
 		this.blocks = blocks;
 		this.imgs = imgs;
 

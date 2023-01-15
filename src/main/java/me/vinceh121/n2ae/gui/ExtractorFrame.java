@@ -10,8 +10,11 @@ import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.JButton;
@@ -31,27 +34,36 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
 import me.vinceh121.n2ae.pkg.TableOfContents;
+import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 
 public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
+	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private final JTree tree;
 	private final JTabbedPane tabbed;
+	private GuiSettings settings;
 	private File openedNpk;
 	private TableOfContents toc;
+	private Map<String, NOBClazz> classModel;
 
 	public static void main(String[] args) {
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
+			UIManager.setLookAndFeel(new NimbusLookAndFeel());
+		} catch (UnsupportedLookAndFeelException e) {
 			System.err.println("Failed to set LAF");
 			e.printStackTrace();
 		}
@@ -61,6 +73,19 @@ public class ExtractorFrame extends JFrame {
 	}
 
 	public ExtractorFrame() {
+		try {
+			this.settings = GuiSettings.load();
+			this.loadClassModel();
+		} catch (FileNotFoundException e) {
+			this.settings = new GuiSettings();
+			this.classModel = new HashMap<>();
+		} catch (IOException e1) {
+			JOptionPane.showMessageDialog(null, "Failed to load settings. " + e1);
+			e1.printStackTrace();
+			this.settings = new GuiSettings();
+			this.classModel = new HashMap<>();
+		}
+
 		this.setTitle("Nebula 2 Assets Extractor");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setIconImage(Icons.getImage("bricks"));
@@ -85,10 +110,16 @@ public class ExtractorFrame extends JFrame {
 					}
 
 					TableOfContents sel = (TableOfContents) node.getUserObject();
+					if (sel.isDirectory()) {
+						return;
+					}
 					final String ext = sel.getName().substring(sel.getName().lastIndexOf('.') + 1);
 					switch (ext) {
 					case "ntx":
 						openTexture(sel);
+						break;
+					case "n":
+						openScript(sel);
 						break;
 					default:
 						JOptionPane.showMessageDialog(null, "Cannot open file " + sel.getName());
@@ -145,6 +176,11 @@ public class ExtractorFrame extends JFrame {
 		mnFile.add(mntQuit);
 	}
 
+	public void openScript(TableOfContents toc) {
+		this.tabbed.addTab(toc.getName(), new ScriptPanel(classModel, toc));
+		this.ensureTabsCloseable();
+	}
+
 	public void openTexture(TableOfContents toc) {
 		NtxFileReader read = new NtxFileReader(new ByteArrayInputStream(toc.getData()));
 		try {
@@ -154,7 +190,7 @@ public class ExtractorFrame extends JFrame {
 			throw new RuntimeException(e);
 		}
 
-		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TextureViewer(read.getBlocks(), read.getTextures()));
+		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable();
 	}
 
@@ -233,6 +269,12 @@ public class ExtractorFrame extends JFrame {
 				this.tabbed.setTabComponentAt(i, new TabCloseButton(tabbed, this.tabbed.getComponentAt(i)));
 			}
 		}
+	}
+
+	private void loadClassModel() throws StreamReadException, DatabindException, IOException {
+		this.classModel = MAPPER.readValue(new File(this.settings.getClassModelPath()),
+				new TypeReference<Map<String, NOBClazz>>() {
+				});
 	}
 
 	private static class TabCloseButton extends JPanel {
