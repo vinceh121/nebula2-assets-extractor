@@ -79,7 +79,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>me.vinceh121.n2ae.cli.ExtractorCli</mainClass>
+							<mainClass>me.vinceh121.n2ae.ExtractorMain</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
