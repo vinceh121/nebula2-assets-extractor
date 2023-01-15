@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
+import me.vinceh121.n2ae.pkg.NnpkFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.script.NOBClazz;
@@ -169,6 +171,19 @@ public class ExtractorFrame extends JFrame {
 		mntOpen.addActionListener(e -> this.openNPK());
 		mnFile.add(mntOpen);
 
+		JMenuItem mntSave = new JMenuItem("Save NPK0");
+		mntSave.setMnemonic('s');
+		mntSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+		mntSave.addActionListener(e -> this.saveNPK());
+		mnFile.add(mntSave);
+
+		JMenuItem mntSaveAs = new JMenuItem("Save NPK0 as");
+		mntSaveAs.setMnemonic('a');
+		mntSaveAs.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		mntSaveAs.addActionListener(e -> this.saveAsNPK());
+		mnFile.add(mntSaveAs);
+
 		JMenuItem mntQuit = new JMenuItem("Quit");
 		mntQuit.setMnemonic('q');
 		mntQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
@@ -194,6 +209,55 @@ public class ExtractorFrame extends JFrame {
 		this.ensureTabsCloseable();
 	}
 
+	private void saveAsNPK() {
+		this.openedNpk = null;
+		this.saveNPK();
+	}
+
+	private void saveNPK() {
+		if (this.openedNpk == null) {
+			JFileChooser fc = new JFileChooser();
+			fc.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public String getDescription() {
+					return "NPK0 archive file";
+				}
+
+				@Override
+				public boolean accept(File f) {
+					return f.getName().endsWith(".npk") || f.isDirectory();
+				}
+			});
+			int status = fc.showSaveDialog(null);
+			if (status != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+
+			this.openedNpk = fc.getSelectedFile();
+		}
+
+		this.setEnabled(false);
+		this.tree.setEnabled(false);
+		CompletableFuture.runAsync(this::writeNPK).thenRunAsync(() -> {
+			this.setEnabled(true);
+			this.tree.setEnabled(true);
+		}).exceptionally(t -> {
+			t.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Failed to write NPK0 file: " + t);
+			return null;
+		});
+	}
+
+	private void writeNPK() throws RuntimeException {
+		try (FileOutputStream out = new FileOutputStream(openedNpk)) {
+			NnpkFileWriter writer = new NnpkFileWriter(out);
+			writer.setTableOfContents(this.toc);
+			writer.writeFromMemory();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private void openNPK() {
 		JFileChooser fc = new JFileChooser();
 		fc.addChoosableFileFilter(new FileFilter() {
@@ -214,7 +278,7 @@ public class ExtractorFrame extends JFrame {
 
 		this.openedNpk = fc.getSelectedFile();
 
-		CompletableFuture.runAsync(this::readNpk).thenRunAsync(() -> {
+		CompletableFuture.runAsync(this::readNPK).thenRunAsync(() -> {
 			this.updateTreeModel();
 			this.tree.setEnabled(true);
 		}).exceptionally((t) -> {
@@ -224,7 +288,7 @@ public class ExtractorFrame extends JFrame {
 		});
 	}
 
-	private void readNpk() throws RuntimeException {
+	private void readNPK() throws RuntimeException {
 		final int dataOffset;
 		try (FileInputStream in = new FileInputStream(this.openedNpk)) {
 			NnpkFileReader read = new NnpkFileReader(in);
