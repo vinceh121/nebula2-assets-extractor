@@ -3,6 +3,11 @@ package me.vinceh121.n2ae.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -57,6 +62,7 @@ public class ExtractorFrame extends JFrame {
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private final JTree tree;
 	private final JTabbedPane tabbed;
+	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
 	private GuiSettings settings;
 	private File openedNpk;
 	private TableOfContents toc;
@@ -189,6 +195,28 @@ public class ExtractorFrame extends JFrame {
 		mntQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
 		mntQuit.addActionListener(e -> System.exit(0));
 		mnFile.add(mntQuit);
+
+		JMenu mnEdit = new JMenu("Edit");
+		mnEdit.setMnemonic('e');
+		bar.add(mnEdit);
+
+		JMenuItem mntCopy = new JMenuItem("Copy");
+		mntCopy.setMnemonic('c');
+		mntCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+		mntCopy.addActionListener(e -> this.copy());
+		mnEdit.add(mntCopy);
+
+		JMenuItem mntCut = new JMenuItem("Cut");
+		mntCut.setMnemonic('u');
+		mntCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
+		mntCut.addActionListener(e -> this.cut());
+		mnEdit.add(mntCut);
+
+		JMenuItem mntPaste = new JMenuItem("Paste");
+		mntCut.setMnemonic('p');
+		mntPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
+		mntPaste.addActionListener(e -> this.paste());
+		mnEdit.add(mntPaste);
 	}
 
 	public void openScript(TableOfContents toc) {
@@ -207,6 +235,60 @@ public class ExtractorFrame extends JFrame {
 
 		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable();
+	}
+
+	private void paste() {
+		try {
+			Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+			if (!clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
+				return;
+			}
+			TOCTransferable trans = (TOCTransferable) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
+			DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+			TableOfContents selToc = (TableOfContents) selNode.getUserObject();
+
+			if (selToc.isDirectory()) { // selected path is a dir, insert inside
+				this.getTreeModel()
+					.insertNodeInto(trans.getNode(),
+							selNode,
+							this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+				selToc.getEntries().put(trans.getToc().getName(), trans.getToc());
+			} else if (selToc.isFile()) { // selected path is file, insert as sibling
+				DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
+				TableOfContents selTocParent = ((TableOfContents) selParent.getUserObject());
+				this.getTreeModel()
+					.insertNodeInto(trans.getNode(),
+							selParent,
+							this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+				selTocParent.getEntries().put(trans.getToc().getName(), trans.getToc());
+			}
+		} catch (UnsupportedFlavorException | IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Failed to paste: " + e);
+		}
+	}
+
+	private void cut() {
+		this.copy();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		TableOfContents parentToc = ((TableOfContents) ((DefaultMutableTreeNode) node.getParent()).getUserObject());
+		parentToc.getEntries().remove(((TableOfContents) node.getUserObject()).getName());
+		this.getTreeModel().removeNodeFromParent(node);
+	}
+
+	private void copy() {
+		Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+		TOCTransferable trans = this.makeTocTransferable();
+		clip.setContents(trans, this.clipboardOwner);
+	}
+
+	private TOCTransferable makeTocTransferable() {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
+			throw new IllegalStateException();
+		}
+
+		return new TOCTransferable((TableOfContents) node.getUserObject(), node);
 	}
 
 	private void saveAsNPK() {
@@ -339,6 +421,16 @@ public class ExtractorFrame extends JFrame {
 		this.classModel = MAPPER.readValue(new File(this.settings.getClassModelPath()),
 				new TypeReference<Map<String, NOBClazz>>() {
 				});
+	}
+
+	private DefaultTreeModel getTreeModel() {
+		return (DefaultTreeModel) this.tree.getModel();
+	}
+
+	private static class ExtractorClipboardOwner implements ClipboardOwner {
+		@Override
+		public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		}
 	}
 
 	private static class TabCloseButton extends JPanel {
