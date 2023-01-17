@@ -11,6 +11,33 @@ public class TableOfContents {
 	private String name;
 	private byte[] data;
 
+	public TableOfContents() {
+	}
+
+	public TableOfContents(TableOfContents from) {
+		this.entries.putAll(from.entries);
+		this.directory = from.directory;
+		this.file = from.file;
+		this.offset = from.offset;
+		this.length = from.length;
+		this.name = from.name;
+		this.data = new byte[from.data.length];
+		System.arraycopy(from.data, 0, this.data, 0, from.data.length);
+	}
+	
+	@Override
+	public TableOfContents clone() {
+		return new TableOfContents(this);
+	}
+	
+	public TableOfContents deepClone() {
+		TableOfContents clone = this.clone();
+		for (String key : clone.entries.keySet()) {
+			clone.entries.put(key, clone.entries.get(key).deepClone());
+		}
+		return clone;
+	}
+
 	public boolean isDirectory() {
 		return this.directory;
 	}
