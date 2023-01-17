@@ -2,6 +2,7 @@ package me.vinceh121.n2ae.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -19,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -63,6 +65,7 @@ public class ExtractorFrame extends JFrame {
 	private final JTree tree;
 	private final JTabbedPane tabbed;
 	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
+	private final AboutDialog aboutDialog = new AboutDialog();
 	private GuiSettings settings;
 	private File openedNpk;
 	private TableOfContents toc;
@@ -217,6 +220,24 @@ public class ExtractorFrame extends JFrame {
 		mntPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
 		mntPaste.addActionListener(e -> this.paste());
 		mnEdit.add(mntPaste);
+
+		JMenu mnHelp = new JMenu("Help");
+		bar.add(mnHelp);
+
+		JMenuItem mntWiki = new JMenuItem("Wiki");
+		mntWiki.addActionListener(e -> {
+			try {
+				Desktop.getDesktop().browse(new URI("https://github.com/vinceh121/nebula2-assets-extractor/wiki"));
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Failed to open browser: " + e1);
+			}
+		});
+		mnHelp.add(mntWiki);
+
+		JMenuItem mntAbout = new JMenuItem("About");
+		mntAbout.addActionListener(e -> this.aboutDialog.setVisible(true));
+		mnHelp.add(mntAbout);
 	}
 
 	public void openScript(TableOfContents toc) {
