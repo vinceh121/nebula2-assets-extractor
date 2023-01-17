@@ -111,6 +111,7 @@ public class ExtractorFrame extends JFrame {
 		this.tree = new JTree(new DefaultMutableTreeNode());
 		this.tree.setEnabled(false);
 		this.tree.setCellRenderer(new NpkTreeCellRenderer());
+		this.tree.setActionMap(null);
 		this.tree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
