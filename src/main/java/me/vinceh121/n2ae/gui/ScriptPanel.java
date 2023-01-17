@@ -18,6 +18,7 @@ import javax.swing.KeyStroke;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import me.vinceh121.n2ae.pkg.TableOfContents;
@@ -57,7 +58,7 @@ public class ScriptPanel extends JPanel {
 		this.scroll = new RTextScrollPane(text, true);
 		this.add(this.scroll, BorderLayout.CENTER);
 
-		this.text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), "save");
+		this.text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), "save");
 		this.text.getActionMap().put("save", new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
@@ -120,5 +121,10 @@ public class ScriptPanel extends JPanel {
 		writer.write(out);
 
 		this.text.setText(new String(out.toByteArray()));
+		this.text.setCaretPosition(0);
+	}
+
+	static {
+		FoldParserManager.get().addFoldParserMapping(SyntaxConstants.SYNTAX_STYLE_TCL, new NebulaFoldParser());
 	}
 }
