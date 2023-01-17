@@ -17,6 +17,7 @@ import javax.swing.KeyStroke;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import me.vinceh121.n2ae.pkg.TableOfContents;
@@ -45,6 +46,13 @@ public class ScriptPanel extends JPanel {
 		this.text.setCodeFoldingEnabled(true);
 		this.text.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_TCL);
 		this.text.requestFocusInWindow();
+
+		try {
+			Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/monokai.xml")).apply(text);
+		} catch (final IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Failed to apply theme: " + e);
+		}
 
 		this.scroll = new RTextScrollPane(text, true);
 		this.add(this.scroll, BorderLayout.CENTER);
