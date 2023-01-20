@@ -238,6 +238,7 @@ public class ExtractorFrame extends JFrame {
 	public void openScript(TableOfContents toc) {
 		this.tabbed.addTab(toc.getName(), new ScriptPanel(classModel, toc));
 		this.ensureTabsCloseable();
+		this.selectLastTab();
 	}
 
 	public void openTexture(TableOfContents toc) {
@@ -251,6 +252,7 @@ public class ExtractorFrame extends JFrame {
 
 		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable();
+		this.selectLastTab();
 	}
 
 	private void paste() {
@@ -431,6 +433,10 @@ public class ExtractorFrame extends JFrame {
 				this.tabbed.setTabComponentAt(i, new TabCloseButton(tabbed, this.tabbed.getComponentAt(i)));
 			}
 		}
+	}
+
+	private void selectLastTab() {
+		this.tabbed.setSelectedIndex(this.tabbed.getTabCount() - 1);
 	}
 
 	private void loadClassModel() throws StreamReadException, DatabindException, IOException {

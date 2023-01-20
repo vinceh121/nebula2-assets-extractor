@@ -155,8 +155,7 @@ public class TableOfContents {
 
 	@Override
 	public String toString() {
-		return "TableOfContents [directory=" + directory + ", file=" + file + ", offset="
-				+ offset + ", length=" + length + ", blockLen=" + blockLen + ", name=" + name + ", data="
-				+ Arrays.toString(data) + "]";
+		return "TableOfContents [directory=" + directory + ", file=" + file + ", offset=" + offset + ", length="
+				+ length + ", blockLen=" + blockLen + ", name=" + name + ", data=" + Arrays.toString(data) + "]";
 	}
 }
