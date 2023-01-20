@@ -13,7 +13,7 @@ import me.vinceh121.n2ae.LEDataOutputStream;
 
 public class NnpkFileWriter {
 	private final LEDataOutputStream out;
-	private int bufferSize = 1048576;
+	private int bufferSize = 1048576, dataLength = -1;
 	private TableOfContents tableOfContents;
 
 	public NnpkFileWriter(final OutputStream out) {
@@ -51,7 +51,10 @@ public class NnpkFileWriter {
 		this.writeHeader(4, 4 * 3 + tocBuffer.size());
 		this.out.write(tocBuffer.toByteArray());
 		this.out.writeIntLE(NpkEntryType.DATA.getStartInt());
-		this.out.writeIntLE(4); // blockLen
+		if (this.dataLength == -1) {
+			this.dataLength = calculateTableOfContentSize(this.tableOfContents);
+		}
+		this.out.writeIntLE(this.dataLength);
 
 		this.writeInMemoryFile(this.tableOfContents);
 	}
@@ -95,7 +98,7 @@ public class NnpkFileWriter {
 	public void writeToc(final TableOfContents toc) throws IOException {
 		if (toc.isDirectory()) {
 			this.out.writeIntLE(NpkEntryType.DIR.getStartInt());
-			this.out.writeIntLE(4); // blockLen
+			this.out.writeIntLE(toc.getBlockLen());
 			this.writeString(toc.getName());
 
 			for (final TableOfContents c : toc.getEntries().values()) {
@@ -103,10 +106,10 @@ public class NnpkFileWriter {
 			}
 
 			this.out.writeIntLE(NpkEntryType.DEND.getStartInt());
-			this.out.writeIntLE(4); // blockLen
+			this.out.writeIntLE(0);
 		} else if (toc.isFile()) {
 			this.out.writeIntLE(NpkEntryType.FILE.getStartInt());
-			this.out.writeIntLE(4); // blockLen
+			this.out.writeIntLE(toc.getBlockLen());
 
 			this.out.writeIntLE(toc.getOffset());
 			this.out.writeIntLE(toc.getLength());
@@ -137,5 +140,17 @@ public class NnpkFileWriter {
 
 	public void setBufferSize(final int bufferSize) {
 		this.bufferSize = bufferSize;
+	}
+
+	public static int calculateTableOfContentSize(TableOfContents toc) {
+		int size = 0;
+		if (toc.isDirectory()) {
+			for (TableOfContents child : toc.getEntries().values()) {
+				size += calculateTableOfContentSize(child);
+			}
+		} else if (toc.isFile()) {
+			size += toc.getLength();
+		}
+		return size;
 	}
 }

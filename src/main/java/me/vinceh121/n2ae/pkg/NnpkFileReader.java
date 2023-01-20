@@ -16,7 +16,7 @@ public class NnpkFileReader {
 
 	private final LEDataInputStream in;
 
-	private int dataOffset;
+	private int dataOffset, dataLength;
 
 	private TableOfContents toc;
 
@@ -74,7 +74,7 @@ public class NnpkFileReader {
 
 		while (insideToc) {
 			final int type = this.in.readIntLE();
-			/* int blockLen = */this.in.readIntLE();
+			int blockLen = this.in.readIntLE();
 
 			if (type == NpkEntryType.DIR.getStartInt()) {
 				final short nameLength = this.in.readShortLE();
@@ -86,6 +86,7 @@ public class NnpkFileReader {
 
 				path.add(name);
 				final TableOfContents e = new TableOfContents();
+				e.setBlockLen(blockLen);
 				e.setDirectory(true);
 				e.setName(name);
 				if (this.toc == null) {
@@ -104,6 +105,7 @@ public class NnpkFileReader {
 
 				path.add(name);
 				final TableOfContents e = new TableOfContents();
+				e.setBlockLen(blockLen);
 				e.setFile(true);
 				e.setLength(fileLength);
 				e.setOffset(fileOffset);
@@ -122,5 +124,9 @@ public class NnpkFileReader {
 
 	public int getDataOffset() {
 		return this.dataOffset;
+	}
+
+	public int getDataLength() {
+		return this.dataLength;
 	}
 }
