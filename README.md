@@ -33,14 +33,16 @@ Commands:
 
 $ java -jar nebula2-assets-extractor.jar help extract
 Usage: nebula2-extractor extract [-d] [-f=<format>] -i=<inputFile>
-                                 -o=<outputFolder>
+                                 [-m=<clazzModel>] -o=<outputFolder>
 Unpacks an NPK archive and converts all assets
-  -d, --delete-old          Deletes original files and unprocessable files
-  -f, --format=<format>     texture output image format
+  -d, --delete-old           Deletes original files and unprocessable files
+  -f, --format=<format>      texture output image format
   -i, --input=<inputFile>
+  -m, --model=<clazzModel>   Json file containing a class model generated using
+                               `extract-classes`
   -o, --output=<outputFolder>
 
-$ java -jar nebula2-assets-extractor.jar extract -i data.npk -o output -d
+$ java -jar nebula2-assets-extractor.jar extract -i data.npk -f png -m project-nomads.classmodel.json -o output -d
 $ tree output
 output
 ├── a_ammo.n
