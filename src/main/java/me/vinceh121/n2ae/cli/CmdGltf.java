@@ -30,10 +30,10 @@ public class CmdGltf implements Callable<Integer> {
 	@Option(names = { "--model" }, description = { "Script class model JSON" }, required = true)
 	private File model;
 
-	@Option(names = { "-m", "--mesh" }, description = { "NVX1 file" }, required = true)
+	@Option(names = { "-m", "--mesh" }, description = { "NVX1 file" })
 	private File mesh;
 
-	@Option(names = { "-a", "--animation" }, description = { "NAX0 file" }, required = true)
+	@Option(names = { "-a", "--animation" }, description = { "NAX0 file" })
 	private File animation;
 
 	@Option(names = { "-o", "--output" }, description = { "A .gltf output file." }, required = true)
@@ -75,16 +75,20 @@ public class CmdGltf implements Callable<Integer> {
 
 		gen.buildBasicScene("scene", gen.getGltf().getNodes().size());
 
-		try (FileInputStream meshIn = new FileInputStream(this.mesh)) {
-			final NvxFileReader meshReader = new NvxFileReader(meshIn);
-			meshReader.readAll();
-			gen.addMesh("skin", meshReader.getTypes(), meshReader.getVertices(), meshReader.getTriangles(), 0);
+		if (this.mesh != null) {
+			try (FileInputStream meshIn = new FileInputStream(this.mesh)) {
+				final NvxFileReader meshReader = new NvxFileReader(meshIn);
+				meshReader.readAll();
+				gen.addMesh("skin", meshReader.getTypes(), meshReader.getVertices(), meshReader.getTriangles(), 0);
+			}
 		}
 
-		try (FileInputStream animIn = new FileInputStream(this.animation)) {
-			final NaxFileReader animReader = new NaxFileReader(animIn);
-			final List<Curve> curves = animReader.readAll();
-			gen.addCurves(curves);
+		if (this.animation != null) {
+			try (FileInputStream animIn = new FileInputStream(this.animation)) {
+				final NaxFileReader animReader = new NaxFileReader(animIn);
+				final List<Curve> curves = animReader.readAll();
+				gen.addCurves(curves);
+			}
 		}
 
 		gen.buildBuffer(this.buffer.getName());
