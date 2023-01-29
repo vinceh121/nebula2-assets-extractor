@@ -9,7 +9,7 @@ import java.util.Objects;
 public class TableOfContents {
 	private final Map<String, TableOfContents> entries = new LinkedHashMap<>();
 	private boolean directory, file;
-	private int offset, length, blockLen;
+	private int offset, length;
 	private String name;
 	private byte[] data;
 
@@ -22,7 +22,6 @@ public class TableOfContents {
 		this.file = from.file;
 		this.offset = from.offset;
 		this.length = from.length;
-		this.blockLen = from.blockLen;
 		this.name = from.name;
 		this.data = new byte[from.data.length];
 		System.arraycopy(from.data, 0, this.data, 0, from.data.length);
@@ -73,14 +72,6 @@ public class TableOfContents {
 		this.length = length;
 	}
 
-	public int getBlockLen() {
-		return blockLen;
-	}
-
-	public void setBlockLen(int blockLen) {
-		this.blockLen = blockLen;
-	}
-
 	public String getName() {
 		return this.name;
 	}
@@ -110,7 +101,7 @@ public class TableOfContents {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(data);
-		result = prime * result + Objects.hash(blockLen, directory, entries, file, length, name, offset);
+		result = prime * result + Objects.hash(directory, entries, file, length, name, offset);
 		return result;
 	}
 
@@ -123,9 +114,9 @@ public class TableOfContents {
 		if (getClass() != obj.getClass())
 			return false;
 		TableOfContents other = (TableOfContents) obj;
-		return blockLen == other.blockLen && Arrays.equals(data, other.data) && directory == other.directory
-				&& Objects.equals(entries, other.entries) && file == other.file && length == other.length
-				&& Objects.equals(name, other.name) && offset == other.offset;
+		return Arrays.equals(data, other.data) && directory == other.directory && Objects.equals(entries, other.entries)
+				&& file == other.file && length == other.length && Objects.equals(name, other.name)
+				&& offset == other.offset;
 	}
 
 	public TableOfContents get(final Iterable<String> path) {
@@ -153,9 +144,19 @@ public class TableOfContents {
 		}
 	}
 
+	public int calculateBlockLen() {
+		if (this.directory) {
+			return 2 + this.name.length();
+		} else if (this.file) {
+			return 2 * 4 + 2 + this.getName().length();
+		} else {
+			throw new IllegalStateException("TOC is neither directory nor file");
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return "TableOfContents [directory=" + directory + ", file=" + file + ", offset=" + offset + ", length="
-				+ length + ", blockLen=" + blockLen + ", name=" + name + ", data=" + Arrays.toString(data) + "]";
+				+ length + ", name=" + name + ", data=" + Arrays.toString(data) + "]";
 	}
 }

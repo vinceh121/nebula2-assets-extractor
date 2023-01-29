@@ -98,7 +98,7 @@ public class NnpkFileWriter {
 	public void writeToc(final TableOfContents toc) throws IOException {
 		if (toc.isDirectory()) {
 			this.out.writeIntLE(NpkEntryType.DIR.getStartInt());
-			this.out.writeIntLE(toc.getBlockLen());
+			this.out.writeIntLE(toc.calculateBlockLen());
 			this.writeString(toc.getName());
 
 			for (final TableOfContents c : toc.getEntries().values()) {
@@ -109,7 +109,7 @@ public class NnpkFileWriter {
 			this.out.writeIntLE(0);
 		} else if (toc.isFile()) {
 			this.out.writeIntLE(NpkEntryType.FILE.getStartInt());
-			this.out.writeIntLE(toc.getBlockLen());
+			this.out.writeIntLE(toc.calculateBlockLen());
 
 			this.out.writeIntLE(toc.getOffset());
 			this.out.writeIntLE(toc.getLength());
