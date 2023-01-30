@@ -353,12 +353,12 @@ public class ExtractorFrame extends JFrame {
 		return new TOCTransferable((TableOfContents) node.getUserObject(), node);
 	}
 
-	private void saveAsNPK() {
+	public void saveAsNPK() {
 		this.openedNpk = null;
 		this.saveNPK();
 	}
 
-	private void saveNPK() {
+	public void saveNPK() {
 		if (this.openedNpk == null) {
 			JFileChooser fc = new JFileChooser();
 			fc.addChoosableFileFilter(new FileFilter() {
@@ -382,13 +382,13 @@ public class ExtractorFrame extends JFrame {
 
 		this.setEnabled(false);
 		this.tree.setEnabled(false);
-		CompletableFuture.runAsync(this::writeNPK).thenRunAsync(() -> {
-			this.setEnabled(true);
-			this.tree.setEnabled(true);
-		}).exceptionally(t -> {
+		CompletableFuture.runAsync(this::writeNPK).exceptionally(t -> {
 			t.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to write NPK0 file: " + t);
 			return null;
+		}).thenRunAsync(() -> {
+			this.setEnabled(true);
+			this.tree.setEnabled(true);
 		});
 	}
 
@@ -402,7 +402,7 @@ public class ExtractorFrame extends JFrame {
 		}
 	}
 
-	private void openNPK() {
+	public void openNPK() {
 		JFileChooser fc = new JFileChooser();
 		fc.addChoosableFileFilter(new FileFilter() {
 			@Override
