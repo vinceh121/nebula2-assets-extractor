@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.InputEvent;
@@ -21,6 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -61,6 +65,7 @@ import me.vinceh121.n2ae.texture.NtxFileReader;
 public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private static final DataFlavor FLAVOR_FILE = new DataFlavor("text/uri-list;class=java.lang.String", "file list");
 	private final JTree tree;
 	private final JTabbedPane tabbed;
 	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
@@ -258,31 +263,70 @@ public class ExtractorFrame extends JFrame {
 	private void paste() {
 		try {
 			Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-			if (!clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
-				return;
+			if (clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
+				this.pasteInternal((TOCTransferable) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR));
+			} else if (clip.isDataFlavorAvailable(FLAVOR_FILE)) {
+				// On Linux DataFlavor.javaFileListFlavor is broken as it reaches an unexpected
+				// \0 in the last URL, so we have to reinvent the wheel
+				final String[] files = ((String) clip.getData(FLAVOR_FILE)).split("\n");
+				for (String f : files) {
+					File file = new File(new URI(f.strip().replace("\0", "")));
+					this.pasteFile(file);
+				}
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"Don't know how to handle mimetype " + Arrays.toString(clip.getAvailableDataFlavors()));
 			}
-			TOCTransferable trans = (TOCTransferable) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
-			DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-			TableOfContents selToc = (TableOfContents) selNode.getUserObject();
-
-			if (selToc.isDirectory()) { // selected path is a dir, insert inside
-				this.getTreeModel()
-					.insertNodeInto(trans.getNode(),
-							selNode,
-							this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
-				selToc.getEntries().put(trans.getToc().getName(), trans.getToc());
-			} else if (selToc.isFile()) { // selected path is file, insert as sibling
-				DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
-				TableOfContents selTocParent = ((TableOfContents) selParent.getUserObject());
-				this.getTreeModel()
-					.insertNodeInto(trans.getNode(),
-							selParent,
-							this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
-				selTocParent.getEntries().put(trans.getToc().getName(), trans.getToc());
-			}
-		} catch (UnsupportedFlavorException | IOException e) {
+		} catch (URISyntaxException | UnsupportedFlavorException | IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to paste: " + e);
+		}
+	}
+
+	private void pasteFile(File f) throws IOException {
+		DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		TableOfContents selToc = (TableOfContents) selNode.getUserObject();
+
+		TableOfContents newToc = new TableOfContents();
+		newToc.setDirectory(f.isDirectory());
+		newToc.setFile(f.isFile());
+		newToc.setName(f.getName());
+		newToc.setData(Files.readAllBytes(f.toPath()));
+		newToc.setLength(newToc.getData().length);
+
+		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newToc);
+
+		if (selToc.isDirectory()) { // selected path is a dir, insert inside
+			this.getTreeModel()
+				.insertNodeInto(newNode, selNode, this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+			selToc.getEntries().put(newToc.getName(), newToc);
+		} else if (selToc.isFile()) { // selected path is file, insert as sibling
+			DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
+			TableOfContents selTocParent = ((TableOfContents) selParent.getUserObject());
+			this.getTreeModel()
+				.insertNodeInto(newNode, selParent, this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+			selTocParent.getEntries().put(newToc.getName(), newToc);
+		}
+	}
+
+	private void pasteInternal(TOCTransferable trans) {
+		DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		TableOfContents selToc = (TableOfContents) selNode.getUserObject();
+
+		if (selToc.isDirectory()) { // selected path is a dir, insert inside
+			this.getTreeModel()
+				.insertNodeInto(trans.getNode(),
+						selNode,
+						this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+			selToc.getEntries().put(trans.getToc().getName(), trans.getToc());
+		} else if (selToc.isFile()) { // selected path is file, insert as sibling
+			DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
+			TableOfContents selTocParent = ((TableOfContents) selParent.getUserObject());
+			this.getTreeModel()
+				.insertNodeInto(trans.getNode(),
+						selParent,
+						this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+			selTocParent.getEntries().put(trans.getToc().getName(), trans.getToc());
 		}
 	}
 
