@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
-import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
+import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
 
 class NpkTests {
 	// @Test do not use this test. It's not possible to use RandomAccessFile to
@@ -26,9 +26,9 @@ class NpkTests {
 			read.readAll();
 		}
 
-		final NnpkInMemoryFileExtractor memRead;
+		final NnpkInMemoryFileReader memRead;
 		try (RandomAccessFile rand = new RandomAccessFile(testFile, "r")) {
-			memRead = new NnpkInMemoryFileExtractor(rand);
+			memRead = new NnpkInMemoryFileReader(rand);
 			memRead.setDataOffset(read.getDataOffset());
 			memRead.readTableOfContents(read.getTableOfContents());
 		}

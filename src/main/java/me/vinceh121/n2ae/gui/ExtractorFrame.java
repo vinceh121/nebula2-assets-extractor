@@ -53,7 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
-import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
+import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.texture.NtxFileReader;
@@ -400,7 +400,7 @@ public class ExtractorFrame extends JFrame {
 		}
 
 		try (RandomAccessFile rand = new RandomAccessFile(this.openedNpk, "r")) {
-			NnpkInMemoryFileExtractor ex = new NnpkInMemoryFileExtractor(rand);
+			NnpkInMemoryFileReader ex = new NnpkInMemoryFileReader(rand);
 			ex.setDataOffset(dataOffset);
 			ex.readTableOfContents(toc);
 		} catch (IOException e) {

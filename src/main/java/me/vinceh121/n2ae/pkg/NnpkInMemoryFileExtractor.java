@@ -1,34 +1,30 @@
 package me.vinceh121.n2ae.pkg;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 public class NnpkInMemoryFileExtractor {
-	private final RandomAccessFile file;
-	private int dataOffset;
+	private final File output;
 
-	public NnpkInMemoryFileExtractor(RandomAccessFile file) {
-		this.file = file;
+	public NnpkInMemoryFileExtractor(File output) {
+		this.output = output;
 	}
-
-	public void readTableOfContents(TableOfContents toc) throws IOException {
+	
+	public void write(TableOfContents toc) throws IOException {
+		this.write(toc, output);
+	}
+	
+	private void write(TableOfContents toc, File out) throws IOException {
 		if (toc.isDirectory()) {
+			out.mkdir();
 			for (TableOfContents child : toc.getEntries().values()) {
-				this.readTableOfContents(child);
+				this.write(child, out.toPath().resolve(child.getName()).toFile());
 			}
 		} else if (toc.isFile()) {
-			this.file.seek(toc.getOffset() + this.dataOffset);
-			byte[] data = new byte[toc.getLength()];
-			this.file.read(data);
-			toc.setData(data);
+			try (FileOutputStream os = new FileOutputStream(out)) {
+				os.write(toc.getData());
+			}
 		}
-	}
-
-	public int getDataOffset() {
-		return dataOffset;
-	}
-
-	public void setDataOffset(int dataOffset) {
-		this.dataOffset = dataOffset;
 	}
 }

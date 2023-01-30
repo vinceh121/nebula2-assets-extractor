@@ -3,10 +3,14 @@ package me.vinceh121.n2ae.gui;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 
 public class TOCTransferable implements Transferable {
@@ -21,7 +25,7 @@ public class TOCTransferable implements Transferable {
 
 	@Override
 	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] { NPK_CHILD_FLAVOR };
+		return new DataFlavor[] { NPK_CHILD_FLAVOR, DataFlavor.javaFileListFlavor };
 	}
 
 	@Override
@@ -31,7 +35,20 @@ public class TOCTransferable implements Transferable {
 
 	@Override
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		return this;
+		if (NPK_CHILD_FLAVOR.equals(flavor)) {
+			return this.toc;
+		} else if (DataFlavor.javaFileListFlavor.equals(flavor)) {
+			final File f = new File(System.getProperty("java.io.tmpdir") + "/" + this.toc.getName());
+			f.deleteOnExit();
+			final NnpkInMemoryFileExtractor ext = new NnpkInMemoryFileExtractor(f);
+			ext.write(this.toc);
+			// because File#delete() doesn't recurse directories
+			if (toc.isDirectory()) {
+				Files.walk(f.toPath()).forEach(p -> p.toFile().deleteOnExit());
+			}
+			return List.of(f);
+		}
+		throw new UnsupportedFlavorException(flavor);
 	}
 
 	public TableOfContents getToc() {
