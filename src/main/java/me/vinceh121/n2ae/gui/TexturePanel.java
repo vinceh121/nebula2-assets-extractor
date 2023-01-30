@@ -28,6 +28,17 @@ import me.vinceh121.n2ae.texture.Block;
 
 public class TexturePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+	private static final FileFilter PNG_FILTER = new FileFilter() {
+		@Override
+		public String getDescription() {
+			return "PNG image";
+		}
+
+		@Override
+		public boolean accept(File f) {
+			return f.getName().endsWith(".png") || f.isDirectory();
+		}
+	};
 	private final List<Block> blocks;
 	private final List<BufferedImage> imgs;
 	private final JLabel lblBlockInfo, lblViewLabel;
@@ -63,17 +74,8 @@ public class TexturePanel extends JPanel {
 		JMenuItem itmSave = new JMenuItem("Save as...");
 		itmSave.addActionListener(e -> {
 			JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter(new FileFilter() {
-				@Override
-				public String getDescription() {
-					return "PNG image";
-				}
-
-				@Override
-				public boolean accept(File f) {
-					return f.getName().endsWith(".png") || f.isDirectory();
-				}
-			});
+			fc.addChoosableFileFilter(PNG_FILTER);
+			fc.setFileFilter(PNG_FILTER);
 			int status = fc.showSaveDialog(null);
 			if (status != JFileChooser.APPROVE_OPTION) {
 				return;

@@ -66,6 +66,17 @@ public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final DataFlavor FLAVOR_FILE = new DataFlavor("text/uri-list;class=java.lang.String", "file list");
+	private static final FileFilter NPK_FILTER = new FileFilter() {
+		@Override
+		public String getDescription() {
+			return "NPK0 archive file";
+		}
+
+		@Override
+		public boolean accept(File f) {
+			return f.getName().endsWith(".npk") || f.isDirectory();
+		}
+	};
 	private final JTree tree;
 	private final JTabbedPane tabbed;
 	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
@@ -362,17 +373,8 @@ public class ExtractorFrame extends JFrame {
 	public void saveNPK() {
 		if (this.openedNpk == null) {
 			JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter(new FileFilter() {
-				@Override
-				public String getDescription() {
-					return "NPK0 archive file";
-				}
-
-				@Override
-				public boolean accept(File f) {
-					return f.getName().endsWith(".npk") || f.isDirectory();
-				}
-			});
+			fc.addChoosableFileFilter(NPK_FILTER);
+			fc.setFileFilter(NPK_FILTER);
 			int status = fc.showSaveDialog(null);
 			if (status != JFileChooser.APPROVE_OPTION) {
 				return;
@@ -406,17 +408,8 @@ public class ExtractorFrame extends JFrame {
 
 	public void openNPK() {
 		JFileChooser fc = new JFileChooser();
-		fc.addChoosableFileFilter(new FileFilter() {
-			@Override
-			public String getDescription() {
-				return "NPK0 archive file";
-			}
-
-			@Override
-			public boolean accept(File f) {
-				return f.getName().endsWith(".npk") || f.isDirectory();
-			}
-		});
+		fc.addChoosableFileFilter(NPK_FILTER);
+		fc.setFileFilter(NPK_FILTER);
 		int status = fc.showOpenDialog(null);
 		if (status != JFileChooser.APPROVE_OPTION) {
 			return;
