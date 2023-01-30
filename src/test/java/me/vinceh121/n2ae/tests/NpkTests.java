@@ -36,6 +36,7 @@ class NpkTests {
 		final NnpkFileWriter writer;
 		final byte[] dataActual;
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			NnpkFileWriter.updateTableOfContentsOffsets(read.getTableOfContents());
 			writer = new NnpkFileWriter(out);
 			writer.setTableOfContents(read.getTableOfContents());
 			writer.writeFromMemory();

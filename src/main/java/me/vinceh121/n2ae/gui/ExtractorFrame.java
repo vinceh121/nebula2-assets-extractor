@@ -395,6 +395,7 @@ public class ExtractorFrame extends JFrame {
 
 	private void writeNPK() throws RuntimeException {
 		try (FileOutputStream out = new FileOutputStream(openedNpk)) {
+			NnpkFileWriter.updateTableOfContentsOffsets(this.toc);
 			NnpkFileWriter writer = new NnpkFileWriter(out);
 			writer.setTableOfContents(this.toc);
 			writer.writeFromMemory();

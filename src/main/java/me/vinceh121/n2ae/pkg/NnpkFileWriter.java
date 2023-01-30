@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import me.vinceh121.n2ae.LEDataOutputStream;
 
@@ -152,5 +153,20 @@ public class NnpkFileWriter {
 			size += toc.getLength();
 		}
 		return size;
+	}
+
+	public static void updateTableOfContentsOffsets(TableOfContents toc) {
+		updateTableOfContentsOffsets(toc, new AtomicInteger());
+	}
+	
+	private static void updateTableOfContentsOffsets(TableOfContents toc, AtomicInteger offset) {
+		if (toc.isDirectory()) {
+			for (TableOfContents child : toc.getEntries().values()) {
+				updateTableOfContentsOffsets(child, offset);
+			}
+		} else if (toc.isFile()) {
+			toc.setLength(toc.getData().length);
+			toc.setOffset(offset.getAndAdd(toc.getLength()));
+		}
 	}
 }
