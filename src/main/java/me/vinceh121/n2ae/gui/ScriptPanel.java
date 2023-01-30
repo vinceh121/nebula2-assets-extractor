@@ -33,6 +33,7 @@ import org.fife.ui.rtextarea.SearchResult;
 
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.script.NOBClazz;
+import me.vinceh121.n2ae.script.ParseException;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 import me.vinceh121.n2ae.script.nob.NOBWriter;
 import me.vinceh121.n2ae.script.tcl.TCLParser;
@@ -82,7 +83,7 @@ public class ScriptPanel extends JPanel implements SearchListener {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					recompile();
-				} catch (IOException e1) {
+				} catch (IOException | ParseException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
 				}
@@ -118,7 +119,7 @@ public class ScriptPanel extends JPanel implements SearchListener {
 		btnSave.addActionListener(e -> {
 			try {
 				this.recompile();
-			} catch (IOException e1) {
+			} catch (IOException | ParseException e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
 			}
@@ -128,15 +129,17 @@ public class ScriptPanel extends JPanel implements SearchListener {
 		this.errorStrip = new ErrorStrip(this.text);
 		this.add(this.errorStrip, BorderLayout.EAST);
 
+		this.text.addParser(new RSTANebulaParser(model));
+		
 		try {
 			this.decompile();
-		} catch (IOException e) {
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to decompile: " + e);
 		}
 	}
 
-	private void recompile() throws IOException {
+	private void recompile() throws IOException, ParseException {
 		TCLParser parser = new TCLParser();
 		parser.setClassModel(this.model);
 		parser.read(this.text.getText());
@@ -150,7 +153,7 @@ public class ScriptPanel extends JPanel implements SearchListener {
 		this.script.setData(out.toByteArray());
 	}
 
-	private void decompile() throws IOException {
+	private void decompile() throws IOException, ParseException {
 		NOBParser parser = new NOBParser();
 		parser.setClassModel(this.model);
 		parser.read(this.script.getData());

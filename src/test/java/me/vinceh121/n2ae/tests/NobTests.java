@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.IWriter;
 import me.vinceh121.n2ae.script.NOBClazz;
+import me.vinceh121.n2ae.script.ParseException;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 import me.vinceh121.n2ae.script.nob.NOBWriter;
 import me.vinceh121.n2ae.script.tcl.TCLParser;
@@ -23,7 +24,7 @@ class NobTests {
 	private ObjectMapper mapper = new ObjectMapper();
 
 	@Test
-	void test() throws IOException {
+	void test() throws IOException, ParseException {
 		final Map<String, NOBClazz> model = this.mapper.readValue(new File("./project-nomads.classmodel.json"),
 				new TypeReference<Map<String, NOBClazz>>() {
 				});
@@ -40,7 +41,7 @@ class NobTests {
 	}
 
 	@Test
-	void nobSymetry() throws IOException {
+	void nobSymetry() throws IOException, ParseException {
 		final Map<String, NOBClazz> model = this.mapper.readValue(new File("./project-nomads.classmodel.json"),
 				new TypeReference<Map<String, NOBClazz>>() {
 				});
@@ -62,7 +63,7 @@ class NobTests {
 	}
 
 	@Test
-	void tclSymetry() throws IOException {
+	void tclSymetry() throws IOException, ParseException {
 		final Map<String, NOBClazz> model = this.mapper.readValue(new File("./project-nomads.classmodel.json"),
 				new TypeReference<Map<String, NOBClazz>>() {
 				});

@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -20,26 +21,29 @@ import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.NOBType;
 import me.vinceh121.n2ae.script.NewCommandCall;
+import me.vinceh121.n2ae.script.ParseException;
 import me.vinceh121.n2ae.script.ScriptHeader;
 import me.vinceh121.n2ae.script.SelCommandCall;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 
 public class TCLParser implements IParser {
-	public static String HEADER_SEPARATOR = "# ---";
+	public static final String HEADER_SEPARATOR = "# ---";
 	private final Stack<String> classStack = new Stack<>();
 	private ScriptHeader header;
 	private LinkedList<ICommandCall> commandCalls = new LinkedList<>();
 	private Map<String, NOBClazz> clazzes = new Hashtable<>();
 
 	@Override
-	public void read(final InputStream in) throws IOException {
+	public void read(final InputStream in) throws IOException, ParseException {
 		this.read(new BufferedReader(new InputStreamReader(in)));
 	}
 
-	public void read(final BufferedReader br) throws IOException {
+	public void read(final BufferedReader br) throws IOException, ParseException {
 		String line = br.readLine();
+		int lineNo = 0;
 		if (TCLParser.HEADER_SEPARATOR.equals(line)) {
 			this.readHeader(br);
+			lineNo += 3;
 		}
 
 		do {
@@ -50,13 +54,14 @@ public class TCLParser implements IParser {
 			}
 
 			try (final Scanner scan = new Scanner(line)) {
-				final ICommandCall call = this.readCommand(scan);
+				final ICommandCall call = this.readCommand(scan, lineNo);
 				this.commandCalls.add(call);
 			}
+			lineNo++;
 		} while ((line = br.readLine()) != null);
 	}
 
-	private ICommandCall readCommand(final Scanner scan) throws IOException {
+	private ICommandCall readCommand(final Scanner scan, final int lineNo) throws IOException, ParseException {
 		final String cmdName = scan.next();
 		if ("new".equals(cmdName)) {
 			final String className = scan.next();
@@ -75,10 +80,14 @@ public class TCLParser implements IParser {
 			return call;
 		} else {
 			if (!cmdName.startsWith(".")) {
-				throw new IOException("Invalid command call");
+				throw new ParseException("Invalid command call", 0, lineNo, 0);
 			}
 
-			final CmdPrototype cmd = this.recursiveGetMethod(this.getLastClazz(), cmdName.substring(1));
+			final CmdPrototype cmd = this.recursiveGetMethod(this.getLastClazz(), cmdName.substring(1), lineNo);
+
+			if (cmd == null) {
+				throw new ParseException("Unknown command " + cmdName.substring(1), 0, lineNo, 0);
+			}
 
 			final ClassCommandCall call = new ClassCommandCall();
 			call.setClazz(this.getLastClazz());
@@ -90,18 +99,26 @@ public class TCLParser implements IParser {
 				final NOBType arg = cmd.getInArgs().get(i);
 				switch (arg) {
 				case INT:
-					args.add(scan.nextInt());
-					break;
+					try {
+						args.add(scan.nextInt());
+						break;
+					} catch (final NoSuchElementException e) {
+						throw new ParseException("Expected int in argument " + i, 0, lineNo, 0);
+					}
 				case FLOAT:
-					args.add(scan.nextFloat());
-					break;
+					try {
+						args.add(scan.nextFloat());
+						break;
+					} catch (final NoSuchElementException e) {
+						throw new ParseException("Expected float in argument " + i, 0, lineNo, 0);
+					}
 				case STRING:
 				case USTRING:
 				case CODE:
 					// ASCII between quotes, but doesn't contain quotes either
 					final String rawStr = scan.findInLine("\"[\\p{ASCII}&&[^\"]]*\"");
-					if (!rawStr.startsWith("\"") || !rawStr.endsWith("\"")) {
-						throw new IOException("Missing String quotes");
+					if (rawStr == null || !rawStr.startsWith("\"") || !rawStr.endsWith("\"")) {
+						throw new ParseException("Missing String quotes", 0, lineNo, 0);
 					}
 					args.add(rawStr.substring(1, rawStr.length() - 1));
 					break;
@@ -113,32 +130,37 @@ public class TCLParser implements IParser {
 					} else if ("false".equals(read)) {
 						b = false;
 					} else {
-						throw new IOException("Expected boolean");
+						throw new ParseException("Expected boolean in argument " + i, 0, lineNo, 0);
 					}
 					args.add(b);
 					break;
 				case VOID:
 					break;
 				default:
-					throw new IllegalArgumentException("fuck " + arg);
+					throw new ParseException("Unknown arg type" + arg, 0, lineNo, 0);
 				}
 			}
+
+			if (scan.hasNext()) {
+				throw new ParseException("Too many arguments, expected " + cmd.getInArgs().size(), 0, lineNo, 0);
+			}
+
 			call.setArguments(args.toArray());
 			return call;
 		}
 	}
 
-	private void readHeader(final BufferedReader br) throws IOException {
+	private void readHeader(final BufferedReader br) throws IOException, ParseException {
 		final String headerLine = br.readLine();
 		final Matcher match = NOBParser.PAT_HEADER.matcher(headerLine);
 		if (!match.find()) {
-			throw new IOException("Invalid header");
+			throw new ParseException("Invalid header", 0, 1, 0);
 		}
 
 		this.header = new ScriptHeader(match.group(1), match.group(2));
 
 		if (!TCLParser.HEADER_SEPARATOR.equals(br.readLine())) {
-			throw new IOException("Invalid header");
+			throw new ParseException("Invalid header", 0, 2, 0);
 		}
 	}
 
@@ -155,16 +177,20 @@ public class TCLParser implements IParser {
 		return null;
 	}
 
-	public CmdPrototype recursiveGetMethod(final NOBClazz cls, final String name) {
+	public CmdPrototype recursiveGetMethod(final NOBClazz cls, final String name, final int lineNo)
+			throws ParseException {
 		if (cls.containsMethodByName(name)) {
 			return cls.getMethodByName(name);
 		} else {
 			if (cls.getSuperclass() != null) {
 				final NOBClazz sc = this.clazzes.get(cls.getSuperclass());
 				if (sc == null) {
-					throw new IllegalStateException(cls.getName() + " has unknown superclass " + cls.getSuperclass());
+					throw new ParseException(cls.getName() + " has unknown superclass " + cls.getSuperclass(),
+							0,
+							lineNo,
+							0);
 				}
-				return this.recursiveGetMethod(sc, name);
+				return this.recursiveGetMethod(sc, name, lineNo);
 			} else {
 				return null;
 			}
@@ -196,5 +222,4 @@ public class TCLParser implements IParser {
 	public boolean isKeepUnknownCommands() {
 		throw new UnsupportedOperationException("TCLParser#isKeepUnknownCommands() is not implemented");
 	}
-
 }

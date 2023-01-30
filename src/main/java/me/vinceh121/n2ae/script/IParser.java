@@ -7,15 +7,15 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public interface IParser {
-	default void read(final String script) throws IOException {
+	default void read(final String script) throws IOException, ParseException {
 		this.read(script.getBytes());
 	}
 
-	default void read(final byte[] bytes) throws IOException {
+	default void read(final byte[] bytes) throws IOException, ParseException {
 		this.read(new ByteArrayInputStream(bytes));
 	}
 
-	void read(InputStream in) throws IOException;
+	void read(InputStream in) throws IOException, ParseException;
 
 	ScriptHeader getHeader();
 

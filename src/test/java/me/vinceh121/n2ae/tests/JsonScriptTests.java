@@ -1,7 +1,5 @@
 package me.vinceh121.n2ae.tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.File;
 import java.util.Map;
 

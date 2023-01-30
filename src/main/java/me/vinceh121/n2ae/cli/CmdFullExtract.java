@@ -20,6 +20,7 @@ import me.vinceh121.n2ae.pkg.NnpkFileExtractor;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
+import me.vinceh121.n2ae.script.ParseException;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 import me.vinceh121.n2ae.script.tcl.TCLWriter;
 import me.vinceh121.n2ae.texture.Block;
@@ -83,7 +84,7 @@ public class CmdFullExtract implements Callable<Integer> {
 		}
 	}
 
-	private void processFile(final File file) throws IOException {
+	private void processFile(final File file) throws IOException, ParseException {
 		if (!file.getName().contains(".")) {
 			this.unprocessableFile(file);
 		}
@@ -163,7 +164,7 @@ public class CmdFullExtract implements Callable<Integer> {
 		}
 	}
 
-	private void processScript(final File fileIn, final File fileOut) throws IOException {
+	private void processScript(final File fileIn, final File fileOut) throws IOException, ParseException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
 			final IParser parser = new NOBParser();
 
