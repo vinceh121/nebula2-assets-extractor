@@ -48,12 +48,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.alee.laf.WebLookAndFeel;
-import com.alee.skin.dark.WebDarkSkin;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.weisj.darklaf.LafManager;
+import com.github.weisj.darklaf.theme.DarculaTheme;
 
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
@@ -76,7 +76,7 @@ public class ExtractorFrame extends JFrame {
 	private Map<String, NOBClazz> classModel;
 
 	public static void main(String[] args) {
-		WebLookAndFeel.install(WebDarkSkin.class);
+		LafManager.install(new DarculaTheme());
 
 		ExtractorFrame frame = new ExtractorFrame();
 		frame.setVisible(true);
@@ -226,11 +226,12 @@ public class ExtractorFrame extends JFrame {
 
 		JMenuItem mntWiki = new JMenuItem("Wiki");
 		mntWiki.addActionListener(e -> {
+			final String uri = "https://github.com/vinceh121/nebula2-assets-extractor/wiki";
 			try {
-				Desktop.getDesktop().browse(new URI("https://github.com/vinceh121/nebula2-assets-extractor/wiki"));
+				Desktop.getDesktop().browse(new URI(uri));
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Failed to open browser: " + e1);
+				JOptionPane.showMessageDialog(null, "Failed to open browser, the wiki is at " + uri);
 			}
 		});
 		mnHelp.add(mntWiki);
