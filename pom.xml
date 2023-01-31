@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.vinceh121.wanderer</groupId>
 	<artifactId>nebula2-assets-extractor</artifactId>
-	<version>0.4.0</version>
+	<version>0.5.0</version>
 	<name>Nebula2 Assets Extractor</name>
 	<properties>
 		<java.version>11</java.version>
@@ -62,9 +62,9 @@
 			<version>3.3.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.weisj</groupId>
-			<artifactId>darklaf-core</artifactId>
-			<version>3.0.2</version>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
