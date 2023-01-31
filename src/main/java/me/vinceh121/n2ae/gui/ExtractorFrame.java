@@ -417,13 +417,13 @@ public class ExtractorFrame extends JFrame {
 
 		this.openedNpk = fc.getSelectedFile();
 
-		CompletableFuture.runAsync(this::readNPK).thenRunAsync(() -> {
-			this.updateTreeModel();
-			this.tree.setEnabled(true);
-		}).exceptionally((t) -> {
+		CompletableFuture.runAsync(this::readNPK).exceptionally((t) -> {
 			t.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to read NPK0 file: " + t);
 			return null;
+		}).thenRunAsync(() -> {
+			this.updateTreeModel();
+			this.tree.setEnabled(true);
 		});
 	}
 
