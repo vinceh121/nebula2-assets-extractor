@@ -2,7 +2,134 @@
   "nroot": {
     "name" : "nroot",
     "superclass" : null,
-    "methods" : { }
+    "methods" : {
+      "SAVE" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "save",
+        "fourcc" : "SAVE"
+      },
+      "SORT" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "sort",
+        "fourcc" : "SORT"
+      },
+      "GNAM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getname",
+        "fourcc" : "GNAM"
+      },
+      "GFNM" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getfullname",
+        "fourcc" : "GFNM"
+      },
+      "CLON" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "clone",
+        "fourcc" : "CLON"
+      },
+      "GISZ" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "INT" ],
+        "name" : "getinstancesize",
+        "fourcc" : "GISZ"
+      },
+      "SVAS" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "saveas",
+        "fourcc" : "SVAS"
+      },
+      "GPRD" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getpred",
+        "fourcc" : "GPRD"
+      },
+      "GTSZ" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "INT" ],
+        "name" : "gettreesize",
+        "fourcc" : "GTSZ"
+      },
+      "GHED" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "gethead",
+        "fourcc" : "GHED"
+      },
+      "GMCD" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getcmds",
+        "fourcc" : "GMCD"
+      },
+      "GTAL" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "gettail",
+        "fourcc" : "GTAL"
+      },
+      "GRPH" : {
+        "inArgs" : [ "OBJECT" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getrelpath",
+        "fourcc" : "GRPH"
+      },
+      "GCLS" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "STRING" ],
+        "name" : "getclass",
+        "fourcc" : "GCLS"
+      },
+      "ISA_" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "isa",
+        "fourcc" : "ISA_"
+      },
+      "FIND" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "find",
+        "fourcc" : "FIND"
+      },
+      "GPRT" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getparent",
+        "fourcc" : "GPRT"
+      },
+      "GRCT" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "INT" ],
+        "name" : "getrefcount",
+        "fourcc" : "GRCT"
+      },
+      "ISIO" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "BOOL" ],
+        "name" : "isinstanceof",
+        "fourcc" : "ISIO"
+      },
+      "SNAM" : {
+        "inArgs" : [ "STRING" ],
+        "returnArgs" : [ "VOID" ],
+        "name" : "setname",
+        "fourcc" : "SNAM"
+      },
+      "GSUC" : {
+        "inArgs" : [ "VOID" ],
+        "returnArgs" : [ "OBJECT" ],
+        "name" : "getsucc",
+        "fourcc" : "GSUC"
+      }
+    }
   },
   "ncritterdamage" : {
     "name" : "ncritterdamage",
