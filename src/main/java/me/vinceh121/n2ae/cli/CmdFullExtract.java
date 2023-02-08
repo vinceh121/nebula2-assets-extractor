@@ -48,11 +48,19 @@ public class CmdFullExtract implements Callable<Integer> {
 			"--model" }, description = "Json file containing a class model generated using `extract-classes`")
 	private File clazzModel;
 
+	private Map<String, NOBClazz> model;
+
 	@Override
 	public Integer call() throws Exception {
 		if (!this.outputFolder.isDirectory()) {
 			System.err.println("Output must be a directory");
 			return -1;
+		}
+
+		if (this.clazzModel != null) {
+			final ObjectMapper mapper = new ObjectMapper();
+			model = mapper.readValue(this.clazzModel, new TypeReference<Map<String, NOBClazz>>() {
+			});
 		}
 
 		try (FileInputStream is = new FileInputStream(this.inputFile)) {
@@ -167,15 +175,7 @@ public class CmdFullExtract implements Callable<Integer> {
 	private void processScript(final File fileIn, final File fileOut) throws IOException, ParseException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
 			final IParser parser = new NOBParser();
-
-			if (this.clazzModel != null) {
-				final ObjectMapper mapper = new ObjectMapper();
-				final Map<String, NOBClazz> model = mapper.readValue(this.clazzModel,
-						new TypeReference<Map<String, NOBClazz>>() {
-						});
-				parser.setClassModel(model);
-			}
-
+			parser.setClassModel(model);
 			parser.read(is);
 
 			final TCLWriter writer = new TCLWriter();
