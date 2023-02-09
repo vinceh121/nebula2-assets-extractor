@@ -116,9 +116,9 @@ public class GLTFGenerator {
 			// NAX0 stores translations as VEC4 with 4th component being always 0
 			final float[] v = c.getVanillaCurve();
 			for (int i = 0; i < c.getVanillaCurve().length; i += 4) {
-				this.packedBinary.writeFloatLE(v[0]);
-				this.packedBinary.writeFloatLE(v[1]);
-				this.packedBinary.writeFloatLE(v[2]);
+				this.packedBinary.writeFloatLE(v[i + 0]);
+				this.packedBinary.writeFloatLE(v[i + 1]);
+				this.packedBinary.writeFloatLE(v[i + 2]);
 			}
 		}
 		this.checkBufferSize();
@@ -158,8 +158,8 @@ public class GLTFGenerator {
 		throw new IllegalStateException();
 	}
 
-	public void addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices, final List<int[]> triangles, final int skinIdx)
-			throws IOException {
+	public void addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices,
+			final List<int[]> triangles, final int skinIdx) throws IOException {
 		final Mesh mesh = new Mesh();
 		mesh.setName(name);
 		final Primitive prim = new Primitive();
