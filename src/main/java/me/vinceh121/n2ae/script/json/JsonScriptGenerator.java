@@ -35,6 +35,7 @@ public class JsonScriptGenerator {
 			if (call instanceof NewCommandCall) {
 				final NewCommandCall newCall = (NewCommandCall) call;
 				final ObjectNode newObject = this.mapper.createObjectNode();
+				newObject.put("@class", call.getClazz().getName());
 				i = this.generateJson(script, i + 1, newObject);
 				node.set(newCall.getVarName(), newObject);
 			} else if (call instanceof SelCommandCall) {
