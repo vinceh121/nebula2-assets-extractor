@@ -50,10 +50,14 @@ public class JsonScriptGenerator {
 
 				if (node.has(prop)) {
 					final JsonNode oldVal = node.get(prop);
-					final ArrayNode arr = this.mapper.createArrayNode();
-					arr.add(oldVal);
-					this.addObject(arr, val);
-					node.set(prop, arr);
+					if (oldVal.isArray() && ((ArrayNode) oldVal).get(0).isArray()) {
+						this.addObject((ArrayNode) oldVal, val);
+					} else {
+						final ArrayNode arr = this.mapper.createArrayNode();
+						arr.add(oldVal);
+						this.addObject(arr, val);
+						node.set(prop, arr);
+					}
 				} else {
 					this.putObject(node, prop, val);
 				}
