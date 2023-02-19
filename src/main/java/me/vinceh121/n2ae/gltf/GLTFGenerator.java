@@ -218,22 +218,18 @@ public class GLTFGenerator {
 				for (final float f : v.getUv().get(1)) {
 					uvBuf.get(1).writeFloatLE(f);
 				}
-				// XXX won't do those now, and probably never will
-				throw new IllegalArgumentException("UV1 not supported");
 			}
 			if (types.contains(VertexType.UV2)) {
 				uv2Count++;
 				for (final float f : v.getUv().get(2)) {
 					uvBuf.get(2).writeFloatLE(f);
 				}
-				throw new IllegalArgumentException("UV2 not supported");
 			}
 			if (types.contains(VertexType.UV3)) {
 				uv3Count++;
 				for (final float f : v.getUv().get(3)) {
 					uvBuf.get(3).writeFloatLE(f);
 				}
-				throw new IllegalArgumentException("UV3 not supported");
 			}
 
 			if (types.contains(VertexType.JOINTS_WEIGHTS)) {
@@ -305,25 +301,16 @@ public class GLTFGenerator {
 		}
 
 		if (types.contains(VertexType.UV0)) {
-			final byte[] buf = ((ByteArrayOutputStream) uvBuf.get(0).getUnderlyingOutputStream()).toByteArray();
-
-			final BufferView view = new BufferView();
-			view.setBuffer(0);
-			view.setByteOffset(this.bufferSize);
-			view.setByteLength(buf.length);
-			this.gltf.getBufferViews().add(view);
-
-			final Accessor accessor = new Accessor();
-			accessor.setBufferView(this.gltf.getBufferViews().indexOf(view));
-			accessor.setType(Type.VEC2);
-			accessor.setComponentType(Accessor.FLOAT);
-			accessor.setCount(uv0Count);
-			this.gltf.getAccessors().add(accessor);
-			attributes.put("TEXCOORD_0", this.gltf.getAccessors().indexOf(accessor));
-
-			this.bufferSize += buf.length;
-			this.packedBinary.write(buf);
-			this.checkBufferSize();
+			this.writeUV(uvBuf.get(0), uv0Count, 0, attributes);
+		}
+		if (types.contains(VertexType.UV1)) {
+			this.writeUV(uvBuf.get(1), uv1Count, 1, attributes);
+		}
+		if (types.contains(VertexType.UV2)) {
+			this.writeUV(uvBuf.get(2), uv2Count, 2, attributes);
+		}
+		if (types.contains(VertexType.UV3)) {
+			this.writeUV(uvBuf.get(3), uv3Count, 3, attributes);
 		}
 
 		if (types.contains(VertexType.JOINTS_WEIGHTS)) {
@@ -411,6 +398,29 @@ public class GLTFGenerator {
 		this.gltf.getNodes().add(node);
 
 		return node;
+	}
+
+	private void writeUV(LEDataOutputStream out, int count, int uvIdx, Map<String, Integer> attributes)
+			throws IOException {
+		final byte[] buf = ((ByteArrayOutputStream) out.getUnderlyingOutputStream()).toByteArray();
+
+		final BufferView view = new BufferView();
+		view.setBuffer(0);
+		view.setByteOffset(this.bufferSize);
+		view.setByteLength(buf.length);
+		this.gltf.getBufferViews().add(view);
+
+		final Accessor accessor = new Accessor();
+		accessor.setBufferView(this.gltf.getBufferViews().indexOf(view));
+		accessor.setType(Type.VEC2);
+		accessor.setComponentType(Accessor.FLOAT);
+		accessor.setCount(count);
+		this.gltf.getAccessors().add(accessor);
+		attributes.put("TEXCOORD_" + uvIdx, this.gltf.getAccessors().indexOf(accessor));
+
+		this.bufferSize += buf.length;
+		this.packedBinary.write(buf);
+		this.checkBufferSize();
 	}
 
 	private float[] normalize(final float[] a) {
