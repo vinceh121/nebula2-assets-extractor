@@ -158,7 +158,12 @@ public class GLTFGenerator {
 		throw new IllegalStateException();
 	}
 
-	public void addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices,
+	public Node addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices,
+			final List<int[]> triangles) throws IOException {
+		return this.addMesh(name, types, vertices, triangles, -1);
+	}
+
+	public Node addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices,
 			final List<int[]> triangles, final int skinIdx) throws IOException {
 		final Mesh mesh = new Mesh();
 		mesh.setName(name);
@@ -404,6 +409,8 @@ public class GLTFGenerator {
 		node.setName(name);
 		node.setSkin(skinIdx);
 		this.gltf.getNodes().add(node);
+
+		return node;
 	}
 
 	private float[] normalize(final float[] a) {
@@ -446,11 +453,17 @@ public class GLTFGenerator {
 		return m;
 	}
 
+	public void buildBasicScene(final String name) {
+		this.buildBasicScene(name, -1);
+	}
+
 	public void buildBasicScene(final String name, final int rootNode) {
 		final Scene sc = new Scene();
 		sc.setName(name);
 		sc.getNodes().add(0);
-		sc.getNodes().add(rootNode);
+		if (rootNode != -1) {
+			sc.getNodes().add(rootNode);
+		}
 		this.gltf.getScenes().add(sc);
 	}
 
