@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -651,6 +653,23 @@ public class GLTFGenerator {
 		buf.setUri(uri);
 		buf.setByteLength(this.bufferSize);
 		this.gltf.getBuffers().add(buf);
+	}
+
+	public void updateRootNodes() {
+		Set<Integer> noParent = new HashSet<>();
+
+		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
+			noParent.add(i);
+		}
+
+		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
+			Node n = this.gltf.getNodes().get(i);
+			for (Integer c : n.getChildren()) {
+				noParent.remove(c);
+			}
+		}
+
+		this.gltf.getScenes().get(0).getNodes().addAll(noParent);
 	}
 
 	private void prependPaddingComp(int compType) throws IOException {
