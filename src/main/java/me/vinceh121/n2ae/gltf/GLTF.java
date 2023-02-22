@@ -18,6 +18,9 @@ public class GLTF {
 	private final List<Accessor> accessors = new ArrayList<>();
 	private final List<BufferView> bufferViews = new ArrayList<>();
 	private final List<Buffer> buffers = new ArrayList<>();
+	private final List<Image> images = new ArrayList<>();
+	private final List<Texture> textures = new ArrayList<>();
+	private final List<Material> materials = new ArrayList<>();
 
 	public int getScene() {
 		return this.scene;
@@ -61,5 +64,17 @@ public class GLTF {
 
 	public List<Buffer> getBuffers() {
 		return this.buffers;
+	}
+
+	public List<Image> getImages() {
+		return images;
+	}
+
+	public List<Texture> getTextures() {
+		return textures;
+	}
+
+	public List<Material> getMaterials() {
+		return materials;
 	}
 }

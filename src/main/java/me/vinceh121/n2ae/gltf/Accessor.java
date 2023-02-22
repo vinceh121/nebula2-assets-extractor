@@ -70,6 +70,22 @@ public class Accessor {
 		this.normalized = normalized;
 	}
 
+	public static int getComponentTypeLength(int compType) {
+		switch (compType) {
+		case Accessor.UNSIGNED_INT:
+		case Accessor.FLOAT:
+			return 4;
+		case Accessor.UNSIGNED_SHORT:
+		case Accessor.SHORT:
+			return 2;
+		case Accessor.UNSIGNED_BYTE:
+		case Accessor.BYTE:
+			return 1;
+		default:
+			throw new IllegalArgumentException("Invalid accessor componentType " + compType);
+		}
+	}
+
 	public enum Type {
 		SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4;
 	}
