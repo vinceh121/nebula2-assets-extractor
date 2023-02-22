@@ -50,6 +50,7 @@ public class GLTFGenerator {
 
 		// input buffer and accessor: array of floats for the timing of each key
 		// NAX0 already guarantees uniform linear keys, so just write a key every delay
+		this.prependPaddingComp(Accessor.FLOAT);
 		final BufferView bufInput = new BufferView();
 		bufInput.setByteOffset(this.bufferSize);
 		bufInput.setByteLength(c.getNumKeys() * 4);
@@ -72,6 +73,7 @@ public class GLTFGenerator {
 
 		// output buffer and accessor: value of keys; vec3 for translation, quaternions
 		// for rotation
+		this.prependPaddingComp(Accessor.FLOAT);
 		final BufferView bufOutput = new BufferView();
 		bufOutput.setByteOffset(this.bufferSize);
 		bufOutput.setBuffer(0);
@@ -257,6 +259,7 @@ public class GLTFGenerator {
 		if (types.contains(VertexType.COORD)) {
 			final byte[] buf = ((ByteArrayOutputStream) positionBuf.getUnderlyingOutputStream()).toByteArray();
 
+			this.prependPaddingComp(Accessor.FLOAT);
 			final BufferView view = new BufferView();
 			view.setBuffer(0);
 			view.setByteOffset(this.bufferSize);
@@ -281,6 +284,7 @@ public class GLTFGenerator {
 		if (types.contains(VertexType.NORM)) {
 			final byte[] buf = ((ByteArrayOutputStream) normalBuf.getUnderlyingOutputStream()).toByteArray();
 
+			this.prependPaddingComp(Accessor.FLOAT);
 			final BufferView view = new BufferView();
 			view.setBuffer(0);
 			view.setByteOffset(this.bufferSize);
@@ -316,6 +320,7 @@ public class GLTFGenerator {
 		if (types.contains(VertexType.JOINTS_WEIGHTS)) {
 			final byte[] bufJoints = ((ByteArrayOutputStream) jointBuf.getUnderlyingOutputStream()).toByteArray();
 
+			this.prependPaddingComp(Accessor.UNSIGNED_SHORT);
 			BufferView view = new BufferView();
 			view.setBuffer(0);
 			view.setByteOffset(this.bufferSize);
@@ -336,6 +341,7 @@ public class GLTFGenerator {
 
 			final byte[] bufWeights = ((ByteArrayOutputStream) weightsBuf.getUnderlyingOutputStream()).toByteArray();
 
+			this.prependPaddingComp(Accessor.FLOAT);
 			view = new BufferView();
 			view.setBuffer(0);
 			view.setByteOffset(this.bufferSize);
@@ -370,6 +376,7 @@ public class GLTFGenerator {
 
 			final byte[] buf = indicesBuf.toByteArray();
 
+			this.prependPaddingComp(Accessor.FLOAT);
 			final BufferView view = new BufferView();
 			view.setBuffer(0);
 			view.setByteOffset(this.bufferSize);
@@ -404,6 +411,7 @@ public class GLTFGenerator {
 			throws IOException {
 		final byte[] buf = ((ByteArrayOutputStream) out.getUnderlyingOutputStream()).toByteArray();
 
+		this.prependPaddingComp(Accessor.FLOAT);
 		final BufferView view = new BufferView();
 		view.setBuffer(0);
 		view.setByteOffset(this.bufferSize);
@@ -561,6 +569,7 @@ public class GLTFGenerator {
 
 		final byte[] invBuf = ((ByteArrayOutputStream) inv.getUnderlyingOutputStream()).toByteArray();
 
+		this.prependPaddingComp(Accessor.FLOAT);
 		final BufferView invView = new BufferView();
 		invView.setBuffer(0);
 		invView.setByteOffset(this.bufferSize);
@@ -644,9 +653,42 @@ public class GLTFGenerator {
 		this.gltf.getBuffers().add(buf);
 	}
 
+	private void prependPaddingComp(int compType) throws IOException {
+		this.prependPadding(Accessor.getComponentTypeLength(compType));
+	}
+
+	/**
+	 * glTF 2.0 requires bufferViews and accessors byte offsets to be multiples of
+	 * their component type. C.f. 3.6.2.4. Data Alignment This function prepends the
+	 * necessary padding to make sure this condition is met.
+	 * 
+	 * @param remainderSize size in bytes of the componentType that's going to be
+	 *                      written
+	 * @throws IOException
+	 */
+	private void prependPadding(int remainderSize) throws IOException {
+		int remaining = this.bufferSize % remainderSize;
+		for (int i = 0; i < remaining; i++) {
+			this.packedBinary.write(0);
+		}
+		this.bufferSize += remaining;
+		this.checkBufferSize();
+	}
+
 	private void checkBufferSize() {
 		if (this.bufferSize != this.packedBinary.getWrittenBytes()) {
 			throw new IllegalStateException("Expected buffer size and real buffer size are off");
+		}
+
+		for (int i = 0; i < this.gltf.getAccessors().size(); i++) {
+			Accessor a = this.gltf.getAccessors().get(i);
+			int compLength = Accessor.getComponentTypeLength(a.getComponentType());
+
+			BufferView view = this.gltf.getBufferViews().get(a.getBufferView());
+			if (view.getByteOffset() % compLength != 0) {
+				throw new IllegalStateException("Accessor's (" + i + ") total byteOffset " + view.getByteOffset()
+						+ " isn't a multiple of componentType length " + compLength);
+			}
 		}
 	}
 
