@@ -478,8 +478,8 @@ public class GLTFGenerator {
 	public void buildBasicScene(final String name, final int rootNode) {
 		final Scene sc = new Scene();
 		sc.setName(name);
-		sc.getNodes().add(0);
 		if (rootNode != -1) {
+			sc.getNodes().add(0);
 			sc.getNodes().add(rootNode);
 		}
 		this.gltf.getScenes().add(sc);
