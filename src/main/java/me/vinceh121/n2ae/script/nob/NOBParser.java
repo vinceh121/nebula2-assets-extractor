@@ -178,4 +178,9 @@ public class NOBParser implements IParser {
 	public void setKeepUnknownCommands(final boolean keepUnknownCommands) {
 		this.keepUnknownCommands = keepUnknownCommands;
 	}
+
+	@Override
+	public Stack<String> getClassStack() {
+		return this.classStack;
+	}
 }

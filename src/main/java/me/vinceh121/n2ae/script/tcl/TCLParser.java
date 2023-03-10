@@ -198,6 +198,11 @@ public class TCLParser implements IParser {
 	}
 
 	@Override
+	public Stack<String> getClassStack() {
+		return this.classStack;
+	}
+
+	@Override
 	public ScriptHeader getHeader() {
 		return this.header;
 	}

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Stack;
 
 public interface IParser {
 	default void read(final String script) throws IOException, ParseException {
@@ -26,4 +27,6 @@ public interface IParser {
 	void setKeepUnknownCommands(final boolean keepUnknownCommands);
 
 	boolean isKeepUnknownCommands();
+
+	Stack<String> getClassStack();
 }

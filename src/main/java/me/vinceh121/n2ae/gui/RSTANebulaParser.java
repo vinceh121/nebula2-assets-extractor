@@ -11,6 +11,7 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 
+import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.ParseException;
 import me.vinceh121.n2ae.script.tcl.TCLParser;
@@ -26,7 +27,7 @@ public class RSTANebulaParser extends AbstractParser {
 	public ParseResult parse(RSyntaxDocument doc, String style) {
 		DefaultParseResult res = new DefaultParseResult(this);
 
-		TCLParser parser = new TCLParser();
+		IParser parser = new TCLParser();
 		parser.setClassModel(this.model);
 
 		try {

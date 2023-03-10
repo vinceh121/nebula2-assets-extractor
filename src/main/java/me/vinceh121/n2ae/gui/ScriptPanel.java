@@ -32,6 +32,7 @@ import org.fife.ui.rtextarea.SearchEngine;
 import org.fife.ui.rtextarea.SearchResult;
 
 import me.vinceh121.n2ae.pkg.TableOfContents;
+import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.ParseException;
 import me.vinceh121.n2ae.script.nob.NOBParser;
@@ -140,7 +141,7 @@ public class ScriptPanel extends JPanel implements SearchListener {
 	}
 
 	private void recompile() throws IOException, ParseException {
-		TCLParser parser = new TCLParser();
+		IParser parser = new TCLParser();
 		parser.setClassModel(this.model);
 		parser.read(this.text.getText());
 
