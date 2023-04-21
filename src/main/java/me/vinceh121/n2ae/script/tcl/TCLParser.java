@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -54,6 +55,7 @@ public class TCLParser implements IParser {
 			}
 
 			try (final Scanner scan = new Scanner(line)) {
+				scan.useLocale(Locale.ENGLISH);
 				final ICommandCall call = this.readCommand(scan, lineNo);
 				this.commandCalls.add(call);
 			}
