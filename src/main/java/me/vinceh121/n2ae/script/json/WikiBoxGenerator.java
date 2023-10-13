@@ -7,24 +7,33 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import me.vinceh121.n2ae.script.json.WikiBox.Entry;
+
 public class WikiBoxGenerator {
 	public void write(final PrintStream out, final WikiBox box, final ObjectNode node) {
 		out.print("{{");
-		out.println(box.getTemplateName());
-		for (final String prop : box.getProperties().keySet()) {
-			final JsonPointer ptr = box.getProperties().get(prop);
-			final JsonNode val = node.at(ptr);
+		out.println(box.getName());
+		for (final Entry e : box.getEntries()) {
+			final JsonPointer ptr = e.getPointer();
+			final JsonNode jsonVal = node.at(ptr);
 
-			if (val.isMissingNode()) {
-				throw new IllegalStateException("Pointer " + ptr + " missing");
+			final Object val;
+			if (jsonVal.isMissingNode()) {
+				if (e.getDefolt() != null) {
+					val = e.getDefolt();
+				} else {
+					throw new IllegalStateException("Pointer " + ptr + " missing and has no default");
+				}
+			} else {
+				val = jsonVal;
 			}
 
 			out.print("| ");
-			out.print(prop);
+			out.print(e.getPointer());
 			out.print("=");
-			if (val.isFloat()) {
+			if (jsonVal.isFloat()) {
 				// use default decimal format to print decimal part only when required
-				out.println(new DecimalFormat().format(val.asDouble()));
+				out.println(new DecimalFormat().format(jsonVal.asDouble()));
 			} else {
 				out.println(val);
 			}

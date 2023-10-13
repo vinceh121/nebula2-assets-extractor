@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.script.json.JsonScriptGenerator;
-import me.vinceh121.n2ae.script.json.WikiBox;
+import me.vinceh121.n2ae.script.json.WikiBoxes;
 import me.vinceh121.n2ae.script.json.WikiBoxGenerator;
 import me.vinceh121.n2ae.script.nob.NOBParser;
 import me.vinceh121.n2ae.script.tcl.TCLParser;
@@ -37,7 +37,7 @@ public class CmdWikiBox implements Callable<Integer> {
 	private File modelInput;
 
 	@Option(names = { "-b", "--box" })
-	private WikiBox box;
+	private WikiBoxes box;
 
 	@Option(names = { "-l", "--list-boxes" })
 	private boolean list;
@@ -48,7 +48,7 @@ public class CmdWikiBox implements Callable<Integer> {
 	@Override
 	public Integer call() throws Exception {
 		if (this.list) {
-			for (final WikiBox box : WikiBox.values()) {
+			for (final WikiBoxes box : WikiBoxes.values()) {
 				System.out.println(box);
 			}
 			return 0;
@@ -86,7 +86,7 @@ public class CmdWikiBox implements Callable<Integer> {
 				return 0;
 			}
 			final WikiBoxGenerator gen = new WikiBoxGenerator();
-			gen.write(System.out, this.box, node);
+			gen.write(System.out, this.box.getWikiBox(), node);
 		}
 		return 0;
 	}
