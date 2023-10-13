@@ -8,6 +8,7 @@ public enum WikiBoxes {
 		.addEntry("rate", "/turret/vhcl/normal/gun/setmgspeed")
 		.addEntry("armor", "/vhcl/setarmor/0/1")
 		.addEntry("guns", "/turret/vhcl/normal/gun", 0)),
+
 	GUNTOWER_FIREMISSILE(new WikiBox("Guntower Firemissile infobox").addEntry("cost", "/vhcl/setartefactuseenergy")
 		.addEntry("buildtime", "/vhcl/bauphase/statewatch/settimeout")
 		.addEntry("health", "/vhcl/setenergy")

@@ -18,6 +18,7 @@ public class WikiBoxGenerator {
 			final JsonNode jsonVal = node.at(ptr);
 
 			final Object val;
+
 			if (jsonVal.isMissingNode()) {
 				if (e.getDefolt() != null) {
 					val = e.getDefolt();
@@ -29,7 +30,7 @@ public class WikiBoxGenerator {
 			}
 
 			out.print("| ");
-			out.print(e.getPointer());
+			out.print(e.getName());
 			out.print("=");
 			if (jsonVal.isFloat()) {
 				// use default decimal format to print decimal part only when required
