@@ -184,6 +184,7 @@ public class GLTFGenerator {
 		int uv1Count = 0;
 		int uv2Count = 0;
 		int uv3Count = 0;
+		int colorCount = 0;
 
 		final LEDataOutputStream positionBuf = new LEDataOutputStream(new ByteArrayOutputStream());
 		final LEDataOutputStream normalBuf = new LEDataOutputStream(new ByteArrayOutputStream());
@@ -193,6 +194,7 @@ public class GLTFGenerator {
 		for (int i = 0; i < 4; i++) {
 			uvBuf.add(new LEDataOutputStream(new ByteArrayOutputStream()));
 		}
+		final LEDataOutputStream colorBuf = new LEDataOutputStream(new ByteArrayOutputStream());
 
 		for (final Vertex v : vertices) {
 			if (types.contains(VertexType.COORD)) {
@@ -252,6 +254,26 @@ public class GLTFGenerator {
 						weightsBuf.writeFloatLE(w[i]);
 					}
 				}
+			}
+
+			if (types.contains(VertexType.RGBA)) {
+				colorCount++;
+				final int bgra = v.getColor();
+
+				final float normB = (bgra & 0xFF000000) >>> 24;
+				final float normG = (bgra & 0x00FF0000) >>> 16;
+				final float normR = (bgra & 0x0000FF00) >>> 8;
+				final float normA = (bgra & 0x000000FF);
+
+				final float b = normB / 255;
+				final float g = normG / 255;
+				final float r = normR / 255;
+				final float a = normA / 255;
+
+				colorBuf.writeFloatLE(r);
+				colorBuf.writeFloatLE(g);
+				colorBuf.writeFloatLE(b);
+				colorBuf.writeFloatLE(a);
 			}
 		}
 
@@ -360,6 +382,29 @@ public class GLTFGenerator {
 
 			this.bufferSize += bufWeights.length;
 			this.packedBinary.write(bufWeights);
+			this.checkBufferSize();
+		}
+
+		if (types.contains(VertexType.RGBA)) {
+			final byte[] buf = ((ByteArrayOutputStream) colorBuf.getUnderlyingOutputStream()).toByteArray();
+
+			this.prependPaddingComp(Accessor.FLOAT);
+			final BufferView view = new BufferView();
+			view.setBuffer(0);
+			view.setByteOffset(this.bufferSize);
+			view.setByteLength(buf.length);
+			this.gltf.getBufferViews().add(view);
+
+			final Accessor accessor = new Accessor();
+			accessor.setBufferView(this.gltf.getBufferViews().indexOf(view));
+			accessor.setType(Type.VEC4);
+			accessor.setComponentType(Accessor.FLOAT);
+			accessor.setCount(colorCount);
+			this.gltf.getAccessors().add(accessor);
+			attributes.put("COLOR_0", this.gltf.getAccessors().indexOf(accessor));
+
+			this.bufferSize += buf.length;
+			this.packedBinary.write(buf);
 			this.checkBufferSize();
 		}
 

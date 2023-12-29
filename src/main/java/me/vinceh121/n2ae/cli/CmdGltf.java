@@ -23,11 +23,10 @@ import picocli.CommandLine.Option;
 
 @Command(name = "gltf", description = { "Extracts a mesh, rig, and animation file into a single glTF 2.0 file" })
 public class CmdGltf implements Callable<Integer> {
-	@Option(names = { "-n", "--script" }, description = {
-			"Script (NOB0 or TCL) that contains joint list" }, required = true)
+	@Option(names = { "-n", "--script" }, description = { "Script (NOB0 or TCL) that contains joint list" })
 	private File nobScript;
 
-	@Option(names = { "--model" }, description = { "Script class model JSON" }, required = true)
+	@Option(names = { "--model" }, description = { "Script class model JSON" })
 	private File model;
 
 	@Option(names = { "-m", "--mesh" }, description = { "NVX1 file" })
@@ -56,30 +55,38 @@ public class CmdGltf implements Callable<Integer> {
 		final FileOutputStream bufferOut = new FileOutputStream(this.buffer);
 		final GLTFGenerator gen = new GLTFGenerator(bufferOut);
 
-		IParser parser;
-		if (this.nobScript.getName().endsWith(".n")) {
-			parser = new NOBParser();
-		} else if (this.nobScript.getName().endsWith(".tcl")) {
-			parser = new TCLParser();
-		} else {
-			throw new IllegalArgumentException("Can't determine script type from extension");
+		if (this.nobScript != null) {
+			IParser parser;
+
+			if (this.nobScript.getName().endsWith(".n")) {
+				parser = new NOBParser();
+			} else if (this.nobScript.getName().endsWith(".tcl")) {
+				parser = new TCLParser();
+			} else {
+				throw new IllegalArgumentException("Can't determine script type from extension");
+			}
+
+			parser.setClassModel(mapper.readValue(this.model, new TypeReference<Map<String, NOBClazz>>() {
+			}));
+
+			try (FileInputStream scriptIn = new FileInputStream(this.nobScript)) {
+				parser.read(scriptIn);
+			}
+
+			gen.addBones(parser.getCalls());
 		}
 
-		parser.setClassModel(mapper.readValue(this.model, new TypeReference<Map<String, NOBClazz>>() {
-		}));
-
-		try (FileInputStream scriptIn = new FileInputStream(this.nobScript)) {
-			parser.read(scriptIn);
-		}
-		gen.addBones(parser.getCalls());
-
-		gen.buildBasicScene("scene", gen.getGltf().getNodes().size());
+		gen.buildBasicScene("scene", this.nobScript != null ? gen.getGltf().getNodes().size() : -1);
 
 		if (this.mesh != null) {
 			try (FileInputStream meshIn = new FileInputStream(this.mesh)) {
 				final NvxFileReader meshReader = new NvxFileReader(meshIn);
 				meshReader.readAll();
-				gen.addMesh("skin", meshReader.getTypes(), meshReader.getVertices(), meshReader.getTriangles(), 0);
+				gen.addMesh("skin",
+						meshReader.getTypes(),
+						meshReader.getVertices(),
+						meshReader.getTriangles(),
+						this.nobScript != null ? 0 : -1);
 			}
 		}
 
