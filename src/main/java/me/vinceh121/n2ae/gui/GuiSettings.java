@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GuiSettings {
 	private static final ObjectMapper CONFIG_MAPPER = new ObjectMapper();
-	private String classModelPath;
+	private String classModelUrl;
 
-	public String getClassModelPath() {
-		return classModelPath;
+	public String getClassModelUrl() {
+		return classModelUrl;
 	}
 
-	public void setClassModelPath(String classModelPath) {
-		this.classModelPath = classModelPath;
+	public void setClassModelUrl(String classModelUrl) {
+		this.classModelUrl = classModelUrl;
 	}
 
 	public void save() throws IOException {

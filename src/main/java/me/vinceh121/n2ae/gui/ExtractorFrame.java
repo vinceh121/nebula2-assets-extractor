@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -93,12 +94,13 @@ public class ExtractorFrame extends JFrame {
 	}
 
 	public ExtractorFrame() {
-		try {
-			this.settings = GuiSettings.load();
+		try { // XXX ugly mess
+			try {
+				this.settings = GuiSettings.load();
+			} catch (FileNotFoundException e) {
+				this.settings = new GuiSettings();
+			}
 			this.loadClassModel();
-		} catch (FileNotFoundException e) {
-			this.settings = new GuiSettings();
-			this.classModel = new HashMap<>();
 		} catch (IOException e1) {
 			JOptionPane.showMessageDialog(null, "Failed to load settings. " + e1);
 			e1.printStackTrace();
@@ -166,8 +168,8 @@ public class ExtractorFrame extends JFrame {
 						return;
 					}
 
-					TableOfContentPopupMenu pop = new TableOfContentPopupMenu((DefaultTreeModel) tree.getModel(),
-							tree.getSelectionPath());
+					TableOfContentPopupMenu pop =
+							new TableOfContentPopupMenu((DefaultTreeModel) tree.getModel(), tree.getSelectionPath());
 					pop.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
@@ -478,8 +480,14 @@ public class ExtractorFrame extends JFrame {
 	}
 
 	private void loadClassModel() throws StreamReadException, DatabindException, IOException {
-		this.classModel = MAPPER.readValue(new File(this.settings.getClassModelPath()),
-				new TypeReference<Map<String, NOBClazz>>() {
+		if (this.settings.getClassModelUrl() == null) {
+			ClassModelSelectionDialog select = new ClassModelSelectionDialog();
+			select.setVisible(true);
+			this.settings.setClassModelUrl(select.getSelectedUrl());
+		}
+
+		this.classModel =
+				MAPPER.readValue(new URL(this.settings.getClassModelUrl()), new TypeReference<Map<String, NOBClazz>>() {
 				});
 	}
 
