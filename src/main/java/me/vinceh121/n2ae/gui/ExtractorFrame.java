@@ -64,7 +64,7 @@ import me.vinceh121.n2ae.texture.NtxFileReader;
 
 public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final ObjectMapper MAPPER = new ObjectMapper();
+	public static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final DataFlavor FLAVOR_FILE = new DataFlavor("text/uri-list;class=java.lang.String", "file list");
 	private static final FileFilter NPK_FILTER = new FileFilter() {
 		@Override

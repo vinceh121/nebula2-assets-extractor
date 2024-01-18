@@ -2,6 +2,7 @@ package me.vinceh121.n2ae.gui;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -14,6 +15,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import me.vinceh121.n2ae.gltf.GLTFGenerator;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 
@@ -53,18 +55,16 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 			JMenu mnExtract = new JMenu("Extract to...");
 			this.add(mnExtract);
 
-			JMenuItem mntObj = new JMenuItem("...OBJ");
+			JMenuItem mntObj = new JMenuItem("OBJ");
 			mntObj.addActionListener(e -> {
-				JFileChooser fc = new JFileChooser();
-				fc.setSelectedFile(new File(this.toc.getName().replace(".nvx", ".obj")));
-				int status = fc.showSaveDialog(null);
+				File outFile = this.saveExtract(".obj");
 
-				if (status != JFileChooser.APPROVE_OPTION) {
+				if (outFile == null) {
 					return;
 				}
 
 				try (ByteArrayInputStream in = new ByteArrayInputStream(this.toc.getData());
-						PrintWriter out = new PrintWriter(fc.getSelectedFile())) {
+						PrintWriter out = new PrintWriter(outFile)) {
 					NvxFileReader read = new NvxFileReader(in);
 					read.readAll();
 					read.writeObj(out);
@@ -74,6 +74,47 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 				}
 			});
 			mnExtract.add(mntObj);
+
+			JMenuItem mntGltf = new JMenuItem("GLTF");
+			mntGltf.addActionListener(e -> {
+				File outFile = this.saveExtract(".gltf");
+
+				if (outFile == null) {
+					return;
+				}
+
+				File bufferOut =
+						outFile.toPath().resolveSibling(outFile.getName().replaceFirst("\\.gltf$", ".bin")).toFile();
+
+				try (ByteArrayInputStream in = new ByteArrayInputStream(this.toc.getData());
+						FileOutputStream outGltf = new FileOutputStream(outFile);
+						FileOutputStream outBin = new FileOutputStream(bufferOut)) {
+					NvxFileReader read = new NvxFileReader(in);
+					read.readAll();
+
+					GLTFGenerator gen = new GLTFGenerator(outBin);
+					gen.buildBasicScene("scene");
+					gen.addMesh("skin", read.getTypes(), read.getVertices(), read.getTriangles(), -1);
+					gen.buildBuffer(bufferOut.getName());
+					ExtractorFrame.MAPPER.writerWithDefaultPrettyPrinter().writeValue(outGltf, gen.getGltf());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, e);
+				}
+			});
+			mnExtract.add(mntGltf);
 		}
+	}
+
+	private File saveExtract(String extension) {
+		JFileChooser fc = new JFileChooser();
+		fc.setSelectedFile(new File(this.toc.getName().replace(".nvx", extension)));
+		int status = fc.showSaveDialog(null);
+
+		if (status != JFileChooser.APPROVE_OPTION) {
+			return null;
+		}
+
+		return fc.getSelectedFile();
 	}
 }
