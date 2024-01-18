@@ -15,8 +15,8 @@ import me.vinceh121.n2ae.LEDataInputStream;
 public class NtxFileReader {
 	public static final String MAGIC_STRING = "NTX1";
 	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NtxFileReader.MAGIC_STRING);
-	public static final byte[] KTX_MAGIC = { (byte) 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, (byte) 0xBB, 0x0D, 0x0A,
-			0x1A, 0x0A };
+	public static final byte[] KTX_MAGIC =
+			{ (byte) 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, (byte) 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
 
 	private final LEDataInputStream in;
 
@@ -135,13 +135,11 @@ public class NtxFileReader {
 			// for each numberOfFaces
 			// for each pixelDepth
 			out.write(raw);
-		}
 
-		// LibGDX's parser wants some padding to play nice, it shouldn't
-		out.write(0);
-		out.write(0);
-		out.write(0);
-		out.write(0);
+			// KTX textures need to be aligned to 4 bytes
+			final int alignmentPadding = ((raw.length + 3) & ~3) - raw.length;
+			out.write(new byte[alignmentPadding]);
+		}
 	}
 
 	public void readAllTextures() throws IOException {
