@@ -25,10 +25,6 @@ public class NnpkFileExtractor {
 	 * @throws IOException
 	 */
 	public void extractAllFiles(final TableOfContents toc) throws IOException {
-		if (!this.output.isDirectory()) {
-			throw new IllegalStateException("output must be a folder");
-		}
-
 		this.extractAllFiles(toc, new ArrayDeque<>(6));
 	}
 

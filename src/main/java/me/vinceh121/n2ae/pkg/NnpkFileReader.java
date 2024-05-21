@@ -108,7 +108,11 @@ public class NnpkFileReader {
 				e.setLength(fileLength);
 				e.setOffset(fileOffset);
 				e.setName(name);
-				this.toc.put(path, e);
+				if (this.toc == null) {
+					this.toc = e;
+				} else {
+					this.toc.put(path, e);
+				}
 				path.pollLast();
 			} else {
 				insideToc = false;
