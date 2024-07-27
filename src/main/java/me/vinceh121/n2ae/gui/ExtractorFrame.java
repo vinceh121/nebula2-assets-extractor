@@ -529,6 +529,7 @@ public class ExtractorFrame extends JFrame {
 		}
 
 		f = File.createTempFile(toc.getName(), extension);
+		f.deleteOnExit();
 		TEMP_EXPORT_CACHE.put(toc, f);
 
 		return f;
