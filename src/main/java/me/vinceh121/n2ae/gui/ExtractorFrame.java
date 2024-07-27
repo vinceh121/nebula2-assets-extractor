@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,6 +56,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
+import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
@@ -65,6 +67,7 @@ import me.vinceh121.n2ae.texture.NtxFileReader;
 public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public static final ObjectMapper MAPPER = new ObjectMapper();
+	private static final Map<TableOfContents, File> TEMP_EXPORT_CACHE = new HashMap<>();
 	private static final DataFlavor FLAVOR_FILE = new DataFlavor("text/uri-list;class=java.lang.String", "file list");
 	private static final FileFilter NPK_FILTER = new FileFilter() {
 		@Override
@@ -143,6 +146,9 @@ public class ExtractorFrame extends JFrame {
 						break;
 					case "n":
 						openScript(sel);
+						break;
+					case "nvx":
+						openModel(sel);
 						break;
 					default:
 						JOptionPane.showMessageDialog(null, "Cannot open file " + sel.getName());
@@ -271,6 +277,26 @@ public class ExtractorFrame extends JFrame {
 		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable();
 		this.selectLastTab();
+	}
+
+	public void openModel(final TableOfContents toc) {
+		try {
+			final File f = getOrCreateTempFile(toc, ".obj");
+
+			if (f.length() == 0) {
+				try (final ByteArrayInputStream in = new ByteArrayInputStream(toc.getData());
+						PrintWriter writer = new PrintWriter(f)) {
+					NvxFileReader reader = new NvxFileReader(in);
+					reader.readAll();
+					reader.writeObj(writer);
+				}
+			}
+
+			Desktop.getDesktop().open(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void paste() {
@@ -493,6 +519,19 @@ public class ExtractorFrame extends JFrame {
 
 	private DefaultTreeModel getTreeModel() {
 		return (DefaultTreeModel) this.tree.getModel();
+	}
+
+	private static File getOrCreateTempFile(TableOfContents toc, String extension) throws IOException {
+		File f = TEMP_EXPORT_CACHE.get(toc);
+
+		if (f != null) {
+			return f;
+		}
+
+		f = File.createTempFile(toc.getName(), extension);
+		TEMP_EXPORT_CACHE.put(toc, f);
+
+		return f;
 	}
 
 	private static class ExtractorClipboardOwner implements ClipboardOwner {
