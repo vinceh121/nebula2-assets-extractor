@@ -55,7 +55,6 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.formdev.flatlaf.FlatDarculaLaf;
 
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
@@ -64,6 +63,7 @@ import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.script.NOBClazz;
 import me.vinceh121.n2ae.texture.NtxFileReader;
+import me.vinceh121.wanderer.launcher.pntheme.PnDarkLaf;
 
 public class ExtractorFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -91,7 +91,7 @@ public class ExtractorFrame extends JFrame {
 	private Map<String, NOBClazz> classModel;
 
 	public static void main(String[] args) {
-		FlatDarculaLaf.setup();
+		PnDarkLaf.setup();
 
 		ExtractorFrame frame = new ExtractorFrame();
 		frame.setVisible(true);
