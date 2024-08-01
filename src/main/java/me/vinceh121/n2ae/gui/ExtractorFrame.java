@@ -49,6 +49,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -122,7 +123,22 @@ public class ExtractorFrame extends JFrame {
 		split.setResizeWeight(0.33);
 		this.add(split, BorderLayout.CENTER);
 
-		this.tree = new JTree(new DefaultMutableTreeNode());
+		this.tree = new JTree(new DefaultMutableTreeNode()) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row,
+					boolean hasFocus) {
+				if (value instanceof DefaultMutableTreeNode
+						&& ((DefaultMutableTreeNode) value).getUserObject() instanceof TableOfContents) {
+					return ((TableOfContents) ((DefaultMutableTreeNode) value).getUserObject()).getName();
+				} else {
+					return super.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
+				}
+			}
+		};
+		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		this.tree.setExpandsSelectedPaths(true);
 		this.tree.setEnabled(false);
 		this.tree.setCellRenderer(new NpkTreeCellRenderer());
 		this.tree.setActionMap(null);
@@ -170,6 +186,7 @@ public class ExtractorFrame extends JFrame {
 			public void popup(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+
 					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 						return;
 					}

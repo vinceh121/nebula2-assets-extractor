@@ -3,6 +3,8 @@ package me.vinceh121.n2ae.pkg;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -153,7 +155,25 @@ public class TableOfContents {
 			throw new IllegalStateException("TOC is neither directory nor file");
 		}
 	}
-	
+
+	public List<TableOfContents> flatten() {
+		final List<TableOfContents> flat = new LinkedList<>();
+
+		if (this.isDirectory()) {
+			flat.add(this);
+
+			for (TableOfContents child : this.entries.values()) {
+				flat.addAll(child.flatten());
+			}
+		} else if (this.isFile()) {
+			flat.add(this);
+		} else {
+			throw new IllegalStateException("TOC is neither directory nor file");
+		}
+
+		return flat;
+	}
+
 	@Override
 	public String toString() {
 		return "TableOfContents [directory=" + directory + ", file=" + file + ", offset=" + offset + ", length="
