@@ -30,7 +30,7 @@ public class NebulaFoldParser implements FoldParser {
 					}
 				} else if (l.startsWith("sel ..")) {
 					if (f != null) {
-						f.setEndOffset(offEnd);
+						f.setEndOffset(offEnd - 1);
 						f = f.getParent();
 					}
 				}
