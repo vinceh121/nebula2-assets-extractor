@@ -14,26 +14,26 @@ public class Texture {
 	private int source = -1;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public int getSampler() {
-		return sampler;
+		return this.sampler;
 	}
 
-	public void setSampler(int sampler) {
+	public void setSampler(final int sampler) {
 		this.sampler = sampler;
 	}
 
 	public int getSource() {
-		return source;
+		return this.source;
 	}
 
-	public void setSource(int source) {
+	public void setSource(final int source) {
 		this.source = source;
 	}
 }

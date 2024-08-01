@@ -18,7 +18,7 @@ public class TableOfContents {
 	public TableOfContents() {
 	}
 
-	public TableOfContents(TableOfContents from) {
+	public TableOfContents(final TableOfContents from) {
 		this.entries.putAll(from.entries);
 		this.directory = from.directory;
 		this.file = from.file;
@@ -35,8 +35,8 @@ public class TableOfContents {
 	}
 
 	public TableOfContents deepClone() {
-		TableOfContents clone = this.clone();
-		for (String key : clone.entries.keySet()) {
+		final TableOfContents clone = this.clone();
+		for (final String key : clone.entries.keySet()) {
 			clone.entries.put(key, clone.entries.get(key).deepClone());
 		}
 		return clone;
@@ -87,7 +87,7 @@ public class TableOfContents {
 	}
 
 	public byte[] getData() {
-		return data;
+		return this.data;
 	}
 
 	public void setData(final byte[] data) {
@@ -102,23 +102,26 @@ public class TableOfContents {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(data);
-		result = prime * result + Objects.hash(directory, entries, file, length, name, offset);
+		result = prime * result + Arrays.hashCode(this.data);
+		result = prime * result + Objects.hash(this.directory, this.entries, this.file, this.length, this.name, this.offset);
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (this.getClass() != obj.getClass()) {
 			return false;
-		TableOfContents other = (TableOfContents) obj;
-		return Arrays.equals(data, other.data) && directory == other.directory && Objects.equals(entries, other.entries)
-				&& file == other.file && length == other.length && Objects.equals(name, other.name)
-				&& offset == other.offset;
+		}
+		final TableOfContents other = (TableOfContents) obj;
+		return Arrays.equals(this.data, other.data) && this.directory == other.directory && Objects.equals(this.entries, other.entries)
+				&& this.file == other.file && this.length == other.length && Objects.equals(this.name, other.name)
+				&& this.offset == other.offset;
 	}
 
 	public TableOfContents get(final Iterable<String> path) {
@@ -162,7 +165,7 @@ public class TableOfContents {
 		if (this.isDirectory()) {
 			flat.add(this);
 
-			for (TableOfContents child : this.entries.values()) {
+			for (final TableOfContents child : this.entries.values()) {
 				flat.addAll(child.flatten());
 			}
 		} else if (this.isFile()) {
@@ -176,7 +179,7 @@ public class TableOfContents {
 
 	@Override
 	public String toString() {
-		return "TableOfContents [directory=" + directory + ", file=" + file + ", offset=" + offset + ", length="
-				+ length + ", name=" + name + ", data=" + Arrays.toString(data) + "]";
+		return "TableOfContents [directory=" + this.directory + ", file=" + this.file + ", offset=" + this.offset + ", length="
+				+ this.length + ", name=" + this.name + ", data=" + Arrays.toString(this.data) + "]";
 	}
 }

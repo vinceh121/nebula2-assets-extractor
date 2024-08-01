@@ -8,18 +8,18 @@ public class PbrMetallicRoughness {
 	private TextureInfo baseColorTexture, metallicRoughnessTexture;
 
 	public TextureInfo getBaseColorTexture() {
-		return baseColorTexture;
+		return this.baseColorTexture;
 	}
 
-	public void setBaseColorTexture(TextureInfo baseColorTexture) {
+	public void setBaseColorTexture(final TextureInfo baseColorTexture) {
 		this.baseColorTexture = baseColorTexture;
 	}
 
 	public TextureInfo getMetallicRoughnessTexture() {
-		return metallicRoughnessTexture;
+		return this.metallicRoughnessTexture;
 	}
 
-	public void setMetallicRoughnessTexture(TextureInfo metallicRoughnessTexture) {
+	public void setMetallicRoughnessTexture(final TextureInfo metallicRoughnessTexture) {
 		this.metallicRoughnessTexture = metallicRoughnessTexture;
 	}
 }

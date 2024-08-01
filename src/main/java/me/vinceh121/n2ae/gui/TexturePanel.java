@@ -35,7 +35,7 @@ public class TexturePanel extends JPanel {
 		}
 
 		@Override
-		public boolean accept(File f) {
+		public boolean accept(final File f) {
 			return f.getName().endsWith(".png") || f.isDirectory();
 		}
 	};
@@ -43,7 +43,7 @@ public class TexturePanel extends JPanel {
 	private final List<BufferedImage> imgs;
 	private final JLabel lblBlockInfo, lblViewLabel;
 
-	public TexturePanel(List<Block> blocks, List<BufferedImage> imgs) {
+	public TexturePanel(final List<Block> blocks, final List<BufferedImage> imgs) {
 		this.blocks = blocks;
 		this.imgs = imgs;
 
@@ -52,16 +52,16 @@ public class TexturePanel extends JPanel {
 		this.lblViewLabel = new JLabel();
 		this.add(this.lblViewLabel, BorderLayout.CENTER);
 
-		JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		final JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		this.add(topBar, BorderLayout.NORTH);
 
-		JComboBox<Block> blockSelect = new JComboBox<>(new Vector<>(blocks));
+		final JComboBox<Block> blockSelect = new JComboBox<>(new Vector<>(blocks));
 		blockSelect.setRenderer(new BasicComboBoxRenderer() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-					boolean cellHasFocus) {
+			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected,
+					final boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 				this.setText("Block " + blocks.indexOf(value)); // because index might be -1
 				return this;
@@ -71,19 +71,19 @@ public class TexturePanel extends JPanel {
 		topBar.add(blockSelect);
 
 		final JPopupMenu popup = new JPopupMenu();
-		JMenuItem itmSave = new JMenuItem("Save as...");
+		final JMenuItem itmSave = new JMenuItem("Save as...");
 		itmSave.addActionListener(e -> {
-			JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter(PNG_FILTER);
-			fc.setFileFilter(PNG_FILTER);
-			int status = fc.showSaveDialog(null);
+			final JFileChooser fc = new JFileChooser();
+			fc.addChoosableFileFilter(TexturePanel.PNG_FILTER);
+			fc.setFileFilter(TexturePanel.PNG_FILTER);
+			final int status = fc.showSaveDialog(null);
 			if (status != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
 
 			try {
 				ImageIO.write(imgs.get(blockSelect.getSelectedIndex()), "png", fc.getSelectedFile());
-			} catch (IOException e1) {
+			} catch (final IOException e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Failed to save texture: " + e1);
 			}
@@ -95,16 +95,16 @@ public class TexturePanel extends JPanel {
 
 		this.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(final MouseEvent e) {
 				this.popup(e);
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void mouseReleased(final MouseEvent e) {
 				this.popup(e);
 			}
 
-			public void popup(MouseEvent e) {
+			public void popup(final MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -114,9 +114,9 @@ public class TexturePanel extends JPanel {
 		this.showBlock(0);
 	}
 
-	private void showBlock(int idx) {
+	private void showBlock(final int idx) {
 		this.lblViewLabel.setIcon(new ImageIcon(this.imgs.get(idx)));
-		Block b = this.blocks.get(idx);
+		final Block b = this.blocks.get(idx);
 		this.lblBlockInfo.setText(b.getWidth() + "×" + b.getHeight() + "×" + b.getDepth() + "\t" + b.getFormat());
 	}
 }

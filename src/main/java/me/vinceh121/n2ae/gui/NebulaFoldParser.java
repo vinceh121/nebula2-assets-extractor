@@ -12,13 +12,13 @@ import org.fife.ui.rsyntaxtextarea.folding.FoldType;
 
 public class NebulaFoldParser implements FoldParser {
 	@Override
-	public List<Fold> getFolds(RSyntaxTextArea textArea) {
+	public List<Fold> getFolds(final RSyntaxTextArea textArea) {
 		try {
-			List<Fold> folds = new ArrayList<>();
+			final List<Fold> folds = new ArrayList<>();
 			Fold f = null;
 			for (int i = 0; i < textArea.getLineCount(); i++) {
-				int offStart = textArea.getLineStartOffset(i);
-				int offEnd = textArea.getLineEndOffset(i);
+				final int offStart = textArea.getLineStartOffset(i);
+				final int offEnd = textArea.getLineEndOffset(i);
 				String l = textArea.getText(offStart, offEnd - offStart);
 				l = l.trim();
 				if (l.startsWith("new")) {
@@ -28,15 +28,13 @@ public class NebulaFoldParser implements FoldParser {
 					} else {
 						f = f.createChild(FoldType.CODE, offStart);
 					}
-				} else if (l.startsWith("sel ..")) {
-					if (f != null) {
-						f.setEndOffset(offEnd - 1);
-						f = f.getParent();
-					}
+				} else if (l.startsWith("sel ..") && (f != null)) {
+					f.setEndOffset(offEnd - 1);
+					f = f.getParent();
 				}
 			}
 			return folds;
-		} catch (BadLocationException e) {
+		} catch (final BadLocationException e) {
 			throw new RuntimeException(e); // shouldn't happen
 		}
 	}

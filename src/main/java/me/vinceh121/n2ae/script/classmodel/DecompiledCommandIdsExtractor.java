@@ -46,9 +46,9 @@ public class DecompiledCommandIdsExtractor {
 		for (int i = 0; i < lines.size(); i++) {
 			final String line = lines.get(i);
 			final Matcher initMatcher;
-			if ((initMatcher = this
-				.tryMatchers(new Matcher[] { DecompiledCommandIdsExtractor.PAT_CLASS_INIT.matcher(line),
-						DecompiledCommandIdsExtractor.PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
+			if ((initMatcher =
+					this.tryMatchers(new Matcher[] { DecompiledCommandIdsExtractor.PAT_CLASS_INIT.matcher(line),
+							DecompiledCommandIdsExtractor.PAT_CLASS_MANUAL_INIT.matcher(line) })) != null) {
 				final String className = initMatcher.group(1);
 
 				final NOBClazz clazz = new NOBClazz(); // we register classes even if they don't have methods

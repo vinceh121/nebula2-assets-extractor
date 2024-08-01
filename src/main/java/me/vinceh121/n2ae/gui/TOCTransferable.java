@@ -18,24 +18,24 @@ public class TOCTransferable implements Transferable {
 	private final TableOfContents toc;
 	private final DefaultMutableTreeNode node;
 
-	public TOCTransferable(TableOfContents toc, DefaultMutableTreeNode node) {
+	public TOCTransferable(final TableOfContents toc, final DefaultMutableTreeNode node) {
 		this.toc = toc;
 		this.node = node;
 	}
 
 	@Override
 	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] { NPK_CHILD_FLAVOR, DataFlavor.javaFileListFlavor };
+		return new DataFlavor[] { TOCTransferable.NPK_CHILD_FLAVOR, DataFlavor.javaFileListFlavor };
 	}
 
 	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		return NPK_CHILD_FLAVOR.equals(flavor);
+	public boolean isDataFlavorSupported(final DataFlavor flavor) {
+		return TOCTransferable.NPK_CHILD_FLAVOR.equals(flavor);
 	}
 
 	@Override
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		if (NPK_CHILD_FLAVOR.equals(flavor)) {
+	public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+		if (TOCTransferable.NPK_CHILD_FLAVOR.equals(flavor)) {
 			return this.toc;
 		} else if (DataFlavor.javaFileListFlavor.equals(flavor)) {
 			final File f = new File(System.getProperty("java.io.tmpdir") + "/" + this.toc.getName());
@@ -43,7 +43,7 @@ public class TOCTransferable implements Transferable {
 			final NnpkInMemoryFileExtractor ext = new NnpkInMemoryFileExtractor(f);
 			ext.write(this.toc);
 			// because File#delete() doesn't recurse directories
-			if (toc.isDirectory()) {
+			if (this.toc.isDirectory()) {
 				Files.walk(f.toPath()).forEach(p -> p.toFile().deleteOnExit());
 			}
 			return List.of(f);
@@ -52,10 +52,10 @@ public class TOCTransferable implements Transferable {
 	}
 
 	public TableOfContents getToc() {
-		return toc;
+		return this.toc;
 	}
 
 	public DefaultMutableTreeNode getNode() {
-		return node;
+		return this.node;
 	}
 }

@@ -10,36 +10,36 @@ public class WikiBox {
 	private final String name;
 	private final List<Entry> entries = new LinkedList<>();
 
-	public WikiBox(String name) {
+	public WikiBox(final String name) {
 		this.name = name;
 	}
 
-	public WikiBox(String name, Collection<Entry> entries) {
+	public WikiBox(final String name, final Collection<Entry> entries) {
 		this.name = name;
 		this.entries.addAll(entries);
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public WikiBox addEntry(Entry entry) {
+	public WikiBox addEntry(final Entry entry) {
 		this.entries.add(entry);
 		return this;
 	}
 
-	public WikiBox addEntry(String name, String pointer) {
+	public WikiBox addEntry(final String name, final String pointer) {
 		this.entries.add(new Entry(name, JsonPointer.compile(pointer), null));
 		return this;
 	}
 
-	public WikiBox addEntry(String name, String pointer, Object defolt) {
+	public WikiBox addEntry(final String name, final String pointer, final Object defolt) {
 		this.entries.add(new Entry(name, JsonPointer.compile(pointer), defolt));
 		return this;
 	}
 
 	public List<Entry> getEntries() {
-		return entries;
+		return this.entries;
 	}
 
 	public static class Entry {
@@ -47,39 +47,39 @@ public class WikiBox {
 		private JsonPointer pointer;
 		private Object defolt; // damn reserved keywords
 
-		public Entry(String name, JsonPointer pointer, Object defolt) {
+		public Entry(final String name, final JsonPointer pointer, final Object defolt) {
 			this.name = name;
 			this.pointer = pointer;
 			this.defolt = defolt;
 		}
 
 		public String getName() {
-			return name;
+			return this.name;
 		}
 
-		public void setName(String name) {
+		public void setName(final String name) {
 			this.name = name;
 		}
 
 		public JsonPointer getPointer() {
-			return pointer;
+			return this.pointer;
 		}
 
-		public void setPointer(JsonPointer pointer) {
+		public void setPointer(final JsonPointer pointer) {
 			this.pointer = pointer;
 		}
 
 		public Object getDefolt() {
-			return defolt;
+			return this.defolt;
 		}
 
-		public void setDefolt(Object defolt) {
+		public void setDefolt(final Object defolt) {
 			this.defolt = defolt;
 		}
 
 		@Override
 		public String toString() {
-			return "Entry [name=" + name + ", pointer=" + pointer + ", defolt=" + defolt + "]";
+			return "Entry [name=" + this.name + ", pointer=" + this.pointer + ", defolt=" + this.defolt + "]";
 		}
 	}
 }

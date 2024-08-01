@@ -49,16 +49,16 @@ class NtxTests {
 		reader.readHeader();
 		reader.readAllRaws();
 
-		File output = File.createTempFile("ktxWriter2Gdx", ".ktx");
+		final File output = File.createTempFile("ktxWriter2Gdx", ".ktx");
 
 		try (FileOutputStream out = new FileOutputStream(output)) {
 			reader.writeKtx(new DataOutputStream(out));
 		}
 
-		KTXTextureData texData = new KTXTextureData(new FileHandle(output), false);
+		final KTXTextureData texData = new KTXTextureData(new FileHandle(output), false);
 		try {
 			texData.prepare();
-		} catch (UnsatisfiedLinkError e) {
+		} catch (final UnsatisfiedLinkError e) {
 			// because natives aren't loaded
 		}
 	}

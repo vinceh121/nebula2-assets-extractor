@@ -109,8 +109,8 @@ public class Curve {
 	@Override
 	public String toString() {
 		return "Curve [startKey=" + this.startKey + ", numKeys=" + this.numKeys + ", keysPerSec=" + this.keysPerSec
-				+ ", interpolation=" + this.interpolation + ", repeat=" + this.repeat + ", type=" + this.type + ", name=" + this.name
-				+ ", vanillaCurve=" + Arrays.toString(this.vanillaCurve) + ", packedCurve=" + Arrays.toString(this.packedCurve)
-				+ "]";
+				+ ", interpolation=" + this.interpolation + ", repeat=" + this.repeat + ", type=" + this.type
+				+ ", name=" + this.name + ", vanillaCurve=" + Arrays.toString(this.vanillaCurve) + ", packedCurve="
+				+ Arrays.toString(this.packedCurve) + "]";
 	}
 }

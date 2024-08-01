@@ -9,12 +9,12 @@ import javax.swing.ImageIcon;
 public final class Icons {
 	private static final Map<String, ImageIcon> ICONS = new HashMap<>();
 
-	public static Image getImage(String i) {
-		return get(i).getImage();
+	public static Image getImage(final String i) {
+		return Icons.get(i).getImage();
 	}
 
 	public static ImageIcon get(final String iconName) {
-		final ImageIcon icon = ICONS.get(iconName);
+		final ImageIcon icon = Icons.ICONS.get(iconName);
 		if (icon == null) {
 			throw new IllegalArgumentException("Icon not found " + iconName);
 		}
@@ -26,7 +26,7 @@ public final class Icons {
 				"page_white_text", "script", "cross" };
 
 		for (final String img : loadList) {
-			ICONS.put(img, new ImageIcon(Icons.class.getClassLoader().getResource("icons/" + img + ".png")));
+			Icons.ICONS.put(img, new ImageIcon(Icons.class.getClassLoader().getResource("icons/" + img + ".png")));
 		}
 	}
 }

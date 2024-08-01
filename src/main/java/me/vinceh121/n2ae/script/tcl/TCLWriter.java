@@ -70,16 +70,14 @@ public class TCLWriter implements IWriter {
 			writer.print(" ");
 			writer.println(newCall.getVarName());
 			this.depth++;
-		} else if (call instanceof SelCommandCall) {
-			final SelCommandCall selCall = (SelCommandCall) call;
+		} else if (call instanceof final SelCommandCall selCall) {
 			if ("..".equals(selCall.getPath())) {
 				this.depth--;
 			}
 			this.writeIndent(writer);
 			writer.print("sel ");
 			writer.println(selCall.getPath());
-		} else if (call instanceof ClassCommandCall) {
-			final ClassCommandCall clsCall = (ClassCommandCall) call;
+		} else if (call instanceof final ClassCommandCall clsCall) {
 			this.writeIndent(writer);
 			writer.print(".");
 			writer.print(clsCall.getPrototype().getName());

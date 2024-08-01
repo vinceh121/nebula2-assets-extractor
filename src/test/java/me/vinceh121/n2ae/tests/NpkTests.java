@@ -9,6 +9,8 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.jupiter.api.Assertions;
+
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
@@ -43,6 +45,6 @@ class NpkTests {
 			dataActual = out.toByteArray();
 		}
 
-		assertArrayEquals(dataExpected, dataActual);
+		Assertions.assertArrayEquals(dataExpected, dataActual);
 	}
 }

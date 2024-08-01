@@ -131,7 +131,7 @@ public class GLTFGenerator {
 		final Sampler sampler = new Sampler();
 		sampler.setInput(this.gltf.getAccessors().indexOf(accessorInput));
 		sampler.setOutput(this.gltf.getAccessors().indexOf(accessorOutput));
-		if (c.isRotation() || (c.isTranslation() && c.getInterpolation() == Interpolation.LINEAR)) {
+		if (c.isRotation() || c.isTranslation() && c.getInterpolation() == Interpolation.LINEAR) {
 			sampler.setInterpolation(GltfInterpolation.LINEAR);
 		} else if (c.isTranslation() && c.getInterpolation() == Interpolation.STEP) {
 			sampler.setInterpolation(GltfInterpolation.STEP);
@@ -263,7 +263,7 @@ public class GLTFGenerator {
 				final float normB = (bgra & 0xFF000000) >>> 24;
 				final float normG = (bgra & 0x00FF0000) >>> 16;
 				final float normR = (bgra & 0x0000FF00) >>> 8;
-				final float normA = (bgra & 0x000000FF);
+				final float normA = bgra & 0x000000FF;
 
 				final float b = normB / 255;
 				final float g = normG / 255;
@@ -454,7 +454,7 @@ public class GLTFGenerator {
 		return node;
 	}
 
-	private void writeUV(LEDataOutputStream out, int count, int uvIdx, Map<String, Integer> attributes)
+	private void writeUV(final LEDataOutputStream out, final int count, final int uvIdx, final Map<String, Integer> attributes)
 			throws IOException {
 		final byte[] buf = ((ByteArrayOutputStream) out.getUnderlyingOutputStream()).toByteArray();
 
@@ -541,10 +541,9 @@ public class GLTFGenerator {
 		final List<Matrix4> invBindMats = new Vector<>();
 
 		for (final ICommandCall cmd : calls) {
-			if (!(cmd instanceof ClassCommandCall)) {
+			if (!(cmd instanceof final ClassCommandCall cmdCls)) {
 				continue;
 			}
-			final ClassCommandCall cmdCls = (ClassCommandCall) cmd;
 			if ("addjoint".equals(cmdCls.getPrototype().getName())) {
 				invBindMats.add(null);
 				rots.add(null);
@@ -552,10 +551,9 @@ public class GLTFGenerator {
 		}
 
 		for (final ICommandCall cmd : calls) {
-			if (!(cmd instanceof ClassCommandCall)) {
+			if (!(cmd instanceof final ClassCommandCall cmdCls)) {
 				continue;
 			}
-			final ClassCommandCall cmdCls = (ClassCommandCall) cmd;
 			if ("addjoint".equals(cmdCls.getPrototype().getName())) {
 				final Node bone = this.buildBones(cmdCls);
 				this.gltf.getNodes().add(bone);
@@ -701,15 +699,14 @@ public class GLTFGenerator {
 	}
 
 	public void updateRootNodes() {
-		Set<Integer> noParent = new HashSet<>();
+		final Set<Integer> noParent = new HashSet<>();
 
 		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
 			noParent.add(i);
 		}
 
-		for (int i = 0; i < this.gltf.getNodes().size(); i++) {
-			Node n = this.gltf.getNodes().get(i);
-			for (Integer c : n.getChildren()) {
+		for (final Node n : this.gltf.getNodes()) {
+			for (final Integer c : n.getChildren()) {
 				noParent.remove(c);
 			}
 		}
@@ -717,7 +714,7 @@ public class GLTFGenerator {
 		this.gltf.getScenes().get(0).getNodes().addAll(noParent);
 	}
 
-	private void prependPaddingComp(int compType) throws IOException {
+	private void prependPaddingComp(final int compType) throws IOException {
 		this.prependPadding(Accessor.getComponentTypeLength(compType));
 	}
 
@@ -725,13 +722,13 @@ public class GLTFGenerator {
 	 * glTF 2.0 requires bufferViews and accessors byte offsets to be multiples of
 	 * their component type. C.f. 3.6.2.4. Data Alignment This function prepends the
 	 * necessary padding to make sure this condition is met.
-	 * 
+	 *
 	 * @param remainderSize size in bytes of the componentType that's going to be
 	 *                      written
 	 * @throws IOException
 	 */
-	private void prependPadding(int remainderSize) throws IOException {
-		int remaining = this.bufferSize % remainderSize;
+	private void prependPadding(final int remainderSize) throws IOException {
+		final int remaining = this.bufferSize % remainderSize;
 		for (int i = 0; i < remaining; i++) {
 			this.packedBinary.write(0);
 		}
@@ -745,10 +742,10 @@ public class GLTFGenerator {
 		}
 
 		for (int i = 0; i < this.gltf.getAccessors().size(); i++) {
-			Accessor a = this.gltf.getAccessors().get(i);
-			int compLength = Accessor.getComponentTypeLength(a.getComponentType());
+			final Accessor a = this.gltf.getAccessors().get(i);
+			final int compLength = Accessor.getComponentTypeLength(a.getComponentType());
 
-			BufferView view = this.gltf.getBufferViews().get(a.getBufferView());
+			final BufferView view = this.gltf.getBufferViews().get(a.getBufferView());
 			if (view.getByteOffset() % compLength != 0) {
 				throw new IllegalStateException("Accessor's (" + i + ") total byteOffset " + view.getByteOffset()
 						+ " isn't a multiple of componentType length " + compLength);

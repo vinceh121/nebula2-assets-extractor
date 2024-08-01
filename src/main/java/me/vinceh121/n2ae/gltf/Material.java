@@ -10,26 +10,26 @@ public class Material {
 	private TextureInfo emissiveTexture;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public PbrMetallicRoughness getPbrMetallicRoughness() {
-		return pbrMetallicRoughness;
+		return this.pbrMetallicRoughness;
 	}
 
-	public void setPbrMetallicRoughness(PbrMetallicRoughness pbrMetallicRoughness) {
+	public void setPbrMetallicRoughness(final PbrMetallicRoughness pbrMetallicRoughness) {
 		this.pbrMetallicRoughness = pbrMetallicRoughness;
 	}
 
 	public TextureInfo getEmissiveTexture() {
-		return emissiveTexture;
+		return this.emissiveTexture;
 	}
 
-	public void setEmissiveTexture(TextureInfo emissiveTexture) {
+	public void setEmissiveTexture(final TextureInfo emissiveTexture) {
 		this.emissiveTexture = emissiveTexture;
 	}
 }

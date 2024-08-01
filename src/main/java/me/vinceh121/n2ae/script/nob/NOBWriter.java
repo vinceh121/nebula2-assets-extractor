@@ -57,17 +57,14 @@ public class NOBWriter implements IWriter {
 	}
 
 	public void writeCall(final LEDataOutputStream stream, final ICommandCall call) throws IOException {
-		if (call instanceof NewCommandCall) {
-			final NewCommandCall newCall = (NewCommandCall) call;
+		if (call instanceof final NewCommandCall newCall) {
 			stream.writeIntLE(NOBParser._NEW);
 			stream.writeString(newCall.getClazz().getName());
 			stream.writeString(newCall.getVarName());
-		} else if (call instanceof SelCommandCall) {
-			final SelCommandCall selCall = (SelCommandCall) call;
+		} else if (call instanceof final SelCommandCall selCall) {
 			stream.writeIntLE(NOBParser._SEL);
 			stream.writeString(selCall.getPath());
-		} else if (call instanceof ClassCommandCall) {
-			final ClassCommandCall classCall = (ClassCommandCall) call;
+		} else if (call instanceof final ClassCommandCall classCall) {
 			stream.writeIntLE(FourccUtils.fourcc(classCall.getPrototype().getFourcc()));
 
 			// need to buffer arguments so we can get their length in bytes

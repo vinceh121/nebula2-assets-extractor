@@ -25,10 +25,10 @@ public class Primitive {
 	}
 
 	public int getMaterial() {
-		return material;
+		return this.material;
 	}
 
-	public void setMaterial(int material) {
+	public void setMaterial(final int material) {
 		this.material = material;
 	}
 }

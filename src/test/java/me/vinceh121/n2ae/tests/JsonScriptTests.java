@@ -32,13 +32,12 @@ class JsonScriptTests {
 		final String actual = this.mapper.writeValueAsString(gen.generateJson(parser.getCalls()));
 
 		Assertions.assertEquals(
-				"{\"visual\":{\"@class\":\"n3dnode\",\"plane\":"
-				+ "{\"@class\":\"n3dnode\",\"txyz\":[1.0,-0.5,-1.5],"
-				+ "\"mesh\":{\"@class\":\"nmeshnode\",\"setfilename\":"
-				+ "\"data:if_hilfe.n/plane.nvx\"},\"shader\":{\"@class\":"
-				+ "\"nlinknode\",\"settarget\":\"/data/shaders/if_hilfe\"},"
-				+ "\"tex\":{\"@class\":\"ntexarraynode\",\"settexture\":"
-				+ "[0,\"data:if_hilfe.n/texturenone.ntx\",\"none\"]}}}}",
+				"{\"visual\":{\"@class\":\"n3dnode\",\"plane\":" + "{\"@class\":\"n3dnode\",\"txyz\":[1.0,-0.5,-1.5],"
+						+ "\"mesh\":{\"@class\":\"nmeshnode\",\"setfilename\":"
+						+ "\"data:if_hilfe.n/plane.nvx\"},\"shader\":{\"@class\":"
+						+ "\"nlinknode\",\"settarget\":\"/data/shaders/if_hilfe\"},"
+						+ "\"tex\":{\"@class\":\"ntexarraynode\",\"settexture\":"
+						+ "[0,\"data:if_hilfe.n/texturenone.ntx\",\"none\"]}}}}",
 				actual);
 	}
 }

@@ -67,14 +67,14 @@ public class GLTF {
 	}
 
 	public List<Image> getImages() {
-		return images;
+		return this.images;
 	}
 
 	public List<Texture> getTextures() {
-		return textures;
+		return this.textures;
 	}
 
 	public List<Material> getMaterials() {
-		return materials;
+		return this.materials;
 	}
 }

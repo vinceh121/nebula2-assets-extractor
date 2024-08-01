@@ -7,28 +7,28 @@ public class NnpkInMemoryFileReader {
 	private final RandomAccessFile file;
 	private int dataOffset;
 
-	public NnpkInMemoryFileReader(RandomAccessFile file) {
+	public NnpkInMemoryFileReader(final RandomAccessFile file) {
 		this.file = file;
 	}
 
-	public void readTableOfContents(TableOfContents toc) throws IOException {
+	public void readTableOfContents(final TableOfContents toc) throws IOException {
 		if (toc.isDirectory()) {
-			for (TableOfContents child : toc.getEntries().values()) {
+			for (final TableOfContents child : toc.getEntries().values()) {
 				this.readTableOfContents(child);
 			}
 		} else if (toc.isFile()) {
 			this.file.seek(toc.getOffset() + this.dataOffset);
-			byte[] data = new byte[toc.getLength()];
+			final byte[] data = new byte[toc.getLength()];
 			this.file.read(data);
 			toc.setData(data);
 		}
 	}
 
 	public int getDataOffset() {
-		return dataOffset;
+		return this.dataOffset;
 	}
 
-	public void setDataOffset(int dataOffset) {
+	public void setDataOffset(final int dataOffset) {
 		this.dataOffset = dataOffset;
 	}
 }

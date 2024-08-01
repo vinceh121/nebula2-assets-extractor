@@ -19,20 +19,20 @@ import me.vinceh121.n2ae.script.tcl.TCLParser;
 public class RSTANebulaParser extends AbstractParser {
 	private final Map<String, NOBClazz> model;
 
-	public RSTANebulaParser(Map<String, NOBClazz> model) {
+	public RSTANebulaParser(final Map<String, NOBClazz> model) {
 		this.model = model;
 	}
 
 	@Override
-	public ParseResult parse(RSyntaxDocument doc, String style) {
-		DefaultParseResult res = new DefaultParseResult(this);
+	public ParseResult parse(final RSyntaxDocument doc, final String style) {
+		final DefaultParseResult res = new DefaultParseResult(this);
 
-		IParser parser = new TCLParser();
+		final IParser parser = new TCLParser();
 		parser.setClassModel(this.model);
 
 		try {
 			parser.read(doc.getText(0, doc.getLength()));
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			res.addNotice(new DefaultParserNotice(this, e.getMessage(), e.getLine()));
 		} catch (IOException | BadLocationException e) {
 			throw new RuntimeException(e);

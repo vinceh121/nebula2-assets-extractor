@@ -9,18 +9,18 @@ public class TextureInfo {
 	private int texCoord = -1;
 
 	public int getIndex() {
-		return index;
+		return this.index;
 	}
 
-	public void setIndex(int index) {
+	public void setIndex(final int index) {
 		this.index = index;
 	}
 
 	public int getTexCoord() {
-		return texCoord;
+		return this.texCoord;
 	}
 
-	public void setTexCoord(int texCoord) {
+	public void setTexCoord(final int texCoord) {
 		this.texCoord = texCoord;
 	}
 

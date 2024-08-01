@@ -16,9 +16,9 @@ public class CmdExtractCommands implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		CommandIdsExtractor extractor = new CommandIdsExtractor();
-		extractor.readRecurse(input);
-		ObjectMapper mapper = new ObjectMapper();
+		final CommandIdsExtractor extractor = new CommandIdsExtractor();
+		extractor.readRecurse(this.input);
+		final ObjectMapper mapper = new ObjectMapper();
 		mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, extractor.getClazzes());
 		return 0;
 	}

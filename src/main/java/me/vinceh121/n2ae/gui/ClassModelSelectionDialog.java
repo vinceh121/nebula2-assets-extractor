@@ -21,11 +21,11 @@ public class ClassModelSelectionDialog extends JDialog {
 		this.setLayout(new FlowLayout());
 		this.setModalityType(ModalityType.APPLICATION_MODAL);
 
-		this.combo = new JComboBox<>(new Vector<>(URLS.keySet()));
-		this.add(combo);
+		this.combo = new JComboBox<>(new Vector<>(ClassModelSelectionDialog.URLS.keySet()));
+		this.add(this.combo);
 
 		this.txtUrl = new JTextField(35);
-		this.add(txtUrl);
+		this.add(this.txtUrl);
 
 		final JButton btnOk = new JButton("OK");
 		btnOk.addActionListener(e -> {
@@ -36,7 +36,7 @@ public class ClassModelSelectionDialog extends JDialog {
 		this.pack();
 
 		this.combo.addActionListener(e -> {
-			final String url = URLS.get(this.combo.getSelectedItem());
+			final String url = ClassModelSelectionDialog.URLS.get(this.combo.getSelectedItem());
 
 			if (url.isEmpty()) {
 				this.txtUrl.setText("");
@@ -51,7 +51,7 @@ public class ClassModelSelectionDialog extends JDialog {
 	}
 
 	public String getSelectedUrl() {
-		final String url = URLS.get(combo.getSelectedItem());
+		final String url = ClassModelSelectionDialog.URLS.get(this.combo.getSelectedItem());
 
 		if (url.isEmpty()) {
 			return this.txtUrl.getText();
@@ -61,8 +61,8 @@ public class ClassModelSelectionDialog extends JDialog {
 	}
 
 	static {
-		URLS.put("Project Nomads",
+		ClassModelSelectionDialog.URLS.put("Project Nomads",
 				"https://raw.githubusercontent.com/vinceh121/nebula2-assets-extractor/master/project-nomads.classmodel.json");
-		URLS.put("Custom", "");
+		ClassModelSelectionDialog.URLS.put("Custom", "");
 	}
 }

@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 public class CountingInputStream extends FilterInputStream {
 
-	public CountingInputStream(InputStream in) {
+	public CountingInputStream(final InputStream in) {
 		super(in);
 	}
 

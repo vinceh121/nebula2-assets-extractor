@@ -15,22 +15,22 @@ public class GuiSettings {
 	private String classModelUrl;
 
 	public String getClassModelUrl() {
-		return classModelUrl;
+		return this.classModelUrl;
 	}
 
-	public void setClassModelUrl(String classModelUrl) {
+	public void setClassModelUrl(final String classModelUrl) {
 		this.classModelUrl = classModelUrl;
 	}
 
 	public void save() throws IOException {
-		try (FileOutputStream out = new FileOutputStream(getConfigFile())) {
-			CONFIG_MAPPER.writerWithDefaultPrettyPrinter().writeValue(out, this);
+		try (FileOutputStream out = new FileOutputStream(GuiSettings.getConfigFile())) {
+			GuiSettings.CONFIG_MAPPER.writerWithDefaultPrettyPrinter().writeValue(out, this);
 		}
 	}
-	
+
 	public static GuiSettings load() throws IOException {
-		try (FileInputStream in = new FileInputStream(getConfigFile())) {
-			return CONFIG_MAPPER.readValue(in, GuiSettings.class);
+		try (FileInputStream in = new FileInputStream(GuiSettings.getConfigFile())) {
+			return GuiSettings.CONFIG_MAPPER.readValue(in, GuiSettings.class);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class GuiSettings {
 		} else {
 			try {
 				return File.createTempFile("n2ae", "config");
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeException("Couldn't create temp config", e);
 			}
 		}

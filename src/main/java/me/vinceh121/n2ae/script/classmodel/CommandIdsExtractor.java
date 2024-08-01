@@ -13,8 +13,8 @@ import me.vinceh121.n2ae.script.CmdPrototype;
 import me.vinceh121.n2ae.script.NOBClazz;
 
 public class CommandIdsExtractor {
-	private static final Pattern PATTERN_ADDCMD = Pattern
-		.compile("AddCmd[ ]*\\([ ]*\"([_\\-0-9a-zA-Z]+)\",[ \t]*\\'([A-Z0-9_\\-]+)\\'[ ]*,");
+	private static final Pattern PATTERN_ADDCMD =
+			Pattern.compile("AddCmd[ ]*\\([ ]*\"([_\\-0-9a-zA-Z]+)\",[ \t]*\\'([A-Z0-9_\\-]+)\\'[ ]*,");
 	private final Map<String, NOBClazz> clazzes = new Hashtable<>();
 
 	public void readRecurse(final File file) throws IOException {

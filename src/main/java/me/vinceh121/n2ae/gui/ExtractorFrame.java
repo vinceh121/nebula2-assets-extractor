@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -45,6 +46,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -77,7 +79,7 @@ public class ExtractorFrame extends JFrame {
 		}
 
 		@Override
-		public boolean accept(File f) {
+		public boolean accept(final File f) {
 			return f.getName().endsWith(".npk") || f.isDirectory();
 		}
 	};
@@ -90,10 +92,10 @@ public class ExtractorFrame extends JFrame {
 	private TableOfContents toc;
 	private Map<String, NOBClazz> classModel;
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		PnDarkLaf.setup();
 
-		ExtractorFrame frame = new ExtractorFrame();
+		final ExtractorFrame frame = new ExtractorFrame();
 		frame.setVisible(true);
 	}
 
@@ -101,11 +103,11 @@ public class ExtractorFrame extends JFrame {
 		try { // XXX ugly mess
 			try {
 				this.settings = GuiSettings.load();
-			} catch (FileNotFoundException e) {
+			} catch (final FileNotFoundException e) {
 				this.settings = new GuiSettings();
 			}
 			this.loadClassModel();
-		} catch (IOException e1) {
+		} catch (final IOException e1) {
 			JOptionPane.showMessageDialog(null, "Failed to load settings. " + e1);
 			e1.printStackTrace();
 			this.settings = new GuiSettings();
@@ -113,10 +115,10 @@ public class ExtractorFrame extends JFrame {
 		}
 
 		this.setTitle("Nebula 2 Assets Extractor");
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setIconImage(Icons.getImage("bricks"));
 		this.setSize(800, 700);
-		this.setExtendedState(MAXIMIZED_BOTH);
+		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setLayout(new BorderLayout());
 
 		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -127,8 +129,8 @@ public class ExtractorFrame extends JFrame {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row,
-					boolean hasFocus) {
+			public String convertValueToText(final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row,
+					final boolean hasFocus) {
 				if (value instanceof DefaultMutableTreeNode
 						&& ((DefaultMutableTreeNode) value).getUserObject() instanceof TableOfContents) {
 					return ((TableOfContents) ((DefaultMutableTreeNode) value).getUserObject()).getName();
@@ -144,27 +146,27 @@ public class ExtractorFrame extends JFrame {
 		this.tree.setActionMap(null);
 		this.tree.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+					final DefaultMutableTreeNode node = (DefaultMutableTreeNode) ExtractorFrame.this.tree.getLastSelectedPathComponent();
 					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 						return;
 					}
 
-					TableOfContents sel = (TableOfContents) node.getUserObject();
+					final TableOfContents sel = (TableOfContents) node.getUserObject();
 					if (sel.isDirectory()) {
 						return;
 					}
 					final String ext = sel.getName().substring(sel.getName().lastIndexOf('.') + 1);
 					switch (ext) {
 					case "ntx":
-						openTexture(sel);
+						ExtractorFrame.this.openTexture(sel);
 						break;
 					case "n":
-						openScript(sel);
+						ExtractorFrame.this.openScript(sel);
 						break;
 					case "nvx":
-						openModel(sel);
+						ExtractorFrame.this.openModel(sel);
 						break;
 					default:
 						JOptionPane.showMessageDialog(null, "Cannot open file " + sel.getName());
@@ -174,120 +176,120 @@ public class ExtractorFrame extends JFrame {
 			}
 
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(final MouseEvent e) {
 				this.popup(e);
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void mouseReleased(final MouseEvent e) {
 				this.popup(e);
 			}
 
-			public void popup(MouseEvent e) {
+			public void popup(final MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+					final DefaultMutableTreeNode node = (DefaultMutableTreeNode) ExtractorFrame.this.tree.getLastSelectedPathComponent();
 
 					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 						return;
 					}
 
-					TableOfContentPopupMenu pop =
-							new TableOfContentPopupMenu((DefaultTreeModel) tree.getModel(), tree.getSelectionPath());
+					final TableOfContentPopupMenu pop =
+							new TableOfContentPopupMenu((DefaultTreeModel) ExtractorFrame.this.tree.getModel(), ExtractorFrame.this.tree.getSelectionPath());
 					pop.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
 		split.setLeftComponent(new JScrollPane(this.tree));
 
-		tabbed = new JTabbedPane();
-		split.setRightComponent(tabbed);
+		this.tabbed = new JTabbedPane();
+		split.setRightComponent(this.tabbed);
 
-		JMenuBar bar = new JMenuBar();
+		final JMenuBar bar = new JMenuBar();
 		this.setJMenuBar(bar);
 
-		JMenu mnFile = new JMenu("File");
+		final JMenu mnFile = new JMenu("File");
 		mnFile.setMnemonic('f');
 		bar.add(mnFile);
 
-		JMenuItem mntOpen = new JMenuItem("Open NPK0");
+		final JMenuItem mntOpen = new JMenuItem("Open NPK0");
 		mntOpen.setMnemonic('o');
 		mntOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 		mntOpen.addActionListener(e -> this.openNPK());
 		mnFile.add(mntOpen);
 
-		JMenuItem mntSave = new JMenuItem("Save NPK0");
+		final JMenuItem mntSave = new JMenuItem("Save NPK0");
 		mntSave.setMnemonic('s');
 		mntSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
 		mntSave.addActionListener(e -> this.saveNPK());
 		mnFile.add(mntSave);
 
-		JMenuItem mntSaveAs = new JMenuItem("Save NPK0 as");
+		final JMenuItem mntSaveAs = new JMenuItem("Save NPK0 as");
 		mntSaveAs.setMnemonic('a');
 		mntSaveAs.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 		mntSaveAs.addActionListener(e -> this.saveAsNPK());
 		mnFile.add(mntSaveAs);
 
-		JMenuItem mntQuit = new JMenuItem("Quit");
+		final JMenuItem mntQuit = new JMenuItem("Quit");
 		mntQuit.setMnemonic('q');
 		mntQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
 		mntQuit.addActionListener(e -> System.exit(0));
 		mnFile.add(mntQuit);
 
-		JMenu mnEdit = new JMenu("Edit");
+		final JMenu mnEdit = new JMenu("Edit");
 		mnEdit.setMnemonic('e');
 		bar.add(mnEdit);
 
-		JMenuItem mntCopy = new JMenuItem("Copy");
+		final JMenuItem mntCopy = new JMenuItem("Copy");
 		mntCopy.setMnemonic('c');
 		mntCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 		mntCopy.addActionListener(e -> this.copy());
 		mnEdit.add(mntCopy);
 
-		JMenuItem mntCut = new JMenuItem("Cut");
+		final JMenuItem mntCut = new JMenuItem("Cut");
 		mntCut.setMnemonic('u');
 		mntCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 		mntCut.addActionListener(e -> this.cut());
 		mnEdit.add(mntCut);
 
-		JMenuItem mntPaste = new JMenuItem("Paste");
+		final JMenuItem mntPaste = new JMenuItem("Paste");
 		mntCut.setMnemonic('p');
 		mntPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
 		mntPaste.addActionListener(e -> this.paste());
 		mnEdit.add(mntPaste);
 
-		JMenu mnHelp = new JMenu("Help");
+		final JMenu mnHelp = new JMenu("Help");
 		bar.add(mnHelp);
 
-		JMenuItem mntWiki = new JMenuItem("Wiki");
+		final JMenuItem mntWiki = new JMenuItem("Wiki");
 		mntWiki.addActionListener(e -> {
 			final String uri = "https://github.com/vinceh121/nebula2-assets-extractor/wiki";
 			try {
 				Desktop.getDesktop().browse(new URI(uri));
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Failed to open browser, the wiki is at " + uri);
 			}
 		});
 		mnHelp.add(mntWiki);
 
-		JMenuItem mntAbout = new JMenuItem("About");
+		final JMenuItem mntAbout = new JMenuItem("About");
 		mntAbout.addActionListener(e -> this.aboutDialog.setVisible(true));
 		mnHelp.add(mntAbout);
 	}
 
-	public void openScript(TableOfContents toc) {
-		this.tabbed.addTab(toc.getName(), new ScriptPanel(classModel, toc));
+	public void openScript(final TableOfContents toc) {
+		this.tabbed.addTab(toc.getName(), new ScriptPanel(this.classModel, toc));
 		this.ensureTabsCloseable();
 		this.selectLastTab();
 	}
 
-	public void openTexture(TableOfContents toc) {
-		NtxFileReader read = new NtxFileReader(new ByteArrayInputStream(toc.getData()));
+	public void openTexture(final TableOfContents toc) {
+		final NtxFileReader read = new NtxFileReader(new ByteArrayInputStream(toc.getData()));
 		try {
 			read.readHeader();
 			read.readAllTextures();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -298,19 +300,19 @@ public class ExtractorFrame extends JFrame {
 
 	public void openModel(final TableOfContents toc) {
 		try {
-			final File f = getOrCreateTempFile(toc, ".obj");
+			final File f = ExtractorFrame.getOrCreateTempFile(toc, ".obj");
 
 			if (f.length() == 0) {
 				try (final ByteArrayInputStream in = new ByteArrayInputStream(toc.getData());
 						PrintWriter writer = new PrintWriter(f)) {
-					NvxFileReader reader = new NvxFileReader(in);
+					final NvxFileReader reader = new NvxFileReader(in);
 					reader.readAll();
 					reader.writeObj(writer);
 				}
 			}
 
 			Desktop.getDesktop().open(f);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -318,15 +320,15 @@ public class ExtractorFrame extends JFrame {
 
 	private void paste() {
 		try {
-			Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+			final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 			if (clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
 				this.pasteInternal((TOCTransferable) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR));
-			} else if (clip.isDataFlavorAvailable(FLAVOR_FILE)) {
+			} else if (clip.isDataFlavorAvailable(ExtractorFrame.FLAVOR_FILE)) {
 				// On Linux DataFlavor.javaFileListFlavor is broken as it reaches an unexpected
 				// \0 in the last URL, so we have to reinvent the wheel
-				final String[] files = ((String) clip.getData(FLAVOR_FILE)).split("\n");
-				for (String f : files) {
-					File file = new File(new URI(f.strip().replace("\0", "")));
+				final String[] files = ((String) clip.getData(ExtractorFrame.FLAVOR_FILE)).split("\n");
+				for (final String f : files) {
+					final File file = new File(new URI(f.strip().replace("\0", "")));
 					this.pasteFile(file);
 				}
 			} else {
@@ -339,35 +341,35 @@ public class ExtractorFrame extends JFrame {
 		}
 	}
 
-	private void pasteFile(File f) throws IOException {
-		DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		TableOfContents selToc = (TableOfContents) selNode.getUserObject();
+	private void pasteFile(final File f) throws IOException {
+		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 
-		TableOfContents newToc = new TableOfContents();
+		final TableOfContents newToc = new TableOfContents();
 		newToc.setDirectory(f.isDirectory());
 		newToc.setFile(f.isFile());
 		newToc.setName(f.getName());
 		newToc.setData(Files.readAllBytes(f.toPath()));
 		newToc.setLength(newToc.getData().length);
 
-		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newToc);
+		final DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newToc);
 
 		if (selToc.isDirectory()) { // selected path is a dir, insert inside
 			this.getTreeModel()
 				.insertNodeInto(newNode, selNode, this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
 			selToc.getEntries().put(newToc.getName(), newToc);
 		} else if (selToc.isFile()) { // selected path is file, insert as sibling
-			DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
-			TableOfContents selTocParent = ((TableOfContents) selParent.getUserObject());
+			final DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
+			final TableOfContents selTocParent = (TableOfContents) selParent.getUserObject();
 			this.getTreeModel()
 				.insertNodeInto(newNode, selParent, this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
 			selTocParent.getEntries().put(newToc.getName(), newToc);
 		}
 	}
 
-	private void pasteInternal(TOCTransferable trans) {
-		DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		TableOfContents selToc = (TableOfContents) selNode.getUserObject();
+	private void pasteInternal(final TOCTransferable trans) {
+		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 
 		if (selToc.isDirectory()) { // selected path is a dir, insert inside
 			this.getTreeModel()
@@ -376,8 +378,8 @@ public class ExtractorFrame extends JFrame {
 						this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
 			selToc.getEntries().put(trans.getToc().getName(), trans.getToc());
 		} else if (selToc.isFile()) { // selected path is file, insert as sibling
-			DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
-			TableOfContents selTocParent = ((TableOfContents) selParent.getUserObject());
+			final DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
+			final TableOfContents selTocParent = (TableOfContents) selParent.getUserObject();
 			this.getTreeModel()
 				.insertNodeInto(trans.getNode(),
 						selParent,
@@ -388,20 +390,20 @@ public class ExtractorFrame extends JFrame {
 
 	private void cut() {
 		this.copy();
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		TableOfContents parentToc = ((TableOfContents) ((DefaultMutableTreeNode) node.getParent()).getUserObject());
+		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+		final TableOfContents parentToc = (TableOfContents) ((DefaultMutableTreeNode) node.getParent()).getUserObject();
 		parentToc.getEntries().remove(((TableOfContents) node.getUserObject()).getName());
 		this.getTreeModel().removeNodeFromParent(node);
 	}
 
 	private void copy() {
-		Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-		TOCTransferable trans = this.makeTocTransferable();
+		final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+		final TOCTransferable trans = this.makeTocTransferable();
 		clip.setContents(trans, this.clipboardOwner);
 	}
 
 	private TOCTransferable makeTocTransferable() {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 		if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 			throw new IllegalStateException();
 		}
@@ -416,10 +418,10 @@ public class ExtractorFrame extends JFrame {
 
 	public void saveNPK() {
 		if (this.openedNpk == null) {
-			JFileChooser fc = new JFileChooser();
-			fc.addChoosableFileFilter(NPK_FILTER);
-			fc.setFileFilter(NPK_FILTER);
-			int status = fc.showSaveDialog(null);
+			final JFileChooser fc = new JFileChooser();
+			fc.addChoosableFileFilter(ExtractorFrame.NPK_FILTER);
+			fc.setFileFilter(ExtractorFrame.NPK_FILTER);
+			final int status = fc.showSaveDialog(null);
 			if (status != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
@@ -440,28 +442,28 @@ public class ExtractorFrame extends JFrame {
 	}
 
 	private void writeNPK() throws RuntimeException {
-		try (FileOutputStream out = new FileOutputStream(openedNpk)) {
+		try (FileOutputStream out = new FileOutputStream(this.openedNpk)) {
 			NnpkFileWriter.updateTableOfContentsOffsets(this.toc);
-			NnpkFileWriter writer = new NnpkFileWriter(out);
+			final NnpkFileWriter writer = new NnpkFileWriter(out);
 			writer.setTableOfContents(this.toc);
 			writer.writeFromMemory();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void openNPK() {
-		JFileChooser fc = new JFileChooser();
-		fc.addChoosableFileFilter(NPK_FILTER);
-		fc.setFileFilter(NPK_FILTER);
-		int status = fc.showOpenDialog(null);
+		final JFileChooser fc = new JFileChooser();
+		fc.addChoosableFileFilter(ExtractorFrame.NPK_FILTER);
+		fc.setFileFilter(ExtractorFrame.NPK_FILTER);
+		final int status = fc.showOpenDialog(null);
 		if (status != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
 
 		this.openedNpk = fc.getSelectedFile();
 
-		CompletableFuture.runAsync(this::readNPK).exceptionally((t) -> {
+		CompletableFuture.runAsync(this::readNPK).exceptionally(t -> {
 			t.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to read NPK0 file: " + t);
 			return null;
@@ -474,33 +476,33 @@ public class ExtractorFrame extends JFrame {
 	private void readNPK() throws RuntimeException {
 		final int dataOffset;
 		try (FileInputStream in = new FileInputStream(this.openedNpk)) {
-			NnpkFileReader read = new NnpkFileReader(in);
+			final NnpkFileReader read = new NnpkFileReader(in);
 			read.readAll();
 			dataOffset = read.getDataOffset();
 			this.toc = read.getTableOfContents();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 
 		try (RandomAccessFile rand = new RandomAccessFile(this.openedNpk, "r")) {
-			NnpkInMemoryFileReader ex = new NnpkInMemoryFileReader(rand);
+			final NnpkInMemoryFileReader ex = new NnpkInMemoryFileReader(rand);
 			ex.setDataOffset(dataOffset);
-			ex.readTableOfContents(toc);
-		} catch (IOException e) {
+			ex.readTableOfContents(this.toc);
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void updateTreeModel() {
 		final DefaultMutableTreeNode root = new DefaultMutableTreeNode(this.toc);
-		this.buildTreeNodes(toc, root);
+		this.buildTreeNodes(this.toc, root);
 		final DefaultTreeModel mdl = new DefaultTreeModel(root);
 		this.tree.setModel(mdl);
 	}
 
-	private void buildTreeNodes(TableOfContents toc, DefaultMutableTreeNode node) {
+	private void buildTreeNodes(final TableOfContents toc, final DefaultMutableTreeNode node) {
 		if (toc.isDirectory()) {
-			for (TableOfContents child : toc.getEntries().values()) {
+			for (final TableOfContents child : toc.getEntries().values()) {
 				final DefaultMutableTreeNode cNode = new DefaultMutableTreeNode(child);
 				this.buildTreeNodes(child, cNode);
 				node.add(cNode);
@@ -513,7 +515,7 @@ public class ExtractorFrame extends JFrame {
 	private void ensureTabsCloseable() {
 		for (int i = 0; i < this.tabbed.getTabCount(); i++) {
 			if (!(this.tabbed.getTabComponentAt(i) instanceof TabCloseButton)) {
-				this.tabbed.setTabComponentAt(i, new TabCloseButton(tabbed, this.tabbed.getComponentAt(i)));
+				this.tabbed.setTabComponentAt(i, new TabCloseButton(this.tabbed, this.tabbed.getComponentAt(i)));
 			}
 		}
 	}
@@ -524,13 +526,13 @@ public class ExtractorFrame extends JFrame {
 
 	private void loadClassModel() throws StreamReadException, DatabindException, IOException {
 		if (this.settings.getClassModelUrl() == null) {
-			ClassModelSelectionDialog select = new ClassModelSelectionDialog();
+			final ClassModelSelectionDialog select = new ClassModelSelectionDialog();
 			select.setVisible(true);
 			this.settings.setClassModelUrl(select.getSelectedUrl());
 		}
 
 		this.classModel =
-				MAPPER.readValue(new URL(this.settings.getClassModelUrl()), new TypeReference<Map<String, NOBClazz>>() {
+				ExtractorFrame.MAPPER.readValue(new URL(this.settings.getClassModelUrl()), new TypeReference<Map<String, NOBClazz>>() {
 				});
 	}
 
@@ -538,8 +540,8 @@ public class ExtractorFrame extends JFrame {
 		return (DefaultTreeModel) this.tree.getModel();
 	}
 
-	private static File getOrCreateTempFile(TableOfContents toc, String extension) throws IOException {
-		File f = TEMP_EXPORT_CACHE.get(toc);
+	private static File getOrCreateTempFile(final TableOfContents toc, final String extension) throws IOException {
+		File f = ExtractorFrame.TEMP_EXPORT_CACHE.get(toc);
 
 		if (f != null) {
 			return f;
@@ -547,28 +549,28 @@ public class ExtractorFrame extends JFrame {
 
 		f = File.createTempFile(toc.getName(), extension);
 		f.deleteOnExit();
-		TEMP_EXPORT_CACHE.put(toc, f);
+		ExtractorFrame.TEMP_EXPORT_CACHE.put(toc, f);
 
 		return f;
 	}
 
 	private static class ExtractorClipboardOwner implements ClipboardOwner {
 		@Override
-		public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		public void lostOwnership(final Clipboard clipboard, final Transferable contents) {
 		}
 	}
 
 	private static class TabCloseButton extends JPanel {
 		private static final long serialVersionUID = 1L;
 
-		public TabCloseButton(JTabbedPane tabs, Component tabComp) {
+		public TabCloseButton(final JTabbedPane tabs, final Component tabComp) {
 			this.setLayout(new FlowLayout(FlowLayout.LEADING));
 			this.setOpaque(false);
 
-			JLabel lblTitle = new JLabel(tabs.getTitleAt(tabs.indexOfComponent(tabComp)));
+			final JLabel lblTitle = new JLabel(tabs.getTitleAt(tabs.indexOfComponent(tabComp)));
 			this.add(lblTitle);
 
-			JButton btnClose = new JButton();
+			final JButton btnClose = new JButton();
 			btnClose.setIcon(Icons.get("cross"));
 			btnClose.addActionListener(e -> tabs.removeTabAt(tabs.indexOfComponent(tabComp)));
 			this.add(btnClose);
@@ -579,8 +581,8 @@ public class ExtractorFrame extends JFrame {
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
-				boolean leaf, int row, boolean hasFocus) {
+		public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded,
+				final boolean leaf, final int row, final boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
 			final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;

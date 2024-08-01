@@ -32,20 +32,17 @@ public class JsonScriptGenerator {
 	private int generateJson(final List<ICommandCall> script, final int start, final ObjectNode node) {
 		for (int i = start; i < script.size(); i++) {
 			final ICommandCall call = script.get(i);
-			if (call instanceof NewCommandCall) {
-				final NewCommandCall newCall = (NewCommandCall) call;
+			if (call instanceof final NewCommandCall newCall) {
 				final ObjectNode newObject = this.mapper.createObjectNode();
 				newObject.put("@class", call.getClazz().getName());
 				i = this.generateJson(script, i + 1, newObject);
 				node.set(newCall.getVarName(), newObject);
-			} else if (call instanceof SelCommandCall) {
-				final SelCommandCall sel = (SelCommandCall) call;
+			} else if (call instanceof final SelCommandCall sel) {
 				if (!"..".equals(sel.getPath())) {
 					throw new UnsupportedOperationException("Sel path other than .. not supported");
 				}
 				return i;
-			} else if (call instanceof ClassCommandCall) {
-				final ClassCommandCall clsCall = (ClassCommandCall) call;
+			} else if (call instanceof final ClassCommandCall clsCall) {
 				final String prop = clsCall.getPrototype().getName();
 				final Object val = this.getValueForCall(clsCall);
 

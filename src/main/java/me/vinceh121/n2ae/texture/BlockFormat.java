@@ -6,17 +6,17 @@ import java.awt.image.BufferedImage;
 
 public enum BlockFormat {
 	NONE(0, 0, 0, 0),
-	RGB8(BufferedImage.TYPE_INT_RGB, GL_UNSIGNED_INT, GL_RGB, GL_RGB8UI),
+	RGB8(BufferedImage.TYPE_INT_RGB, GLConstants.GL_UNSIGNED_INT, GLConstants.GL_RGB, GLConstants.GL_RGB8UI),
 	/**
 	 * OpenGL: swap alpha
 	 */
-	ARGB8(BufferedImage.TYPE_INT_ARGB, GL_UNSIGNED_INT_8_8_8_8, GL_RGBA, GL_RGBA8UI),
-	RGB565(BufferedImage.TYPE_USHORT_565_RGB, GL_UNSIGNED_SHORT_5_6_5, GL_RGB, GL_RGB565),
+	ARGB8(BufferedImage.TYPE_INT_ARGB, GLConstants.GL_UNSIGNED_INT_8_8_8_8, GLConstants.GL_RGBA, GLConstants.GL_RGBA8UI),
+	RGB565(BufferedImage.TYPE_USHORT_565_RGB, GLConstants.GL_UNSIGNED_SHORT_5_6_5, GLConstants.GL_RGB, GLConstants.GL_RGB565),
 	/**
 	 * JavaImage: 16-bit ARGB with 4 bits per channel, need to convert to ARGB8
 	 * OpenGL: swap alpha
 	 */
-	ARGB4(BufferedImage.TYPE_INT_ARGB, GL_UNSIGNED_SHORT_4_4_4_4, GL_RGBA, GL_RGBA4);
+	ARGB4(BufferedImage.TYPE_INT_ARGB, GLConstants.GL_UNSIGNED_SHORT_4_4_4_4, GLConstants.GL_RGBA, GLConstants.GL_RGBA4);
 
 	private final int javaFormat, glType, glFormat, glInternalFormat;
 

@@ -70,7 +70,7 @@ public class Accessor {
 		this.normalized = normalized;
 	}
 
-	public static int getComponentTypeLength(int compType) {
+	public static int getComponentTypeLength(final int compType) {
 		switch (compType) {
 		case Accessor.UNSIGNED_INT:
 		case Accessor.FLOAT:

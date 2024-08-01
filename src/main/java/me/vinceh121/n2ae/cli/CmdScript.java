@@ -98,8 +98,8 @@ public class CmdScript implements Callable<Integer> {
 
 			if (this.clazzModel != null) {
 				final ObjectMapper mapper = new ObjectMapper();
-				final Map<String, NOBClazz> model = mapper.readValue(this.clazzModel,
-						new TypeReference<Map<String, NOBClazz>>() {
+				final Map<String, NOBClazz> model =
+						mapper.readValue(this.clazzModel, new TypeReference<Map<String, NOBClazz>>() {
 						});
 				parser.setClassModel(model);
 			}

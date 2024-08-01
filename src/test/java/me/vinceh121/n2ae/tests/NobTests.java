@@ -68,8 +68,8 @@ class NobTests {
 				new TypeReference<Map<String, NOBClazz>>() {
 				});
 
-		final String orig = new String(
-				NobTests.class.getClassLoader().getResourceAsStream("if_hilfe.tcl").readAllBytes());
+		final String orig =
+				new String(NobTests.class.getClassLoader().getResourceAsStream("if_hilfe.tcl").readAllBytes());
 
 		final IParser parse = new TCLParser();
 		parse.setClassModel(model);

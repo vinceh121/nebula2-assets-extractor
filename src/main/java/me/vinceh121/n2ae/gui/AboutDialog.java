@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 
 public class AboutDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -12,10 +13,10 @@ public class AboutDialog extends JDialog {
 		this.setTitle("About");
 		this.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		this.setModalityType(ModalityType.APPLICATION_MODAL);
-		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 
-		JTextArea text = new JTextArea();
+		final JTextArea text = new JTextArea();
 		text.setEditable(false);
 		// @formatter:off
 		text.setText("nebula2-assets-extractor Copyright (C) 2022-present vinceh121"

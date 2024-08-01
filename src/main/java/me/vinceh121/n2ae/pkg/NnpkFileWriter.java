@@ -53,7 +53,7 @@ public class NnpkFileWriter {
 		this.out.write(tocBuffer.toByteArray());
 		this.out.writeIntLE(NpkEntryType.DATA.getStartInt());
 		if (this.dataLength == -1) {
-			this.dataLength = calculateTableOfContentSize(this.tableOfContents);
+			this.dataLength = NnpkFileWriter.calculateTableOfContentSize(this.tableOfContents);
 		}
 		this.out.writeIntLE(this.dataLength);
 
@@ -131,7 +131,7 @@ public class NnpkFileWriter {
 		return this.tableOfContents;
 	}
 
-	public void setTableOfContents(TableOfContents tableOfContents) {
+	public void setTableOfContents(final TableOfContents tableOfContents) {
 		this.tableOfContents = tableOfContents;
 	}
 
@@ -143,11 +143,11 @@ public class NnpkFileWriter {
 		this.bufferSize = bufferSize;
 	}
 
-	public static int calculateTableOfContentSize(TableOfContents toc) {
+	public static int calculateTableOfContentSize(final TableOfContents toc) {
 		int size = 0;
 		if (toc.isDirectory()) {
-			for (TableOfContents child : toc.getEntries().values()) {
-				size += calculateTableOfContentSize(child);
+			for (final TableOfContents child : toc.getEntries().values()) {
+				size += NnpkFileWriter.calculateTableOfContentSize(child);
 			}
 		} else if (toc.isFile()) {
 			size += toc.getLength();
@@ -155,14 +155,14 @@ public class NnpkFileWriter {
 		return size;
 	}
 
-	public static void updateTableOfContentsOffsets(TableOfContents toc) {
-		updateTableOfContentsOffsets(toc, new AtomicInteger());
+	public static void updateTableOfContentsOffsets(final TableOfContents toc) {
+		NnpkFileWriter.updateTableOfContentsOffsets(toc, new AtomicInteger());
 	}
-	
-	private static void updateTableOfContentsOffsets(TableOfContents toc, AtomicInteger offset) {
+
+	private static void updateTableOfContentsOffsets(final TableOfContents toc, final AtomicInteger offset) {
 		if (toc.isDirectory()) {
-			for (TableOfContents child : toc.getEntries().values()) {
-				updateTableOfContentsOffsets(child, offset);
+			for (final TableOfContents child : toc.getEntries().values()) {
+				NnpkFileWriter.updateTableOfContentsOffsets(child, offset);
 			}
 		} else if (toc.isFile()) {
 			toc.setLength(toc.getData().length);

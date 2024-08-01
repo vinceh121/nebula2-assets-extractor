@@ -137,7 +137,7 @@ public class NtxFileReader {
 			out.write(raw);
 
 			// KTX textures need to be aligned to 4 bytes
-			final int alignmentPadding = ((raw.length + 3) & ~3) - raw.length;
+			final int alignmentPadding = (raw.length + 3 & ~3) - raw.length;
 			out.write(new byte[alignmentPadding]);
 		}
 	}

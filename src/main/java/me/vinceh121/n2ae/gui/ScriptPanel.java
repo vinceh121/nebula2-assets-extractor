@@ -50,7 +50,7 @@ public class ScriptPanel extends JPanel implements SearchListener {
 	private final ReplaceDialog replaceDialog;
 	private final ErrorStrip errorStrip;
 
-	public ScriptPanel(Map<String, NOBClazz> model, TableOfContents script) {
+	public ScriptPanel(final Map<String, NOBClazz> model, final TableOfContents script) {
 		this.script = script;
 		this.model = model;
 
@@ -64,13 +64,13 @@ public class ScriptPanel extends JPanel implements SearchListener {
 		this.text.requestFocusInWindow();
 
 		try {
-			Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/monokai.xml")).apply(text);
+			Theme.load(this.getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/monokai.xml")).apply(this.text);
 		} catch (final IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to apply theme: " + e);
 		}
 
-		this.scroll = new RTextScrollPane(text, true);
+		this.scroll = new RTextScrollPane(this.text, true);
 		this.add(this.scroll, BorderLayout.CENTER);
 
 		this.findDialog = new FindDialog((Dialog) null, this);
@@ -81,9 +81,9 @@ public class ScriptPanel extends JPanel implements SearchListener {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				try {
-					recompile();
+					ScriptPanel.this.recompile();
 				} catch (IOException | ParseException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
@@ -96,8 +96,8 @@ public class ScriptPanel extends JPanel implements SearchListener {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				findDialog.setVisible(true);
+			public void actionPerformed(final ActionEvent e) {
+				ScriptPanel.this.findDialog.setVisible(true);
 			}
 		});
 
@@ -108,15 +108,15 @@ public class ScriptPanel extends JPanel implements SearchListener {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				replaceDialog.setVisible(true);
+			public void actionPerformed(final ActionEvent e) {
+				ScriptPanel.this.replaceDialog.setVisible(true);
 			}
 		});
 
-		JToolBar bar = new JToolBar();
+		final JToolBar bar = new JToolBar();
 		this.add(bar, BorderLayout.NORTH);
 
-		JButton btnSave = new JButton("Recompile and save");
+		final JButton btnSave = new JButton("Recompile and save");
 		btnSave.addActionListener(e -> {
 			try {
 				this.recompile();
@@ -131,7 +131,7 @@ public class ScriptPanel extends JPanel implements SearchListener {
 		this.add(this.errorStrip, BorderLayout.EAST);
 
 		this.text.addParser(new RSTANebulaParser(model));
-		
+
 		try {
 			this.decompile();
 		} catch (IOException | ParseException e) {
@@ -141,12 +141,12 @@ public class ScriptPanel extends JPanel implements SearchListener {
 	}
 
 	private void recompile() throws IOException, ParseException {
-		IParser parser = new TCLParser();
+		final IParser parser = new TCLParser();
 		parser.setClassModel(this.model);
 		parser.read(this.text.getText());
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		NOBWriter writer = new NOBWriter();
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final NOBWriter writer = new NOBWriter();
 		writer.setHeader(parser.getHeader());
 		writer.setCalls(parser.getCalls());
 		writer.write(out);
@@ -155,12 +155,12 @@ public class ScriptPanel extends JPanel implements SearchListener {
 	}
 
 	private void decompile() throws IOException, ParseException {
-		NOBParser parser = new NOBParser();
+		final NOBParser parser = new NOBParser();
 		parser.setClassModel(this.model);
 		parser.read(this.script.getData());
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		TCLWriter writer = new TCLWriter();
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final TCLWriter writer = new TCLWriter();
 		writer.setHeader(parser.getHeader());
 		writer.setCalls(parser.getCalls());
 		writer.write(out);
@@ -170,29 +170,29 @@ public class ScriptPanel extends JPanel implements SearchListener {
 	}
 
 	@Override
-	public void searchEvent(SearchEvent e) {
-		SearchEvent.Type type = e.getType();
-		SearchContext context = e.getSearchContext();
+	public void searchEvent(final SearchEvent e) {
+		final SearchEvent.Type type = e.getType();
+		final SearchContext context = e.getSearchContext();
 		SearchResult result;
 
 		switch (type) {
 		case MARK_ALL:
-			result = SearchEngine.markAll(text, context);
+			result = SearchEngine.markAll(this.text, context);
 			break;
 		case FIND:
-			result = SearchEngine.find(text, context);
+			result = SearchEngine.find(this.text, context);
 			if (!result.wasFound() || result.isWrapped()) {
-				UIManager.getLookAndFeel().provideErrorFeedback(text);
+				UIManager.getLookAndFeel().provideErrorFeedback(this.text);
 			}
 			break;
 		case REPLACE:
-			result = SearchEngine.replace(text, context);
+			result = SearchEngine.replace(this.text, context);
 			if (!result.wasFound() || result.isWrapped()) {
-				UIManager.getLookAndFeel().provideErrorFeedback(text);
+				UIManager.getLookAndFeel().provideErrorFeedback(this.text);
 			}
 			break;
 		case REPLACE_ALL:
-			result = SearchEngine.replaceAll(text, context);
+			result = SearchEngine.replaceAll(this.text, context);
 			JOptionPane.showMessageDialog(null, result.getCount() + " occurrences replaced.");
 			break;
 		}

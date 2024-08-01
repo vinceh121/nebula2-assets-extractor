@@ -59,7 +59,7 @@ public class CmdFullExtract implements Callable<Integer> {
 
 		if (this.clazzModel != null) {
 			final ObjectMapper mapper = new ObjectMapper();
-			model = mapper.readValue(this.clazzModel, new TypeReference<Map<String, NOBClazz>>() {
+			this.model = mapper.readValue(this.clazzModel, new TypeReference<Map<String, NOBClazz>>() {
 			});
 		}
 
@@ -175,7 +175,7 @@ public class CmdFullExtract implements Callable<Integer> {
 	private void processScript(final File fileIn, final File fileOut) throws IOException, ParseException {
 		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
 			final IParser parser = new NOBParser();
-			parser.setClassModel(model);
+			parser.setClassModel(this.model);
 			parser.read(is);
 
 			final TCLWriter writer = new TCLWriter();
