@@ -168,6 +168,9 @@ public class ExtractorFrame extends JFrame {
 					case "nvx":
 						ExtractorFrame.this.openModel(sel);
 						break;
+					case "txt":
+						ExtractorFrame.this.openText(sel);
+						break;
 					default:
 						JOptionPane.showMessageDialog(null, "Cannot open file " + sel.getName());
 						break;
@@ -280,6 +283,12 @@ public class ExtractorFrame extends JFrame {
 
 	public void openScript(final TableOfContents toc) {
 		this.tabbed.addTab(toc.getName(), new ScriptPanel(this.classModel, toc));
+		this.ensureTabsCloseable();
+		this.selectLastTab();
+	}
+	
+	public void openText(final TableOfContents toc) {
+		this.tabbed.addTab(toc.getName(), new TextPanel(toc));
 		this.ensureTabsCloseable();
 		this.selectLastTab();
 	}
