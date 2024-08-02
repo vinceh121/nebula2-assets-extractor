@@ -37,9 +37,13 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 
 		final JMenuItem itmRename = new JMenuItem("Rename");
 		itmRename.addActionListener(e -> {
-			final String newName = JOptionPane.showInputDialog(null, "Rename \"" + this.toc.getName() + "\"", this.toc.getName());
-			this.toc.setName(newName);
-			model.nodeChanged(node);
+			final String newName =
+					JOptionPane.showInputDialog(null, "Rename \"" + this.toc.getName() + "\"", this.toc.getName());
+
+			if (newName != null) {
+				this.toc.setName(newName);
+				model.nodeChanged(node);
+			}
 		});
 		this.add(itmRename);
 

@@ -10,10 +10,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
@@ -40,7 +38,7 @@ import me.vinceh121.n2ae.script.nob.NOBWriter;
 import me.vinceh121.n2ae.script.tcl.TCLParser;
 import me.vinceh121.n2ae.script.tcl.TCLWriter;
 
-public class ScriptPanel extends JPanel implements SearchListener {
+public class ScriptPanel extends JPanel implements SearchListener, TabListener {
 	private static final long serialVersionUID = 1L;
 	private final RSyntaxTextArea text = new RSyntaxTextArea();
 	private final RTextScrollPane scroll;
@@ -64,7 +62,8 @@ public class ScriptPanel extends JPanel implements SearchListener {
 		this.text.requestFocusInWindow();
 
 		try {
-			Theme.load(this.getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/monokai.xml")).apply(this.text);
+			Theme.load(this.getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"))
+				.apply(this.text);
 		} catch (final IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to apply theme: " + e);
@@ -75,21 +74,6 @@ public class ScriptPanel extends JPanel implements SearchListener {
 
 		this.findDialog = new FindDialog((Dialog) null, this);
 		this.replaceDialog = new ReplaceDialog((Dialog) null, this);
-
-		this.text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), "save");
-		this.text.getActionMap().put("save", new AbstractAction() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				try {
-					ScriptPanel.this.recompile();
-				} catch (IOException | ParseException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
-				}
-			}
-		});
 
 		this.text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), "find");
 		this.text.getActionMap().put("find", new AbstractAction() {
@@ -112,20 +96,6 @@ public class ScriptPanel extends JPanel implements SearchListener {
 				ScriptPanel.this.replaceDialog.setVisible(true);
 			}
 		});
-
-		final JToolBar bar = new JToolBar();
-		this.add(bar, BorderLayout.NORTH);
-
-		final JButton btnSave = new JButton("Recompile and save");
-		btnSave.addActionListener(e -> {
-			try {
-				this.recompile();
-			} catch (IOException | ParseException e1) {
-				e1.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
-			}
-		});
-		bar.add(btnSave);
 
 		this.errorStrip = new ErrorStrip(this.text);
 		this.add(this.errorStrip, BorderLayout.EAST);
@@ -201,6 +171,21 @@ public class ScriptPanel extends JPanel implements SearchListener {
 	@Override
 	public String getSelectedText() {
 		return this.text.getSelectedText();
+	}
+
+	@Override
+	public void onBeforeSave() {
+		try {
+			ScriptPanel.this.recompile();
+		} catch (IOException | ParseException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
+		}
+	}
+	
+	@Override
+	public void onClose() {
+		this.onBeforeSave();
 	}
 
 	static {

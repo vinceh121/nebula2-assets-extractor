@@ -29,9 +29,12 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -87,6 +90,7 @@ public class ExtractorFrame extends JFrame {
 	private final JTabbedPane tabbed;
 	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
 	private final AboutDialog aboutDialog = new AboutDialog();
+	private final List<TabListener> listeners = new LinkedList<>();
 	private GuiSettings settings;
 	private File openedNpk;
 	private TableOfContents toc;
@@ -129,8 +133,8 @@ public class ExtractorFrame extends JFrame {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public String convertValueToText(final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row,
-					final boolean hasFocus) {
+			public String convertValueToText(final Object value, final boolean selected, final boolean expanded,
+					final boolean leaf, final int row, final boolean hasFocus) {
 				if (value instanceof DefaultMutableTreeNode
 						&& ((DefaultMutableTreeNode) value).getUserObject() instanceof TableOfContents) {
 					return ((TableOfContents) ((DefaultMutableTreeNode) value).getUserObject()).getName();
@@ -148,7 +152,8 @@ public class ExtractorFrame extends JFrame {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					final DefaultMutableTreeNode node = (DefaultMutableTreeNode) ExtractorFrame.this.tree.getLastSelectedPathComponent();
+					final DefaultMutableTreeNode node =
+							(DefaultMutableTreeNode) ExtractorFrame.this.tree.getLastSelectedPathComponent();
 					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 						return;
 					}
@@ -190,14 +195,16 @@ public class ExtractorFrame extends JFrame {
 
 			public void popup(final MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					final DefaultMutableTreeNode node = (DefaultMutableTreeNode) ExtractorFrame.this.tree.getLastSelectedPathComponent();
+					final DefaultMutableTreeNode node =
+							(DefaultMutableTreeNode) ExtractorFrame.this.tree.getLastSelectedPathComponent();
 
 					if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
 						return;
 					}
 
 					final TableOfContentPopupMenu pop =
-							new TableOfContentPopupMenu((DefaultTreeModel) ExtractorFrame.this.tree.getModel(), ExtractorFrame.this.tree.getSelectionPath());
+							new TableOfContentPopupMenu((DefaultTreeModel) ExtractorFrame.this.tree.getModel(),
+									ExtractorFrame.this.tree.getSelectionPath());
 					pop.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
@@ -282,13 +289,13 @@ public class ExtractorFrame extends JFrame {
 	}
 
 	public void openScript(final TableOfContents toc) {
-		this.tabbed.addTab(toc.getName(), new ScriptPanel(this.classModel, toc));
+		this.addTab(toc.getName(), new ScriptPanel(this.classModel, toc));
 		this.ensureTabsCloseable();
 		this.selectLastTab();
 	}
-	
+
 	public void openText(final TableOfContents toc) {
-		this.tabbed.addTab(toc.getName(), new TextPanel(toc));
+		this.addTab(toc.getName(), new TextPanel(toc));
 		this.ensureTabsCloseable();
 		this.selectLastTab();
 	}
@@ -302,7 +309,7 @@ public class ExtractorFrame extends JFrame {
 			throw new RuntimeException(e);
 		}
 
-		this.tabbed.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
+		this.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable();
 		this.selectLastTab();
 	}
@@ -327,6 +334,18 @@ public class ExtractorFrame extends JFrame {
 		}
 	}
 
+	private void addTab(String name, Component comp) {
+		this.addTab(name, null, comp);
+	}
+
+	private void addTab(String name, Icon icon, Component comp) {
+		if (comp instanceof TabListener listener) {
+			this.listeners.add(listener);
+		}
+
+		this.tabbed.addTab(name, icon, comp);
+	}
+
 	private void paste() {
 		try {
 			final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -336,6 +355,7 @@ public class ExtractorFrame extends JFrame {
 				// On Linux DataFlavor.javaFileListFlavor is broken as it reaches an unexpected
 				// \0 in the last URL, so we have to reinvent the wheel
 				final String[] files = ((String) clip.getData(ExtractorFrame.FLAVOR_FILE)).split("\n");
+
 				for (final String f : files) {
 					final File file = new File(new URI(f.strip().replace("\0", "")));
 					this.pasteFile(file);
@@ -426,6 +446,10 @@ public class ExtractorFrame extends JFrame {
 	}
 
 	public void saveNPK() {
+		for (TabListener listener : this.listeners) {
+			listener.onBeforeSave();
+		}
+
 		if (this.openedNpk == null) {
 			final JFileChooser fc = new JFileChooser();
 			fc.addChoosableFileFilter(ExtractorFrame.NPK_FILTER);
@@ -540,8 +564,8 @@ public class ExtractorFrame extends JFrame {
 			this.settings.setClassModelUrl(select.getSelectedUrl());
 		}
 
-		this.classModel =
-				ExtractorFrame.MAPPER.readValue(new URL(this.settings.getClassModelUrl()), new TypeReference<Map<String, NOBClazz>>() {
+		this.classModel = ExtractorFrame.MAPPER.readValue(new URL(this.settings.getClassModelUrl()),
+				new TypeReference<Map<String, NOBClazz>>() {
 				});
 	}
 
@@ -569,7 +593,7 @@ public class ExtractorFrame extends JFrame {
 		}
 	}
 
-	private static class TabCloseButton extends JPanel {
+	private class TabCloseButton extends JPanel {
 		private static final long serialVersionUID = 1L;
 
 		public TabCloseButton(final JTabbedPane tabs, final Component tabComp) {
@@ -581,7 +605,14 @@ public class ExtractorFrame extends JFrame {
 
 			final JButton btnClose = new JButton();
 			btnClose.setIcon(Icons.get("cross"));
-			btnClose.addActionListener(e -> tabs.removeTabAt(tabs.indexOfComponent(tabComp)));
+			btnClose.addActionListener(e -> {
+				tabs.removeTabAt(tabs.indexOfComponent(tabComp));
+
+				if (tabComp instanceof TabListener listener) {
+					listener.onClose();
+					listeners.remove(listener);
+				}
+			});
 			this.add(btnClose);
 		}
 	}
@@ -590,8 +621,8 @@ public class ExtractorFrame extends JFrame {
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded,
-				final boolean leaf, final int row, final boolean hasFocus) {
+		public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel,
+				final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
 			final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;

@@ -28,7 +28,7 @@ import org.fife.ui.rtextarea.SearchResult;
 
 import me.vinceh121.n2ae.pkg.TableOfContents;
 
-public class TextPanel extends JPanel implements SearchListener {
+public class TextPanel extends JPanel implements SearchListener, TabListener {
 	private static final long serialVersionUID = 1L;
 	private static final Charset ASCII = Charset.forName("US-ASCII");
 	private final RSyntaxTextArea text = new RSyntaxTextArea();
@@ -63,16 +63,6 @@ public class TextPanel extends JPanel implements SearchListener {
 		this.replaceDialog = new ReplaceDialog((Dialog) null, this);
 		this.errorStrip = new ErrorStrip(this.text);
 		this.add(this.errorStrip, BorderLayout.EAST);
-
-		this.text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), "save");
-		this.text.getActionMap().put("save", new AbstractAction() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				textFile.setData(TextPanel.this.text.getText().getBytes(ASCII));
-			}
-		});
 
 		this.text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), "find");
 		this.text.getActionMap().put("find", new AbstractAction() {
@@ -135,5 +125,15 @@ public class TextPanel extends JPanel implements SearchListener {
 
 	public void load() {
 		this.text.setText(new String(this.textFile.getData(), ASCII));
+	}
+	
+	@Override
+	public void onBeforeSave() {
+		textFile.setData(TextPanel.this.text.getText().getBytes(ASCII));
+	}
+	
+	@Override
+	public void onClose() {
+		this.onBeforeSave();
 	}
 }
