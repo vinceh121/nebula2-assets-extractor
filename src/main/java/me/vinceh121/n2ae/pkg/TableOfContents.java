@@ -1,5 +1,8 @@
 package me.vinceh121.n2ae.pkg;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -8,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class TableOfContents {
+public class TableOfContents implements Serializable {
+	private static final long serialVersionUID = -3528403199997622881L;
 	private final Map<String, TableOfContents> entries = new LinkedHashMap<>();
 	private boolean directory, file;
 	private int offset, length;
@@ -25,8 +29,11 @@ public class TableOfContents {
 		this.offset = from.offset;
 		this.length = from.length;
 		this.name = from.name;
-		this.data = new byte[from.data.length];
-		System.arraycopy(from.data, 0, this.data, 0, from.data.length);
+
+		if (from.data != null) {
+			this.data = new byte[from.data.length];
+			System.arraycopy(from.data, 0, this.data, 0, from.data.length);
+		}
 	}
 
 	@Override
@@ -36,9 +43,11 @@ public class TableOfContents {
 
 	public TableOfContents deepClone() {
 		final TableOfContents clone = this.clone();
+
 		for (final String key : clone.entries.keySet()) {
 			clone.entries.put(key, clone.entries.get(key).deepClone());
 		}
+
 		return clone;
 	}
 
@@ -103,7 +112,8 @@ public class TableOfContents {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(this.data);
-		result = prime * result + Objects.hash(this.directory, this.entries, this.file, this.length, this.name, this.offset);
+		result = prime * result
+				+ Objects.hash(this.directory, this.entries, this.file, this.length, this.name, this.offset);
 		return result;
 	}
 
@@ -119,9 +129,9 @@ public class TableOfContents {
 			return false;
 		}
 		final TableOfContents other = (TableOfContents) obj;
-		return Arrays.equals(this.data, other.data) && this.directory == other.directory && Objects.equals(this.entries, other.entries)
-				&& this.file == other.file && this.length == other.length && Objects.equals(this.name, other.name)
-				&& this.offset == other.offset;
+		return Arrays.equals(this.data, other.data) && this.directory == other.directory
+				&& Objects.equals(this.entries, other.entries) && this.file == other.file && this.length == other.length
+				&& Objects.equals(this.name, other.name) && this.offset == other.offset;
 	}
 
 	public TableOfContents get(final Iterable<String> path) {
@@ -179,7 +189,7 @@ public class TableOfContents {
 
 	@Override
 	public String toString() {
-		return "TableOfContents [directory=" + this.directory + ", file=" + this.file + ", offset=" + this.offset + ", length="
-				+ this.length + ", name=" + this.name + ", data=" + Arrays.toString(this.data) + "]";
+		return "TableOfContents [directory=" + this.directory + ", file=" + this.file + ", offset=" + this.offset
+				+ ", length=" + this.length + ", name=" + this.name + ", data=" + Arrays.toString(this.data) + "]";
 	}
 }

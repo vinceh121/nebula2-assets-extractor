@@ -53,7 +53,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
@@ -377,8 +376,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	private void paste() {
 		try {
 			final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+
 			if (clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
-				this.pasteInternal((TOCTransferable) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR));
+				final Object data = clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
+
+				if (data instanceof TableOfContents toc) {
+					this.pasteInternal(toc);
+				}
 			} else if (clip.isDataFlavorAvailable(ExtractorFrame.FLAVOR_FILE)) {
 				// On Linux DataFlavor.javaFileListFlavor is broken as it reaches an unexpected
 				// \0 in the last URL, so we have to reinvent the wheel
@@ -392,6 +396,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				JOptionPane.showMessageDialog(null,
 						"Don't know how to handle mimetype " + Arrays.toString(clip.getAvailableDataFlavors()));
 			}
+
 		} catch (URISyntaxException | UnsupportedFlavorException | IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Failed to paste: " + e);
@@ -424,25 +429,21 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private void pasteInternal(final TOCTransferable trans) {
+	private void pasteInternal(final TableOfContents toc) {
+		final DefaultMutableTreeNode node = new DefaultMutableTreeNode(toc);
+
 		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 
 		if (selToc.isDirectory()) { // selected path is a dir, insert inside
-			this.getTreeModel()
-				.insertNodeInto(trans.getNode(),
-						selNode,
-						this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
-			selToc.getEntries().put(trans.getToc().getName(), trans.getToc());
+			selToc.getEntries().put(toc.getName(), toc);
 		} else if (selToc.isFile()) { // selected path is file, insert as sibling
 			final DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
 			final TableOfContents selTocParent = (TableOfContents) selParent.getUserObject();
-			this.getTreeModel()
-				.insertNodeInto(trans.getNode(),
-						selParent,
-						this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
-			selTocParent.getEntries().put(trans.getToc().getName(), trans.getToc());
+			selTocParent.getEntries().put(toc.getName(), toc);
 		}
+
+		this.updateTreeModel();
 	}
 
 	private void cut() {
@@ -461,11 +462,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 	private TOCTransferable makeTocTransferable() {
 		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-		if (node == null || !(node.getUserObject() instanceof TableOfContents)) {
+
+		if (node != null && node instanceof DefaultMutableTreeNode mnode
+				&& mnode.getUserObject() instanceof TableOfContents toc) {
+			return new TOCTransferable(toc.deepClone());
+		} else {
 			throw new IllegalStateException();
 		}
-
-		return new TOCTransferable((TableOfContents) node.getUserObject(), node);
 	}
 
 	private DefaultMutableTreeNode getSelectedNode() {

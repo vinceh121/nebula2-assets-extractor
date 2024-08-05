@@ -8,19 +8,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 
 public class TOCTransferable implements Transferable {
-	public static final DataFlavor NPK_CHILD_FLAVOR = new DataFlavor("application/nebula.npk.child", "NPK0 child");
+	public static final DataFlavor NPK_CHILD_FLAVOR = new DataFlavor(TableOfContents.class, "NPK0 child");
 	private final TableOfContents toc;
-	private final DefaultMutableTreeNode node;
 
-	public TOCTransferable(final TableOfContents toc, final DefaultMutableTreeNode node) {
+	public TOCTransferable(final TableOfContents toc) {
 		this.toc = toc;
-		this.node = node;
 	}
 
 	@Override
@@ -38,7 +34,9 @@ public class TOCTransferable implements Transferable {
 		if (TOCTransferable.NPK_CHILD_FLAVOR.equals(flavor)) {
 			return this.toc;
 		} else if (DataFlavor.javaFileListFlavor.equals(flavor)) {
-			final File f = new File(System.getProperty("java.io.tmpdir") + "/" + this.toc.getName());
+			final File f = new File(System.getProperty("java.io.tmpdir") + "/" + this.toc.getName()); // FIXME cross
+																										// platform file
+																										// separator
 			f.deleteOnExit();
 			final NnpkInMemoryFileExtractor ext = new NnpkInMemoryFileExtractor(f);
 			ext.write(this.toc);
@@ -53,9 +51,5 @@ public class TOCTransferable implements Transferable {
 
 	public TableOfContents getToc() {
 		return this.toc;
-	}
-
-	public DefaultMutableTreeNode getNode() {
-		return this.node;
 	}
 }
