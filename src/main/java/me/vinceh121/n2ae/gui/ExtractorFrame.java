@@ -461,8 +461,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	private TOCTransferable makeTocTransferable() {
 		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 
-		if (node != null && node instanceof DefaultMutableTreeNode mnode
-				&& mnode.getUserObject() instanceof TableOfContents toc) {
+		if (node != null && node.getUserObject() instanceof TableOfContents toc) {
 			return new TOCTransferable(toc.deepClone());
 		} else {
 			throw new IllegalStateException();
