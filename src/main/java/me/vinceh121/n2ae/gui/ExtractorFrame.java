@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,12 +27,15 @@ import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.Icon;
@@ -49,12 +53,21 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+
+import org.fife.rsta.ui.search.FindDialog;
+import org.fife.rsta.ui.search.SearchEvent;
+import org.fife.rsta.ui.search.SearchListener;
+import org.fife.ui.rtextarea.SearchContext;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -67,10 +80,13 @@ import me.vinceh121.n2ae.pkg.NnpkFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.script.NOBClazz;
+import me.vinceh121.n2ae.script.ParseException;
+import me.vinceh121.n2ae.script.nob.NOBParser;
+import me.vinceh121.n2ae.script.tcl.TCLWriter;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 import me.vinceh121.wanderer.launcher.pntheme.PnDarkLaf;
 
-public class ExtractorFrame extends JFrame {
+public class ExtractorFrame extends JFrame implements SearchListener {
 	private static final long serialVersionUID = 1L;
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final Map<TableOfContents, File> TEMP_EXPORT_CACHE = new HashMap<>();
@@ -91,6 +107,7 @@ public class ExtractorFrame extends JFrame {
 	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
 	private final AboutDialog aboutDialog = new AboutDialog();
 	private final List<TabListener> listeners = new LinkedList<>();
+	private final FindDialog searchAllDialog = new FindDialog(this, this);
 	private GuiSettings settings;
 	private File openedNpk;
 	private TableOfContents toc;
@@ -135,9 +152,9 @@ public class ExtractorFrame extends JFrame {
 			@Override
 			public String convertValueToText(final Object value, final boolean selected, final boolean expanded,
 					final boolean leaf, final int row, final boolean hasFocus) {
-				if (value instanceof DefaultMutableTreeNode
-						&& ((DefaultMutableTreeNode) value).getUserObject() instanceof TableOfContents) {
-					return ((TableOfContents) ((DefaultMutableTreeNode) value).getUserObject()).getName();
+				if (value instanceof DefaultMutableTreeNode node
+						&& node.getUserObject() instanceof TableOfContents toc) {
+					return toc.getName();
 				} else {
 					return super.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
 				}
@@ -263,10 +280,19 @@ public class ExtractorFrame extends JFrame {
 		mnEdit.add(mntCut);
 
 		final JMenuItem mntPaste = new JMenuItem("Paste");
-		mntCut.setMnemonic('p');
+		mntPaste.setMnemonic('p');
 		mntPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
 		mntPaste.addActionListener(e -> this.paste());
 		mnEdit.add(mntPaste);
+
+		mnEdit.addSeparator();
+
+		final JMenuItem mntSearchAll = new JMenuItem("Search all");
+		mntSearchAll.setMnemonic('a');
+		mntSearchAll.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK));
+		mntSearchAll.addActionListener(e -> this.searchAll());
+		mnEdit.add(mntSearchAll);
 
 		final JMenu mnHelp = new JMenu("Help");
 		bar.add(mnHelp);
@@ -274,6 +300,7 @@ public class ExtractorFrame extends JFrame {
 		final JMenuItem mntWiki = new JMenuItem("Wiki");
 		mntWiki.addActionListener(e -> {
 			final String uri = "https://github.com/vinceh121/nebula2-assets-extractor/wiki";
+
 			try {
 				Desktop.getDesktop().browse(new URI(uri));
 			} catch (final Exception e1) {
@@ -302,6 +329,7 @@ public class ExtractorFrame extends JFrame {
 
 	public void openTexture(final TableOfContents toc) {
 		final NtxFileReader read = new NtxFileReader(new ByteArrayInputStream(toc.getData()));
+
 		try {
 			read.readHeader();
 			read.readAllTextures();
@@ -438,6 +466,93 @@ public class ExtractorFrame extends JFrame {
 		}
 
 		return new TOCTransferable((TableOfContents) node.getUserObject(), node);
+	}
+
+	private DefaultMutableTreeNode getSelectedNode() {
+		return (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+	}
+
+	private void searchAll() {
+		this.searchAllDialog.setVisible(true);
+	}
+
+	@Override
+	public void searchEvent(final SearchEvent e) {
+		if (e.getType() != SearchEvent.Type.FIND) {
+			return;
+		}
+
+		final SearchContext ctx = e.getSearchContext();
+		final List<TableOfContents> flat = this.toc.flatten();
+
+		final int skip;
+		if (this.getSelectedNode() != null) {
+			skip = flat.indexOf(this.getSelectedNode().getUserObject());
+		} else {
+			skip = 0;
+		}
+
+		final Optional<TOCText> optNextToc = flat.stream()
+			.skip(skip)
+			.filter(toc -> toc.isFile() && (toc.getName().endsWith(".n") || toc.getName().endsWith(".txt")))
+			.map(toc -> {
+				final String text;
+
+				if (toc.getName().endsWith(".n")) {
+					try {
+						final NOBParser parser = new NOBParser();
+						parser.setClassModel(this.classModel);
+						parser.read(toc.getData());
+
+						final ByteArrayOutputStream out = new ByteArrayOutputStream();
+						final TCLWriter writer = new TCLWriter();
+						writer.setHeader(parser.getHeader());
+						writer.setCalls(parser.getCalls());
+						writer.write(out);
+
+						text = new String(out.toByteArray());
+					} catch (IOException | ParseException ex) {
+						throw new RuntimeException(ex);
+					}
+				} else {
+					text = new String(toc.getData(), Charset.forName("US-ASCII"));
+				}
+
+				return new TOCText(toc, text);
+			})
+			.filter(t -> t.text.contains(ctx.getSearchFor()))
+			.findFirst();
+
+		if (optNextToc.isPresent()) {
+			System.out.println(optNextToc.get().toc.getName());
+
+			final DefaultMutableTreeNode nextNode = this.nodeForToc(optNextToc.get().toc);
+			final TreePath path = new TreePath(nextNode.getPath());
+			this.tree.setSelectionPath(path);
+			this.tree.scrollPathToVisible(path);
+		} else {
+			UIManager.getLookAndFeel().provideErrorFeedback(this);
+		}
+	}
+
+	private DefaultMutableTreeNode nodeForToc(TableOfContents toc) {
+		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.tree.getModel().getRoot();
+		final Enumeration<TreeNode> enu = root.preorderEnumeration();
+
+		while (enu.hasMoreElements()) {
+			final DefaultMutableTreeNode node = (DefaultMutableTreeNode) enu.nextElement();
+
+			if (node.getUserObject() == toc) {
+				return node;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getSelectedText() {
+		return null;
 	}
 
 	public void saveAsNPK() {
@@ -585,6 +700,9 @@ public class ExtractorFrame extends JFrame {
 		ExtractorFrame.TEMP_EXPORT_CACHE.put(toc, f);
 
 		return f;
+	}
+
+	private record TOCText(TableOfContents toc, String text) {
 	}
 
 	private static class ExtractorClipboardOwner implements ClipboardOwner {
