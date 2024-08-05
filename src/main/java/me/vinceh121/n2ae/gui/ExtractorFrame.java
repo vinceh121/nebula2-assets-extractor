@@ -430,8 +430,6 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	}
 
 	private void pasteInternal(final TableOfContents toc) {
-		final DefaultMutableTreeNode node = new DefaultMutableTreeNode(toc);
-
 		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 

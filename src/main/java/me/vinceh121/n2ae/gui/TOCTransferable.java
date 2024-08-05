@@ -6,6 +6,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
@@ -34,9 +35,7 @@ public class TOCTransferable implements Transferable {
 		if (TOCTransferable.NPK_CHILD_FLAVOR.equals(flavor)) {
 			return this.toc;
 		} else if (DataFlavor.javaFileListFlavor.equals(flavor)) {
-			final File f = new File(System.getProperty("java.io.tmpdir") + "/" + this.toc.getName()); // FIXME cross
-																										// platform file
-																										// separator
+			final File f = Path.of(System.getProperty("java.io.tmpdir"), this.toc.getName()).toFile();
 			f.deleteOnExit();
 			final NnpkInMemoryFileExtractor ext = new NnpkInMemoryFileExtractor(f);
 			ext.write(this.toc);
