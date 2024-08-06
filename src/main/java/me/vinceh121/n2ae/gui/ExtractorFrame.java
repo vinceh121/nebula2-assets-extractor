@@ -15,6 +15,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -53,6 +55,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
@@ -90,6 +93,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final Map<TableOfContents, File> TEMP_EXPORT_CACHE = new HashMap<>();
 	private static final DataFlavor FLAVOR_FILE = new DataFlavor("text/uri-list;class=java.lang.String", "file list");
+	private static final DataFlavor TAB_FLAVOR = new DataFlavor(TabInfo.class, "N2AE Tab");
 	private static final FileFilter NPK_FILTER = new FileFilter() {
 		@Override
 		public String getDescription() {
@@ -228,6 +232,17 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		split.setLeftComponent(new JScrollPane(this.tree));
 
 		this.tabbed = new JTabbedPane();
+		this.tabbed.setTransferHandler(new TabTransferHandler());
+		this.tabbed.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				final int idx = tabbed.indexAtLocation(e.getX(), e.getY());
+
+				if (idx != -1) {
+					tabbed.getTransferHandler().exportAsDrag(tabbed, e, TransferHandler.MOVE);
+				}
+			}
+		});
 		split.setRightComponent(this.tabbed);
 
 		final JMenuBar bar = new JMenuBar();
@@ -703,6 +718,86 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	}
 
 	private record TOCText(TableOfContents toc, String text) {
+	}
+
+	private record TabInfo(Component page, String title) {
+	}
+
+	private static class TabTransferHandler extends TransferHandler {
+		private static final long serialVersionUID = 27243515377511540L;
+
+		@Override
+		protected Transferable createTransferable(JComponent c) {
+			if (c instanceof JTabbedPane tabs) {
+				return new TabTransferable(
+						new TabInfo(tabs.getSelectedComponent(), tabs.getTitleAt(tabs.getSelectedIndex())));
+			}
+
+			return null;
+		}
+
+		@Override
+		public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+			boolean hasFlavor = false;
+
+			for (final DataFlavor df : transferFlavors) {
+				if (TAB_FLAVOR.equals(df)) {
+					hasFlavor = true;
+				}
+			}
+
+			return comp instanceof JTabbedPane && hasFlavor;
+		}
+
+		@Override
+		public boolean importData(JComponent comp, Transferable t) {
+			if (comp instanceof JTabbedPane other && t.isDataFlavorSupported(TAB_FLAVOR)) {
+				try {
+					final TabInfo info = (TabInfo) t.getTransferData(TAB_FLAVOR);
+					other.addTab(info.title(), info.page());
+
+					return true;
+				} catch (UnsupportedFlavorException | IOException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, e);
+				}
+			}
+
+			return super.importData(comp, t);
+		}
+
+		@Override
+		public int getSourceActions(JComponent c) {
+			return MOVE;
+		}
+	}
+
+	private static class TabTransferable implements Transferable {
+		private final TabInfo tabInfo;
+
+		public TabTransferable(TabInfo tabInfo) {
+			this.tabInfo = tabInfo;
+		}
+
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] { TAB_FLAVOR };
+		}
+
+		@Override
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return TAB_FLAVOR.equals(flavor);
+		}
+
+		@Override
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+			if (TAB_FLAVOR.equals(flavor)) {
+				return this.tabInfo;
+			}
+
+			throw new UnsupportedFlavorException(flavor);
+		}
+
 	}
 
 	private static class ExtractorClipboardOwner implements ClipboardOwner {
