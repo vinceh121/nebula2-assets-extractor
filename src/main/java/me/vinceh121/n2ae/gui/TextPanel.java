@@ -20,6 +20,7 @@ import org.fife.rsta.ui.search.SearchEvent;
 import org.fife.rsta.ui.search.SearchListener;
 import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.SearchContext;
@@ -47,6 +48,10 @@ public class TextPanel extends JPanel implements SearchListener, TabListener {
 		this.text.setMarkOccurrences(true);
 		this.text.setCodeFoldingEnabled(true);
 		this.text.requestFocusInWindow();
+
+		if (textFile.getName().endsWith(".tcl")) {
+			this.text.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_TCL);
+		}
 
 		try {
 			Theme.load(this.getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"))
@@ -126,12 +131,12 @@ public class TextPanel extends JPanel implements SearchListener, TabListener {
 	public void load() {
 		this.text.setText(new String(this.textFile.getData(), ASCII));
 	}
-	
+
 	@Override
 	public void onBeforeSave() {
 		textFile.setData(TextPanel.this.text.getText().getBytes(ASCII));
 	}
-	
+
 	@Override
 	public void onClose() {
 		this.onBeforeSave();

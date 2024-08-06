@@ -197,7 +197,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 					case "nvx":
 						ExtractorFrame.this.openModel(sel);
 						break;
-					case "txt":
+					case "txt", "tcl":
 						ExtractorFrame.this.openText(sel);
 						break;
 					default:
