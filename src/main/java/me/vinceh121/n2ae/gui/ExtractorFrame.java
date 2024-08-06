@@ -41,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -105,12 +106,15 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			return f.getName().endsWith(".npk") || f.isDirectory();
 		}
 	};
+	private final TabTransferHandler tabTransferHandler = new TabTransferHandler();
 	private final JTree tree;
+	private final JSplitPane editorSplit;
 	private final JTabbedPane tabbed;
 	private final ExtractorClipboardOwner clipboardOwner = new ExtractorClipboardOwner();
 	private final AboutDialog aboutDialog = new AboutDialog();
 	private final List<TabListener> listeners = new LinkedList<>();
 	private final FindDialog searchAllDialog = new FindDialog(this, this);
+	private JTabbedPane secondTab;
 	private GuiSettings settings;
 	private File openedNpk;
 	private TableOfContents toc;
@@ -231,19 +235,15 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		});
 		split.setLeftComponent(new JScrollPane(this.tree));
 
-		this.tabbed = new JTabbedPane();
-		this.tabbed.setTransferHandler(new TabTransferHandler());
-		this.tabbed.addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				final int idx = tabbed.indexAtLocation(e.getX(), e.getY());
+		this.editorSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		this.editorSplit.setResizeWeight(0.5);
+		this.editorSplit.setOneTouchExpandable(true);
+		split.setRightComponent(this.editorSplit);
 
-				if (idx != -1) {
-					tabbed.getTransferHandler().exportAsDrag(tabbed, e, TransferHandler.MOVE);
-				}
-			}
-		});
-		split.setRightComponent(this.tabbed);
+		this.tabbed = new JTabbedPane();
+		this.tabbed.setTransferHandler(tabTransferHandler);
+		this.tabbed.addMouseMotionListener(new TabbedDNDMouseListener());
+		this.editorSplit.setLeftComponent(this.tabbed);
 
 		final JMenuBar bar = new JMenuBar();
 		this.setJMenuBar(bar);
@@ -308,6 +308,23 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		mntSearchAll.addActionListener(e -> this.searchAll());
 		mnEdit.add(mntSearchAll);
 
+		final JMenu mnView = new JMenu("View");
+		bar.add(mnView);
+
+		final JCheckBoxMenuItem mncSplit = new JCheckBoxMenuItem("Split");
+		mncSplit.addActionListener(e -> {
+			if (mncSplit.isSelected()) {
+				this.secondTab = new JTabbedPane(JTabbedPane.TOP);
+				this.secondTab.setTransferHandler(tabTransferHandler);
+				this.secondTab.addMouseMotionListener(new TabbedDNDMouseListener());
+				this.editorSplit.setRightComponent(this.secondTab);
+			} else {
+				this.secondTab = null;
+				this.editorSplit.setRightComponent(null);
+			}
+		});
+		mnView.add(mncSplit);
+
 		final JMenu mnHelp = new JMenu("Help");
 		bar.add(mnHelp);
 
@@ -331,13 +348,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 	public void openScript(final TableOfContents toc) {
 		this.addTab(toc.getName(), new ScriptPanel(this.classModel, toc));
-		this.ensureTabsCloseable();
+		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
 
 	public void openText(final TableOfContents toc) {
 		this.addTab(toc.getName(), new TextPanel(toc));
-		this.ensureTabsCloseable();
+		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
 
@@ -352,7 +369,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 
 		this.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
-		this.ensureTabsCloseable();
+		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
 
@@ -675,10 +692,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private void ensureTabsCloseable() {
-		for (int i = 0; i < this.tabbed.getTabCount(); i++) {
-			if (!(this.tabbed.getTabComponentAt(i) instanceof TabCloseButton)) {
-				this.tabbed.setTabComponentAt(i, new TabCloseButton(this.tabbed, this.tabbed.getComponentAt(i)));
+	private void ensureTabsCloseable(final JTabbedPane tabs) {
+		for (int i = 0; i < tabs.getTabCount(); i++) {
+			if (!(tabs.getTabComponentAt(i) instanceof TabCloseButton)) {
+				tabs.setTabComponentAt(i, new TabCloseButton(this, tabs, tabs.getComponentAt(i)));
 			}
 		}
 	}
@@ -723,7 +740,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	private record TabInfo(Component page, String title) {
 	}
 
-	private static class TabTransferHandler extends TransferHandler {
+	private class TabTransferHandler extends TransferHandler {
 		private static final long serialVersionUID = 27243515377511540L;
 
 		@Override
@@ -755,6 +772,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				try {
 					final TabInfo info = (TabInfo) t.getTransferData(TAB_FLAVOR);
 					other.addTab(info.title(), info.page());
+					ensureTabsCloseable(other);
 
 					return true;
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -772,6 +790,18 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
+	private static class TabbedDNDMouseListener extends MouseMotionAdapter {
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			final JTabbedPane tabbed = (JTabbedPane) e.getComponent();
+			final int idx = tabbed.indexAtLocation(e.getX(), e.getY());
+
+			if (idx != -1) {
+				tabbed.getTransferHandler().exportAsDrag(tabbed, e, TransferHandler.MOVE);
+			}
+		}
+	}
+	
 	private static class TabTransferable implements Transferable {
 		private final TabInfo tabInfo;
 
@@ -806,10 +836,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private class TabCloseButton extends JPanel {
+	private static class TabCloseButton extends JPanel {
 		private static final long serialVersionUID = 1L;
 
-		public TabCloseButton(final JTabbedPane tabs, final Component tabComp) {
+		public TabCloseButton(final ExtractorFrame frame, final JTabbedPane tabs, final Component tabComp) {
 			this.setLayout(new FlowLayout(FlowLayout.LEADING));
 			this.setOpaque(false);
 
@@ -823,7 +853,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 				if (tabComp instanceof TabListener listener) {
 					listener.onClose();
-					listeners.remove(listener);
+					frame.listeners.remove(listener);
 				}
 			});
 			this.add(btnClose);
