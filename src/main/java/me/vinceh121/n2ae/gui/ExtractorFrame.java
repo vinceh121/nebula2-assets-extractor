@@ -79,6 +79,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import me.vinceh121.n2ae.gui.Icons.Name;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
@@ -146,7 +147,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 		this.setTitle("Nebula 2 Assets Extractor");
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.setIconImage(Icons.getImage("bricks"));
+		this.setIconImage(Icons.getImage(Name.BRICKS));
 		this.setSize(800, 700);
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setLayout(new BorderLayout());
@@ -349,13 +350,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	}
 
 	public void openScript(final TableOfContents toc) {
-		this.addTab(this.fullPathForNode(toc), new ScriptPanel(this.classModel, toc));
+		this.addTab(this.fullPathForNode(toc), Icons.get(Name.SCRIPT), new ScriptPanel(this.classModel, toc));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
 
 	public void openText(final TableOfContents toc) {
-		this.addTab(this.fullPathForNode(toc), new TextPanel(toc));
+		this.addTab(this.fullPathForNode(toc), Icons.get(Name.PAGE_WHITE_TEXT), new TextPanel(toc));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
@@ -370,7 +371,9 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			throw new RuntimeException(e);
 		}
 
-		this.addTab(this.fullPathForNode(toc), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
+		this.addTab(this.fullPathForNode(toc),
+				Icons.get(Name.IMAGE),
+				new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
@@ -393,10 +396,6 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
 		}
-	}
-
-	private void addTab(String name, Component comp) {
-		this.addTab(name, null, comp);
 	}
 
 	private void addTab(String name, Icon icon, Component comp) {
@@ -855,11 +854,15 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			this.setLayout(new FlowLayout(FlowLayout.LEADING));
 			this.setOpaque(false);
 
-			final JLabel lblTitle = new JLabel(tabs.getTitleAt(tabs.indexOfComponent(tabComp)));
+			final int idx = tabs.indexOfComponent(tabComp);
+
+			final JLabel lblTitle = new JLabel(tabs.getTitleAt(idx));
+			lblTitle.setIcon(tabs.getIconAt(idx));
 			this.add(lblTitle);
 
 			final JButton btnClose = new JButton();
-			btnClose.setIcon(Icons.get("cross"));
+			btnClose.putClientProperty("JButton.buttonType", "borderless");
+			btnClose.setIcon(Icons.get(Name.CROSS));
 			btnClose.addActionListener(e -> {
 				tabs.removeTabAt(tabs.indexOfComponent(tabComp));
 
@@ -889,27 +892,27 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			this.setText(toc.getName());
 
 			if (toc.isDirectory()) {
-				this.setIcon(Icons.get("folder"));
+				this.setIcon(Icons.get(Name.FOLDER));
 			} else if (toc.isFile()) {
 				final String ext = toc.getName().substring(toc.getName().lastIndexOf('.') + 1);
 				switch (ext) {
 				case "ntx":
-					this.setIcon(Icons.get("image"));
+					this.setIcon(Icons.get(Name.IMAGE));
 					break;
 				case "n":
-					this.setIcon(Icons.get("script"));
+					this.setIcon(Icons.get(Name.SCRIPT));
 					break;
 				case "nvx":
-					this.setIcon(Icons.get("database"));
+					this.setIcon(Icons.get(Name.DATABASE));
 					break;
 				case "nax":
-					this.setIcon(Icons.get("chart_line"));
+					this.setIcon(Icons.get(Name.CHART_LINE));
 					break;
-				case "txt":
-					this.setIcon(Icons.get("page_white_text"));
+				case "txt", "tcl":
+					this.setIcon(Icons.get(Name.PAGE_WHITE_TEXT));
 					break;
 				default:
-					this.setIcon(Icons.get("page_white_error"));
+					this.setIcon(Icons.get(Name.PAGE_WHITE_ERROR));
 					break;
 				}
 			}
