@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -347,13 +349,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	}
 
 	public void openScript(final TableOfContents toc) {
-		this.addTab(toc.getName(), new ScriptPanel(this.classModel, toc));
+		this.addTab(this.fullPathForNode(toc), new ScriptPanel(this.classModel, toc));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
 
 	public void openText(final TableOfContents toc) {
-		this.addTab(toc.getName(), new TextPanel(toc));
+		this.addTab(this.fullPathForNode(toc), new TextPanel(toc));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
@@ -368,7 +370,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			throw new RuntimeException(e);
 		}
 
-		this.addTab(toc.getName(), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
+		this.addTab(this.fullPathForNode(toc), Icons.get("image"), new TexturePanel(read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}
@@ -720,6 +722,16 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		return (DefaultTreeModel) this.tree.getModel();
 	}
 
+	private String fullPathForNode(final TableOfContents toc) {
+		return fullPathForNode(this.nodeForToc(toc));
+	}
+
+	private static String fullPathForNode(final DefaultMutableTreeNode node) {
+		return "/" + Stream.of(node.getUserObjectPath())
+			.map(o -> ((TableOfContents) o).getName())
+			.collect(Collectors.joining("/"));
+	}
+
 	private static File getOrCreateTempFile(final TableOfContents toc, final String extension) throws IOException {
 		File f = ExtractorFrame.TEMP_EXPORT_CACHE.get(toc);
 
@@ -801,7 +813,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			}
 		}
 	}
-	
+
 	private static class TabTransferable implements Transferable {
 		private final TabInfo tabInfo;
 
