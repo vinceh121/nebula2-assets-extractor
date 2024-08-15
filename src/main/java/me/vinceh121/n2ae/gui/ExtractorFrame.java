@@ -186,10 +186,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 					}
 
 					final TableOfContents sel = (TableOfContents) node.getUserObject();
+
 					if (sel.isDirectory()) {
 						return;
 					}
+
 					final String ext = sel.getName().substring(sel.getName().lastIndexOf('.') + 1);
+
 					switch (ext) {
 					case "ntx":
 						ExtractorFrame.this.openTexture(sel);
@@ -202,6 +205,9 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 						break;
 					case "txt", "tcl":
 						ExtractorFrame.this.openText(sel);
+						break;
+					case "wav":
+						ExtractorFrame.this.openWav(sel);
 						break;
 					default:
 						JOptionPane.showMessageDialog(null, "Cannot open file " + sel.getName());
@@ -395,6 +401,23 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		} catch (final IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public void openWav(final TableOfContents toc) {
+		try {
+			final File f = ExtractorFrame.getOrCreateTempFile(toc, ".wav");
+
+			if (f.length() == 0) {
+				try (final FileOutputStream out = new FileOutputStream(f)) {
+					out.write(toc.getData());
+				}
+			}
+
+			Desktop.getDesktop().open(f);
+		} catch (final IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e);
 		}
 	}
 
@@ -910,6 +933,9 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 					break;
 				case "txt", "tcl":
 					this.setIcon(Icons.get(Name.PAGE_WHITE_TEXT));
+					break;
+				case "wav":
+					this.setIcon(Icons.get(Name.MUSIC));
 					break;
 				default:
 					this.setIcon(Icons.get(Name.PAGE_WHITE_ERROR));

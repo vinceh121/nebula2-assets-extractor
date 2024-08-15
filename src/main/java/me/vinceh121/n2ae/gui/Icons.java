@@ -22,7 +22,7 @@ public final class Icons {
 	}
 
 	public enum Name {
-		BRICKS, CHART_LINE, DATABASE, FOLDER, IMAGE, PAGE_WHITE_ERROR, PAGE_WHITE_TEXT, SCRIPT, CROSS;
+		BRICKS, CHART_LINE, DATABASE, FOLDER, IMAGE, PAGE_WHITE_ERROR, PAGE_WHITE_TEXT, SCRIPT, CROSS, MUSIC;
 
 		public String getPath() {
 			return "icons/" + this.name().toLowerCase() + ".png";
