@@ -542,13 +542,26 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 
+		final TableOfContents dir;
+
 		if (selToc.isDirectory()) { // selected path is a dir, insert inside
-			selToc.getEntries().put(toc.getName(), toc);
+			dir = selToc;
 		} else if (selToc.isFile()) { // selected path is file, insert as sibling
 			final DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
 			final TableOfContents selTocParent = (TableOfContents) selParent.getUserObject();
-			selTocParent.getEntries().put(toc.getName(), toc);
+			dir = selTocParent;
+		} else {
+			throw new IllegalStateException("blablabla");
 		}
+
+		// conflicting name? ask for new name
+		if (dir.getEntries().keySet().contains(toc.getName())) {
+			final String newName =
+					JOptionPane.showInputDialog("Name conflict, input new name for " + toc.getName(), toc.getName());
+			toc.setName(newName);
+		}
+
+		dir.getEntries().put(toc.getName(), toc);
 
 		this.updateTreeModel();
 	}
