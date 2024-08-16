@@ -182,10 +182,15 @@ public class ScriptPanel extends JPanel implements SearchListener, TabListener {
 			JOptionPane.showMessageDialog(null, "Failed to recompile: " + e1);
 		}
 	}
-	
+
 	@Override
 	public void onClose() {
 		this.onBeforeSave();
+	}
+
+	@Override
+	public TableOfContents getOpenedFile() {
+		return this.script;
 	}
 
 	static {

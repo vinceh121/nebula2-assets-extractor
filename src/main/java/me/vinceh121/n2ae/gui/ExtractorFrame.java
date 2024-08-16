@@ -193,6 +193,18 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 						return;
 					}
 
+					// is the file already opened? if so select the tab
+					for (int i = 0; i < tabbed.getTabCount(); i++) {
+						final Component c = tabbed.getComponentAt(i);
+
+						if (c instanceof TabListener t) {
+							if (t.getOpenedFile() == sel) {
+								tabbed.setSelectedIndex(i);
+								return;
+							}
+						}
+					}
+
 					final String ext = sel.getName().substring(sel.getName().lastIndexOf('.') + 1);
 
 					switch (ext) {
@@ -402,7 +414,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 		this.addTab(this.fullPathForNode(toc),
 				Icons.get(Name.IMAGE),
-				new TexturePanel(read.getBlocks(), read.getTextures()));
+				new TexturePanel(toc, read.getBlocks(), read.getTextures()));
 		this.ensureTabsCloseable(this.tabbed);
 		this.selectLastTab();
 	}

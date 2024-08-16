@@ -141,4 +141,9 @@ public class TextPanel extends JPanel implements SearchListener, TabListener {
 	public void onClose() {
 		this.onBeforeSave();
 	}
+	
+	@Override
+	public TableOfContents getOpenedFile() {
+		return this.textFile;
+	}
 }

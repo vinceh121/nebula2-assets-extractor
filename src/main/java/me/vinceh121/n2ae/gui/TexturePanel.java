@@ -24,9 +24,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
+import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.texture.Block;
 
-public class TexturePanel extends JPanel {
+public class TexturePanel extends JPanel implements TabListener {
 	private static final long serialVersionUID = 1L;
 	private static final FileFilter PNG_FILTER = new FileFilter() {
 		@Override
@@ -42,8 +43,10 @@ public class TexturePanel extends JPanel {
 	private final List<Block> blocks;
 	private final List<BufferedImage> imgs;
 	private final JLabel lblBlockInfo, lblViewLabel;
+	private final TableOfContents toc;
 
-	public TexturePanel(final List<Block> blocks, final List<BufferedImage> imgs) {
+	public TexturePanel(final TableOfContents toc, final List<Block> blocks, final List<BufferedImage> imgs) {
+		this.toc = toc;
 		this.blocks = blocks;
 		this.imgs = imgs;
 
@@ -60,8 +63,8 @@ public class TexturePanel extends JPanel {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected,
-					final boolean cellHasFocus) {
+			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+					final boolean isSelected, final boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 				this.setText("Block " + blocks.indexOf(value)); // because index might be -1
 				return this;
@@ -118,5 +121,18 @@ public class TexturePanel extends JPanel {
 		this.lblViewLabel.setIcon(new ImageIcon(this.imgs.get(idx)));
 		final Block b = this.blocks.get(idx);
 		this.lblBlockInfo.setText(b.getWidth() + "×" + b.getHeight() + "×" + b.getDepth() + "\t" + b.getFormat());
+	}
+
+	@Override
+	public void onBeforeSave() {
+	}
+
+	@Override
+	public void onClose() {
+	}
+
+	@Override
+	public TableOfContents getOpenedFile() {
+		return this.toc;
 	}
 }
