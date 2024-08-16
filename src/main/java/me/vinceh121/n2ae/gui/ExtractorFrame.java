@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -138,8 +139,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			} catch (final FileNotFoundException e) {
 				this.settings = new GuiSettings();
 			}
-			this.loadClassModel();
-			this.settings.save();
+
+			if (this.settings.getClassModelUrl() == null) {
+				this.askClassModel();
+				this.settings.save();
+			} else {
+				this.loadClassModel();
+			}
 		} catch (final IOException e1) {
 			JOptionPane.showMessageDialog(null, "Failed to load settings. " + e1);
 			e1.printStackTrace();
@@ -371,6 +377,18 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 		final JMenu mnHelp = new JMenu("Help");
 		bar.add(mnHelp);
+
+		final JMenuItem mntClassModel = new JMenuItem("Change class model");
+		mntClassModel.addActionListener(e -> {
+			try {
+				askClassModel();
+				settings.save();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Failed to load class model: " + e1);
+			}
+		});
+		mnHelp.add(mntClassModel);
 
 		final JMenuItem mntWiki = new JMenuItem("Wiki");
 		mntWiki.addActionListener(e -> {
@@ -772,13 +790,15 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		this.tabbed.setSelectedIndex(this.tabbed.getTabCount() - 1);
 	}
 
-	private void loadClassModel() throws StreamReadException, DatabindException, IOException {
-		if (this.settings.getClassModelUrl() == null) {
-			final ClassModelSelectionDialog select = new ClassModelSelectionDialog();
-			select.setVisible(true);
-			this.settings.setClassModelUrl(select.getSelectedUrl());
-		}
+	private void askClassModel() throws StreamReadException, DatabindException, IOException {
+		final ClassModelSelectionDialog select = new ClassModelSelectionDialog();
+		select.setVisible(true);
+		this.settings.setClassModelUrl(select.getSelectedUrl());
 
+		this.loadClassModel();
+	}
+
+	private void loadClassModel() throws StreamReadException, DatabindException, MalformedURLException, IOException {
 		this.classModel = ExtractorFrame.MAPPER.readValue(new URL(this.settings.getClassModelUrl()),
 				new TypeReference<Map<String, NOBClazz>>() {
 				});
