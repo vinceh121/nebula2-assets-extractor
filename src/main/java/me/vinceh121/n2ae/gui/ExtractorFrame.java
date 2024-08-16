@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -138,6 +139,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				this.settings = new GuiSettings();
 			}
 			this.loadClassModel();
+			this.settings.save();
 		} catch (final IOException e1) {
 			JOptionPane.showMessageDialog(null, "Failed to load settings. " + e1);
 			e1.printStackTrace();
@@ -266,6 +268,27 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		mntOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 		mntOpen.addActionListener(e -> this.openNPK());
 		mnFile.add(mntOpen);
+
+		final JMenu mnRecentlyOpened = new JMenu("Recently opened");
+
+		for (final String recentlyOpened : this.settings.getRecentlyOpened()) {
+			final JMenuItem itm = new JMenuItem(Path.of(recentlyOpened).getFileName().toString());
+			itm.addActionListener(e -> {
+				this.openedNpk = new File(recentlyOpened);
+
+				CompletableFuture.runAsync(this::readNPK).exceptionally(t -> {
+					t.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Failed to read NPK0 file: " + t);
+					return null;
+				}).thenRunAsync(() -> {
+					this.updateTreeModel();
+					this.tree.setEnabled(true);
+				});
+			});
+			mnRecentlyOpened.add(itm);
+		}
+
+		mnFile.add(mnRecentlyOpened);
 
 		final JMenuItem mntSave = new JMenuItem("Save NPK0");
 		mntSave.setMnemonic('s');
@@ -626,6 +649,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			fc.addChoosableFileFilter(ExtractorFrame.NPK_FILTER);
 			fc.setFileFilter(ExtractorFrame.NPK_FILTER);
 			final int status = fc.showSaveDialog(null);
+
 			if (status != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
@@ -661,11 +685,19 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		fc.addChoosableFileFilter(ExtractorFrame.NPK_FILTER);
 		fc.setFileFilter(ExtractorFrame.NPK_FILTER);
 		final int status = fc.showOpenDialog(null);
+
 		if (status != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
 
 		this.openedNpk = fc.getSelectedFile();
+		this.settings.addRecentlyOpened(this.openedNpk.getAbsolutePath());
+
+		try {
+			this.settings.save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		CompletableFuture.runAsync(this::readNPK).exceptionally(t -> {
 			t.printStackTrace();
