@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import me.vinceh121.n2ae.FourccUtils;
@@ -31,24 +32,27 @@ public class NvxFileReader {
 	}
 
 	public void writeObj(final PrintWriter out) {
+		final Locale l = Locale.ENGLISH;
+
 		if (this.types.contains(VertexType.COORD)) {
 			for (final Vertex v : this.getVertices()) {
-				out.printf("v %.6f %.6f %.6f\n", v.getCoord()[0], v.getCoord()[1], v.getCoord()[2]);
+				out.printf(l, "v %.6f %.6f %.6f\n", v.getCoord()[0], v.getCoord()[1], v.getCoord()[2]);
 			}
 		}
 		if (this.types.contains(VertexType.UV0)) {
 			for (final Vertex v : this.getVertices()) {
-				out.printf("vt %.6f %.6f\n", v.getUv().get(0)[0], v.getUv().get(0)[1]);
+				out.printf(l, "vt %.6f %.6f\n", v.getUv().get(0)[0], v.getUv().get(0)[1]);
 			}
 		}
 		if (this.types.contains(VertexType.NORM)) {
 			for (final Vertex v : this.getVertices()) {
-				out.printf("vn %.6f %.6f %.6f\n", v.getNormal()[0], v.getNormal()[1], v.getNormal()[2]);
+				out.printf(l, "vn %.6f %.6f %.6f\n", v.getNormal()[0], v.getNormal()[1], v.getNormal()[2]);
 			}
 		}
 		if (this.types.contains(VertexType.JOINTS_WEIGHTS)) {
 			for (final Vertex v : this.getVertices()) {
-				out.printf("jw4 %d %.6f %d %.6f %d %.6f %d %.6f\n",
+				out.printf(l,
+						"jw4 %d %.6f %d %.6f %d %.6f %d %.6f\n",
 						v.getJointIndices()[0],
 						v.getWeights()[0],
 						v.getJointIndices()[1],
@@ -63,7 +67,8 @@ public class NvxFileReader {
 		for (int i = 0; i < this.getTriangles().size(); i++) {
 			final int[] t = this.getTriangles().get(i);
 			if (this.types.contains(VertexType.UV0) && this.types.contains(VertexType.NORM)) {
-				out.printf("f %d/%d/%d %d/%d/%d %d/%d/%d\n",
+				out.printf(l,
+						"f %d/%d/%d %d/%d/%d %d/%d/%d\n",
 						t[0] + 1,
 						t[0] + 1,
 						t[0] + 1, //
@@ -74,7 +79,8 @@ public class NvxFileReader {
 						t[2] + 1,
 						t[2] + 1);
 			} else if (this.types.contains(VertexType.UV0)) {
-				out.printf("f %d/%d %d/%d %d/%d\n",
+				out.printf(l,
+						"f %d/%d %d/%d %d/%d\n",
 						t[0] + 1,
 						t[0] + 1, //
 						t[1] + 1,
@@ -82,7 +88,7 @@ public class NvxFileReader {
 						t[2] + 1,
 						t[2] + 1);
 			} else {
-				out.printf("f %d %d %d\n", t[0] + 1, t[1] + 1, t[2] + 1);
+				out.printf(l, "f %d %d %d\n", t[0] + 1, t[1] + 1, t[2] + 1);
 			}
 		}
 	}
