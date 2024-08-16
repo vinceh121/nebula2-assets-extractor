@@ -119,6 +119,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	private final AboutDialog aboutDialog = new AboutDialog();
 	private final List<TabListener> listeners = new LinkedList<>();
 	private final FindDialog searchAllDialog = new FindDialog(this, this);
+	private final StatusBar statusBar = new StatusBar();
 	private JTabbedPane secondTab;
 	private GuiSettings settings;
 	private File openedNpk;
@@ -159,6 +160,8 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		this.setSize(800, 700);
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setLayout(new BorderLayout());
+
+		this.add(this.statusBar, BorderLayout.SOUTH);
 
 		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setResizeWeight(0.33);
@@ -683,7 +686,9 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 	}
 
 	public void saveNPK() {
-		for (TabListener listener : this.listeners) {
+		final long start = System.currentTimeMillis();
+
+		for (final TabListener listener : this.listeners) {
 			listener.onBeforeSave();
 		}
 
@@ -709,6 +714,9 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}).thenRunAsync(() -> {
 			this.setEnabled(true);
 			this.tree.setEnabled(true);
+
+			final long diff = System.currentTimeMillis() - start;
+			this.statusBar.addMessage("Saved! (%dms)".formatted(diff));
 		});
 	}
 
