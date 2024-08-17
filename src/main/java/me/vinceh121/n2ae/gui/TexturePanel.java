@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -42,7 +41,8 @@ public class TexturePanel extends JPanel implements TabListener {
 	};
 	private final List<Block> blocks;
 	private final List<BufferedImage> imgs;
-	private final JLabel lblBlockInfo, lblViewLabel;
+	private final JLabel lblBlockInfo, lblZoom;
+	private final ImageViewer viewer;
 	private final TableOfContents toc;
 
 	public TexturePanel(final TableOfContents toc, final List<Block> blocks, final List<BufferedImage> imgs) {
@@ -52,8 +52,8 @@ public class TexturePanel extends JPanel implements TabListener {
 
 		this.setLayout(new BorderLayout());
 
-		this.lblViewLabel = new JLabel();
-		this.add(this.lblViewLabel, BorderLayout.CENTER);
+		this.viewer = new ImageViewer();
+		this.add(this.viewer, BorderLayout.CENTER);
 
 		final JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		this.add(topBar, BorderLayout.NORTH);
@@ -96,6 +96,12 @@ public class TexturePanel extends JPanel implements TabListener {
 		this.lblBlockInfo = new JLabel();
 		topBar.add(this.lblBlockInfo);
 
+		this.lblZoom = new JLabel();
+		this.viewer.addZoomListener(zoom -> {
+			this.lblZoom.setText("%d %%".formatted((int) (zoom * 100)));
+		});
+		topBar.add(this.lblZoom);
+
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(final MouseEvent e) {
@@ -118,7 +124,7 @@ public class TexturePanel extends JPanel implements TabListener {
 	}
 
 	private void showBlock(final int idx) {
-		this.lblViewLabel.setIcon(new ImageIcon(this.imgs.get(idx)));
+		this.viewer.setImage(this.imgs.get(idx));
 		final Block b = this.blocks.get(idx);
 		this.lblBlockInfo.setText(b.getWidth() + "×" + b.getHeight() + "×" + b.getDepth() + "\t" + b.getFormat());
 	}
