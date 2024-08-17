@@ -393,6 +393,21 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		});
 		mnHelp.add(mntClassModel);
 
+		mnHelp.addSeparator();
+
+		final JMenuItem mntPjClasses = new JMenuItem("Project Nomads Classes");
+		mntPjClasses.addActionListener(e -> {
+			final String uri = "https://pj-classes.vinceh121.me/";
+
+			try {
+				Desktop.getDesktop().browse(new URI(uri));
+			} catch (final Exception e1) {
+				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Failed to open browser, the reference documentation is at " + uri);
+			}
+		});
+		mnHelp.add(mntPjClasses);
+
 		final JMenuItem mntWiki = new JMenuItem("Wiki");
 		mntWiki.addActionListener(e -> {
 			final String uri = "https://github.com/vinceh121/nebula2-assets-extractor/wiki";
