@@ -25,7 +25,9 @@ public class GuiSettings {
 	}
 
 	public void addRecentlyOpened(final String path) {
-		this.recentlyOpened.add(path);
+		if (!this.recentlyOpened.contains(path)) {
+			this.recentlyOpened.add(path);
+		}
 
 		if (this.recentlyOpened.size() > 5) {
 			this.recentlyOpened.pop();
