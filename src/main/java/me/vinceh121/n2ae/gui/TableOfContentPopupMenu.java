@@ -17,6 +17,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import me.vinceh121.n2ae.gltf.GLTFGenerator;
+import me.vinceh121.n2ae.model.Mesh;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.texture.NtxFileReader;
@@ -132,10 +133,11 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 					FileOutputStream outBin = new FileOutputStream(bufferOut)) {
 				final NvxFileReader read = new NvxFileReader(in);
 				read.readAll();
+				final Mesh mesh = read.getMesh();
 
 				final GLTFGenerator gen = new GLTFGenerator(outBin);
 				gen.buildBasicScene("scene");
-				gen.addMesh("skin", read.getTypes(), read.getVertices(), read.getTriangles(), -1);
+				gen.addMesh("skin", mesh.getTypes(), mesh.getVertices(), mesh.getTriangles(), -1);
 				gen.buildBuffer(bufferOut.getName());
 				ExtractorFrame.MAPPER.writerWithDefaultPrettyPrinter().writeValue(outGltf, gen.getGltf());
 			} catch (final IOException e1) {

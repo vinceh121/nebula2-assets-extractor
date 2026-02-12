@@ -11,6 +11,7 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -361,6 +362,12 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		mntSearchAll.addActionListener(e -> this.searchAll());
 		mnEdit.add(mntSearchAll);
 
+		mnEdit.addSeparator();
+
+		final JMenuItem mntInsertNvx = new JMenuItem("Insert NVX");
+		mntInsertNvx.addActionListener(this::insertNvx);
+		mnEdit.add(mntInsertNvx);
+
 		final JMenu mnView = new JMenu("View");
 		bar.add(mnView);
 
@@ -491,6 +498,31 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
+	
+	private void insertNvx(ActionEvent e) {
+		final JFileChooser fc = new JFileChooser();
+		fc.addChoosableFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return ".obj Wavefront model file";
+			}
+
+			@Override
+			public boolean accept(File f) {
+				return f.getName().endsWith(".obj");
+			}
+		});
+		
+		final int result = fc.showOpenDialog(null);
+		
+		if (result != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		
+		final File nvxFile = fc.getSelectedFile();
+		
+	}
 
 	private void addTab(String name, Icon icon, Component comp) {
 		if (comp instanceof TabListener listener) {
@@ -544,8 +576,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		final DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newToc);
 
 		if (selToc.isDirectory()) { // selected path is a dir, insert inside
-			this.getTreeModel()
-				.insertNodeInto(newNode, selNode, this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+			this.getTreeModel().insertNodeInto(newNode, selNode, 0);
 			selToc.getEntries().put(newToc.getName(), newToc);
 		} else if (selToc.isFile()) { // selected path is file, insert as sibling
 			final DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();

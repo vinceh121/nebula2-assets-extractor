@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.concurrent.Callable;
 
+import me.vinceh121.n2ae.model.Mesh;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -32,13 +33,14 @@ public class CmdModel implements Callable<Integer> {
 				FileOutputStream os = new FileOutputStream(this.outputFile)) {
 			final NvxFileReader reader = new NvxFileReader(is);
 			reader.readAll();
+			final Mesh mesh = reader.getMesh();
 
 			if (this.info) {
-				System.out.println("Vertices: " + reader.getCountVertices());
-				System.out.println("Edges: " + reader.getCountEdges());
-				System.out.println("Indices: " + reader.getCountIndices());
-				System.out.println("Model size: " + reader.getDataSize());
-				System.out.println("Model offset: 0x" + Integer.toHexString(reader.getDataStart()));
+				System.out.println("Vertices: " + mesh.getCountVertices());
+				System.out.println("Edges: " + mesh.getCountEdges());
+				System.out.println("Indices: " + mesh.getCountIndices());
+				System.out.println("Model size: " + mesh.getDataSize());
+				System.out.println("Model offset: 0x" + Integer.toHexString(mesh.getDataStart()));
 				return 0;
 			}
 
