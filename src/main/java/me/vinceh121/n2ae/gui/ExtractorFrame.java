@@ -11,6 +11,7 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -43,6 +44,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -259,7 +261,8 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 					}
 
 					final TableOfContentPopupMenu pop =
-							new TableOfContentPopupMenu((DefaultTreeModel) ExtractorFrame.this.tree.getModel(),
+							new TableOfContentPopupMenu(ExtractorFrame.this,
+									(DefaultTreeModel) ExtractorFrame.this.tree.getModel(),
 									ExtractorFrame.this.tree.getSelectionPath());
 					pop.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -333,6 +336,8 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		final JMenu mnEdit = new JMenu("Edit");
 		mnEdit.setMnemonic('e');
 		bar.add(mnEdit);
+
+		mnEdit.add(new DeleteAction());
 
 		final JMenuItem mntCopy = new JMenuItem("Copy");
 		mntCopy.setMnemonic('c');
@@ -866,6 +871,53 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		ExtractorFrame.TEMP_EXPORT_CACHE.put(toc, f);
 
 		return f;
+	}
+
+	public class DeleteAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public DeleteAction() {
+			this.putValue(NAME, "Delete");
+			this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+			this.putValue(MNEMONIC_KEY, KeyEvent.VK_D);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			final TreePath[] pathsArr = ExtractorFrame.this.tree.getSelectionPaths();
+			
+			if (pathsArr == null) {
+				return;
+			}
+
+			final List<TreePath> paths = List.of(pathsArr);
+
+			final List<DefaultMutableTreeNode> selectedTreeNodes = paths
+					.stream()
+					.map(n -> (DefaultMutableTreeNode) n.getLastPathComponent())
+					.toList();
+			
+			final List<TableOfContents> selectedFiles = paths
+					.stream()
+					.map(n -> n.getLastPathComponent())
+					.map(n -> (TableOfContents) ((DefaultMutableTreeNode)n).getUserObject())
+					.toList();
+			
+			final List<TableOfContents> parents = paths
+					.stream()
+					.map(n -> n.getPathComponent(n.getPathCount() - 1))
+					.map(n -> (TableOfContents) ((DefaultMutableTreeNode)n).getUserObject())
+					.toList();
+
+			for (int i = 0; i < selectedFiles.size(); i++) {
+				if (selectedTreeNodes.get(i).getParent() == null) {
+					continue;
+				}
+
+				parents.get(i).getEntries().remove(selectedFiles.get(i).getName());
+				getTreeModel().removeNodeFromParent(selectedTreeNodes.get(i));
+			}
+		}
 	}
 
 	private record TOCText(TableOfContents toc, String text) {
