@@ -183,7 +183,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				}
 			}
 		};
-		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		this.tree.setExpandsSelectedPaths(true);
 		this.tree.setEnabled(false);
 		this.tree.setCellRenderer(new NpkTreeCellRenderer());
@@ -365,6 +365,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK));
 		mntSearchAll.addActionListener(e -> this.searchAll());
 		mnEdit.add(mntSearchAll);
+
+		mnEdit.addSeparator();
+
+		mnEdit.add(new SelectAllAction());
 
 		final JMenu mnView = new JMenu("View");
 		bar.add(mnView);
@@ -871,6 +875,23 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		ExtractorFrame.TEMP_EXPORT_CACHE.put(toc, f);
 
 		return f;
+	}
+	
+	public class SelectAllAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public SelectAllAction() {
+			this.putValue(NAME, "Select all");
+			this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+			this.putValue(MNEMONIC_KEY, KeyEvent.VK_A);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				tree.addSelectionRow(i);
+			}
+		}
 	}
 
 	public class DeleteAction extends AbstractAction {
