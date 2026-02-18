@@ -595,10 +595,8 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 	private void cut() {
 		this.copy();
-		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-		final TableOfContents parentToc = (TableOfContents) ((DefaultMutableTreeNode) node.getParent()).getUserObject();
-		parentToc.getEntries().remove(((TableOfContents) node.getUserObject()).getName());
-		this.getTreeModel().removeNodeFromParent(node);
+
+		new DeleteAction().actionPerformed(null);
 	}
 
 	private void copy() {
