@@ -603,22 +603,21 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 	private void copy() {
 		final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-		final TOCTransferable trans = this.makeTocTransferable();
+		final TOCTransferable trans = new TOCTransferable(this.getSelectedTocs());
+
 		clip.setContents(trans, this.clipboardOwner);
-	}
-
-	private TOCTransferable makeTocTransferable() {
-		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-
-		if (node != null && node.getUserObject() instanceof TableOfContents toc) {
-			return new TOCTransferable(toc.deepClone());
-		} else {
-			throw new IllegalStateException();
-		}
 	}
 
 	private DefaultMutableTreeNode getSelectedNode() {
 		return (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+	}
+
+	private List<TableOfContents> getSelectedTocs() {
+		return List.of(this.tree.getSelectionPaths())
+				.stream()
+				.map(n -> n.getLastPathComponent())
+				.map(n -> (TableOfContents) ((DefaultMutableTreeNode)n).getUserObject())
+				.toList();
 	}
 
 	private void searchAll() {
@@ -917,13 +916,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 					.stream()
 					.map(n -> (DefaultMutableTreeNode) n.getLastPathComponent())
 					.toList();
-			
+
 			final List<TableOfContents> selectedFiles = paths
 					.stream()
 					.map(n -> n.getLastPathComponent())
 					.map(n -> (TableOfContents) ((DefaultMutableTreeNode)n).getUserObject())
 					.toList();
-			
+
 			final List<TableOfContents> parents = paths
 					.stream()
 					.map(n -> n.getPathComponent(n.getPathCount() - 1))

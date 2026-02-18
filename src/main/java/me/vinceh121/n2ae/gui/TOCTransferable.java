@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileExtractor;
@@ -14,10 +15,10 @@ import me.vinceh121.n2ae.pkg.TableOfContents;
 
 public class TOCTransferable implements Transferable {
 	public static final DataFlavor NPK_CHILD_FLAVOR = new DataFlavor(TableOfContents.class, "NPK0 child");
-	private final TableOfContents toc;
+	private final List<TableOfContents> tocs;
 
-	public TOCTransferable(final TableOfContents toc) {
-		this.toc = toc;
+	public TOCTransferable(final List<TableOfContents> tocs) {
+		this.tocs = tocs;
 	}
 
 	@Override
@@ -33,22 +34,33 @@ public class TOCTransferable implements Transferable {
 	@Override
 	public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException, IOException {
 		if (TOCTransferable.NPK_CHILD_FLAVOR.equals(flavor)) {
-			return this.toc;
+			return this.tocs;
 		} else if (DataFlavor.javaFileListFlavor.equals(flavor)) {
-			final File f = Path.of(System.getProperty("java.io.tmpdir"), this.toc.getName()).toFile();
-			f.deleteOnExit();
-			final NnpkInMemoryFileExtractor ext = new NnpkInMemoryFileExtractor(f);
-			ext.write(this.toc);
-			// because File#delete() doesn't recurse directories
-			if (this.toc.isDirectory()) {
-				Files.walk(f.toPath()).forEach(p -> p.toFile().deleteOnExit());
+			final List<File> files = new ArrayList<>(this.tocs.size());
+
+			for (TableOfContents toc : this.tocs) {
+				files.add(this.writeTmp(toc));
 			}
-			return List.of(f);
+
+			return files;
 		}
 		throw new UnsupportedFlavorException(flavor);
 	}
+	
+	private File writeTmp(TableOfContents toc) throws IOException {
+		final File f = Path.of(System.getProperty("java.io.tmpdir"), toc.getName()).toFile();
+		f.deleteOnExit();
+		final NnpkInMemoryFileExtractor ext = new NnpkInMemoryFileExtractor(f);
+		ext.write(toc);
+		// because File#delete() doesn't recurse directories
+		if (toc.isDirectory()) {
+			Files.walk(f.toPath()).forEach(p -> p.toFile().deleteOnExit());
+		}
+		
+		return f;
+	}
 
-	public TableOfContents getToc() {
-		return this.toc;
+	public List<TableOfContents> getTocs() {
+		return this.tocs;
 	}
 }
