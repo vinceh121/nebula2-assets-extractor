@@ -514,11 +514,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 
 			if (clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
-				final Object data = clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
+				@SuppressWarnings("unchecked")
+				final List<TableOfContents> data = (List<TableOfContents>) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
 
-				if (data instanceof TableOfContents toc) {
-					this.pasteInternal(toc);
-				}
+				this.pasteInternal(data);
 			} else if (clip.isDataFlavorAvailable(ExtractorFrame.FLAVOR_FILE)) {
 				// On Linux DataFlavor.javaFileListFlavor is broken as it reaches an unexpected
 				// \0 in the last URL, so we have to reinvent the wheel
@@ -565,7 +564,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private void pasteInternal(final TableOfContents toc) {
+	private void pasteInternal(final List<TableOfContents> tocs) {
 		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 
@@ -581,14 +580,16 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			throw new IllegalStateException("blablabla");
 		}
 
-		// conflicting name? ask for new name
-		if (dir.getEntries().keySet().contains(toc.getName())) {
-			final String newName =
-					JOptionPane.showInputDialog("Name conflict, input new name for " + toc.getName(), toc.getName());
-			toc.setName(newName);
-		}
+		for (TableOfContents toc : tocs) {
+			// conflicting name? ask for new name
+			if (dir.getEntries().keySet().contains(toc.getName())) {
+				final String newName = JOptionPane.showInputDialog("Name conflict, input new name for " + toc.getName(),
+						toc.getName());
+				toc.setName(newName);
+			}
 
-		dir.getEntries().put(toc.getName(), toc);
+			dir.getEntries().put(toc.getName(), toc);
+		}
 
 		this.updateTreeModel();
 	}
