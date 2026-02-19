@@ -522,6 +522,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				return f.getName().endsWith(".obj");
 			}
 		});
+		fc.setFileFilter(fc.getChoosableFileFilters()[1]);
 		
 		final int result = fc.showOpenDialog(null);
 		
@@ -530,6 +531,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 		
 		final File nvxFile = fc.getSelectedFile();
+		
 		
 	}
 

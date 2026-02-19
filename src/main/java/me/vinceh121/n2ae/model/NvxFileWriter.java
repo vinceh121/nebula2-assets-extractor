@@ -2,16 +2,21 @@ package me.vinceh121.n2ae.model;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Vector;
 
 import me.vinceh121.n2ae.LEDataOutputStream;
 
-public class NvxFileWriter {
+public class NvxFileWriter extends AbstractMeshWriter {
 	private final LEDataOutputStream out;
 
 	public NvxFileWriter(final OutputStream out) {
+		super(out);
 		this.out = new LEDataOutputStream(out);
+	}
+
+	@Override
+	public void writeMesh(Mesh mesh) throws IOException {
+		this.writeHeaders(mesh);
+		this.writeData(mesh);
 	}
 
 	public void writeHeaders(final Mesh mesh) throws IOException {
@@ -89,7 +94,7 @@ public class NvxFileWriter {
 		}
 	}
 
-
+	@Override
 	public void close() throws IOException {
 		this.out.close();
 	}
