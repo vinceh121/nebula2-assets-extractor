@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -369,6 +370,8 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		mnEdit.addSeparator();
 
 		mnEdit.add(new SelectAllAction());
+
+		mnEdit.add(new InvertSelectAction());
 
 		final JMenu mnView = new JMenu("View");
 		bar.add(mnView);
@@ -874,7 +877,38 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 		return f;
 	}
-	
+
+	public class InvertSelectAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public InvertSelectAction() {
+			this.putValue(NAME, "Invert selection");
+			this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK));
+			this.putValue(MNEMONIC_KEY, KeyEvent.VK_I);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			final int[] selected = tree.getSelectionRows();
+			
+			if (selected == null || selected.length == 0) {
+				new SelectAllAction().actionPerformed(e);
+
+				return;
+			}
+			
+			final Set<Integer> selectedSet = Arrays.stream(selected).boxed().collect(Collectors.toSet());
+
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				if (selectedSet.contains(i)) {
+					tree.removeSelectionRow(i);
+				} else {
+					tree.addSelectionRow(i);
+				}
+			}
+		}
+	}
+
 	public class SelectAllAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
