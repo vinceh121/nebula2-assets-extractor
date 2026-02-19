@@ -26,7 +26,7 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
 	private final TableOfContents toc;
 
-	public TableOfContentPopupMenu(final DefaultTreeModel model, final TreePath treePath) {
+	public TableOfContentPopupMenu(final ExtractorFrame frame, final DefaultTreeModel model, final TreePath treePath) {
 		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
 
 		final TableOfContents[] path = new TableOfContents[treePath.getPathCount()];
@@ -48,13 +48,7 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 		});
 		this.add(itmRename);
 
-		final JMenuItem itmDelete = new JMenuItem("Delete");
-		itmDelete.addActionListener(e -> {
-			final TableOfContents parent = path[path.length - 2];
-			parent.getEntries().remove(this.toc.getName());
-			model.removeNodeFromParent(node);
-		});
-		this.add(itmDelete);
+		this.add(frame.new DeleteAction());
 
 		if (this.toc.getName().endsWith(".nvx")) {
 			this.addModelOptions();
