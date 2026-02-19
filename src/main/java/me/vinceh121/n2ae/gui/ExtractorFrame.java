@@ -183,7 +183,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 				}
 			}
 		};
-		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		this.tree.setExpandsSelectedPaths(true);
 		this.tree.setEnabled(false);
 		this.tree.setCellRenderer(new NpkTreeCellRenderer());
@@ -366,6 +366,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		mntSearchAll.addActionListener(e -> this.searchAll());
 		mnEdit.add(mntSearchAll);
 
+		mnEdit.addSeparator();
+
+		mnEdit.add(new SelectAllAction());
+
 		final JMenu mnView = new JMenu("View");
 		bar.add(mnView);
 
@@ -510,11 +514,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 
 			if (clip.isDataFlavorAvailable(TOCTransferable.NPK_CHILD_FLAVOR)) {
-				final Object data = clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
+				@SuppressWarnings("unchecked")
+				final List<TableOfContents> data = (List<TableOfContents>) clip.getData(TOCTransferable.NPK_CHILD_FLAVOR);
 
-				if (data instanceof TableOfContents toc) {
-					this.pasteInternal(toc);
-				}
+				this.pasteInternal(data);
 			} else if (clip.isDataFlavorAvailable(ExtractorFrame.FLAVOR_FILE)) {
 				// On Linux DataFlavor.javaFileListFlavor is broken as it reaches an unexpected
 				// \0 in the last URL, so we have to reinvent the wheel
@@ -561,7 +564,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private void pasteInternal(final TableOfContents toc) {
+	private void pasteInternal(final List<TableOfContents> tocs) {
 		final DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
 		final TableOfContents selToc = (TableOfContents) selNode.getUserObject();
 
@@ -577,44 +580,43 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			throw new IllegalStateException("blablabla");
 		}
 
-		// conflicting name? ask for new name
-		if (dir.getEntries().keySet().contains(toc.getName())) {
-			final String newName =
-					JOptionPane.showInputDialog("Name conflict, input new name for " + toc.getName(), toc.getName());
-			toc.setName(newName);
-		}
+		for (TableOfContents toc : tocs) {
+			// conflicting name? ask for new name
+			if (dir.getEntries().keySet().contains(toc.getName())) {
+				final String newName = JOptionPane.showInputDialog("Name conflict, input new name for " + toc.getName(),
+						toc.getName());
+				toc.setName(newName);
+			}
 
-		dir.getEntries().put(toc.getName(), toc);
+			dir.getEntries().put(toc.getName(), toc);
+		}
 
 		this.updateTreeModel();
 	}
 
 	private void cut() {
 		this.copy();
-		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-		final TableOfContents parentToc = (TableOfContents) ((DefaultMutableTreeNode) node.getParent()).getUserObject();
-		parentToc.getEntries().remove(((TableOfContents) node.getUserObject()).getName());
-		this.getTreeModel().removeNodeFromParent(node);
+
+		new DeleteAction().actionPerformed(null);
 	}
 
 	private void copy() {
 		final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-		final TOCTransferable trans = this.makeTocTransferable();
+		final TOCTransferable trans = new TOCTransferable(this.getSelectedTocs());
+
 		clip.setContents(trans, this.clipboardOwner);
-	}
-
-	private TOCTransferable makeTocTransferable() {
-		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-
-		if (node != null && node.getUserObject() instanceof TableOfContents toc) {
-			return new TOCTransferable(toc.deepClone());
-		} else {
-			throw new IllegalStateException();
-		}
 	}
 
 	private DefaultMutableTreeNode getSelectedNode() {
 		return (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+	}
+
+	private List<TableOfContents> getSelectedTocs() {
+		return List.of(this.tree.getSelectionPaths())
+				.stream()
+				.map(n -> n.getLastPathComponent())
+				.map(n -> (TableOfContents) ((DefaultMutableTreeNode)n).getUserObject())
+				.toList();
 	}
 
 	private void searchAll() {
@@ -872,6 +874,23 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 		return f;
 	}
+	
+	public class SelectAllAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public SelectAllAction() {
+			this.putValue(NAME, "Select all");
+			this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+			this.putValue(MNEMONIC_KEY, KeyEvent.VK_A);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				tree.addSelectionRow(i);
+			}
+		}
+	}
 
 	public class DeleteAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
@@ -896,13 +915,13 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 					.stream()
 					.map(n -> (DefaultMutableTreeNode) n.getLastPathComponent())
 					.toList();
-			
+
 			final List<TableOfContents> selectedFiles = paths
 					.stream()
 					.map(n -> n.getLastPathComponent())
 					.map(n -> (TableOfContents) ((DefaultMutableTreeNode)n).getUserObject())
 					.toList();
-			
+
 			final List<TableOfContents> parents = paths
 					.stream()
 					.map(n -> n.getPathComponent(n.getPathCount() - 1))
