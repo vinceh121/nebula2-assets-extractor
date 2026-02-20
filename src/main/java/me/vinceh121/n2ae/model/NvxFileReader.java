@@ -9,7 +9,7 @@ import java.util.Locale;
 import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
 
-public class NvxFileReader {
+public class NvxFileReader extends AbstractMeshReader {
 	public static final String MAGIC_STRING = "NVX1";
 	public static final int MAGIC_NUMBER = FourccUtils.fourcc(NvxFileReader.MAGIC_STRING);
 
@@ -17,73 +17,15 @@ public class NvxFileReader {
 	private Mesh mesh;
 
 	public NvxFileReader(final InputStream in) {
+		super(in);
 		this.in = new LEDataInputStream(in);
 	}
 
-	public void writeObj(final OutputStream out) {
-		this.writeObj(new PrintWriter(out, true));
-	}
+	@Override
+	public Mesh readMesh() throws IOException {
+		this.readAll();
 
-	public void writeObj(final PrintWriter out) {
-		final Locale l = Locale.ENGLISH;
-
-		if (this.mesh.getTypes().contains(VertexType.COORD)) {
-			for (final Vertex v : this.mesh.getVertices()) {
-				out.printf(l, "v %.6f %.6f %.6f\n", v.getCoord()[0], v.getCoord()[1], v.getCoord()[2]);
-			}
-		}
-		if (this.mesh.getTypes().contains(VertexType.UV0)) {
-			for (final Vertex v : this.mesh.getVertices()) {
-				out.printf(l, "vt %.6f %.6f\n", v.getUv().get(0)[0], v.getUv().get(0)[1]);
-			}
-		}
-		if (this.mesh.getTypes().contains(VertexType.NORM)) {
-			for (final Vertex v : this.mesh.getVertices()) {
-				out.printf(l, "vn %.6f %.6f %.6f\n", v.getNormal()[0], v.getNormal()[1], v.getNormal()[2]);
-			}
-		}
-		if (this.mesh.getTypes().contains(VertexType.JOINTS_WEIGHTS)) {
-			for (final Vertex v : this.mesh.getVertices()) {
-				out.printf(l,
-						"jw4 %d %.6f %d %.6f %d %.6f %d %.6f\n",
-						v.getJointIndices()[0],
-						v.getWeights()[0],
-						v.getJointIndices()[1],
-						v.getWeights()[1],
-						v.getJointIndices()[2],
-						v.getWeights()[2],
-						v.getJointIndices()[3],
-						v.getWeights()[3]);
-			}
-		}
-
-		for (int i = 0; i < this.mesh.getTriangles().size(); i++) {
-			final int[] t = this.mesh.getTriangles().get(i);
-			if (this.mesh.getTypes().contains(VertexType.UV0) && this.mesh.getTypes().contains(VertexType.NORM)) {
-				out.printf(l,
-						"f %d/%d/%d %d/%d/%d %d/%d/%d\n",
-						t[0] + 1,
-						t[0] + 1,
-						t[0] + 1, //
-						t[1] + 1,
-						t[1] + 1,
-						t[1] + 1, //
-						t[2] + 1,
-						t[2] + 1,
-						t[2] + 1);
-			} else if (this.mesh.getTypes().contains(VertexType.UV0)) {
-				out.printf(l,
-						"f %d/%d %d/%d %d/%d\n",
-						t[0] + 1,
-						t[0] + 1, //
-						t[1] + 1,
-						t[1] + 1, //
-						t[2] + 1,
-						t[2] + 1);
-			} else {
-				out.printf(l, "f %d %d %d\n", t[0] + 1, t[1] + 1, t[2] + 1);
-			}
-		}
+		return this.mesh;
 	}
 
 	public void readAll() throws IOException {

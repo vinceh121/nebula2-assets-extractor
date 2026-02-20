@@ -86,6 +86,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.vinceh121.n2ae.gui.Icons.Name;
 import me.vinceh121.n2ae.model.NvxFileReader;
+import me.vinceh121.n2ae.model.ObjFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
@@ -477,10 +478,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 			if (f.length() == 0) {
 				try (final ByteArrayInputStream in = new ByteArrayInputStream(toc.getData());
-						PrintWriter writer = new PrintWriter(f)) {
-					final NvxFileReader reader = new NvxFileReader(in);
-					reader.readAll();
-					reader.writeObj(writer);
+						FileOutputStream out = new FileOutputStream(f);
+						final NvxFileReader reader = new NvxFileReader(in);
+						final ObjFileWriter writer = new ObjFileWriter(out)) {
+					writer.writeMesh(reader.readMesh());
 				}
 			}
 

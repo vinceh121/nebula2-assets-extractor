@@ -15,7 +15,9 @@ import javax.imageio.ImageIO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import me.vinceh121.n2ae.model.Mesh;
 import me.vinceh121.n2ae.model.NvxFileReader;
+import me.vinceh121.n2ae.model.ObjFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkFileExtractor;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.script.IParser;
@@ -165,10 +167,12 @@ public class CmdFullExtract implements Callable<Integer> {
 	}
 
 	private void processModel(final File fileIn, final File fileOut) throws IOException {
-		try (FileInputStream is = new FileInputStream(fileIn); FileOutputStream os = new FileOutputStream(fileOut)) {
-			final NvxFileReader r = new NvxFileReader(is);
-			r.readAll();
-			r.writeObj(os);
+		try (FileInputStream is = new FileInputStream(fileIn);
+				FileOutputStream os = new FileOutputStream(fileOut);
+				NvxFileReader r = new NvxFileReader(is);
+				ObjFileWriter w = new ObjFileWriter(os)) {
+			final Mesh mesh = r.readMesh();
+			w.writeMesh(mesh);
 		}
 	}
 
