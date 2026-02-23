@@ -2,9 +2,10 @@ package me.vinceh121.n2ae.gui;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -19,6 +20,8 @@ import javax.swing.tree.TreePath;
 import me.vinceh121.n2ae.gltf.GLTFGenerator;
 import me.vinceh121.n2ae.model.Mesh;
 import me.vinceh121.n2ae.model.NvxFileReader;
+import me.vinceh121.n2ae.model.ObjFileReader;
+import me.vinceh121.n2ae.model.ObjFileWriter;
 import me.vinceh121.n2ae.pkg.TableOfContents;
 import me.vinceh121.n2ae.texture.NtxFileReader;
 
@@ -99,11 +102,10 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 				return;
 			}
 
-			try (ByteArrayInputStream in = new ByteArrayInputStream(this.toc.getData());
-					PrintWriter out = new PrintWriter(outFile)) {
-				final NvxFileReader read = new NvxFileReader(in);
-				read.readAll();
-				read.writeObj(out);
+			try (final NvxFileReader read = new NvxFileReader(new ByteArrayInputStream(this.toc.getData()));
+					final ObjFileWriter writer = new ObjFileWriter(new FileOutputStream(outFile))) {
+				final Mesh mesh = read.readMesh();
+				writer.writeMesh(mesh);
 			} catch (final IOException e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, e);
@@ -140,6 +142,29 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 			}
 		});
 		mnExtract.add(mntGltf);
+		
+		final JMenu mnInsert = new JMenu("Insert...");
+		this.add(mnInsert);
+		
+		final JMenuItem mntInsertObj = new JMenuItem("OBJ");
+		mntInsertObj.addActionListener(e -> {
+			final JFileChooser fc = new JFileChooser();
+			final int status = fc.showOpenDialog(null);
+			
+			if (status != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+			
+			final File file = fc.getSelectedFile();
+			
+			try (final ObjFileReader reader = new ObjFileReader(new FileInputStream(file))) {
+				final Mesh mesh = reader.readMesh();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, e);
+			}
+		});
+		mnInsert.add(mntInsertObj);
 	}
 
 	private File saveExtract(final String originalExtension, final String extension) {
