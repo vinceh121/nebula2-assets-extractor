@@ -42,15 +42,22 @@ public class ObjFileReader extends AbstractMeshReader {
 						final Vertex v = mesh.getVertices().get(vertexIndex);
 						v.setNormal(new float[] {scan.nextFloat(), scan.nextFloat(), scan.nextFloat()});
 					} else if ("f".equals(type)) {
-						mesh.getTriangles().add(new int[] {scan.nextInt(), scan.nextInt(), scan.nextInt()}); // FIXME handle UV indexes
+						final int[] indexes = scan.tokens().mapToInt(str -> {
+							if (str.contains("/")) {
+								// consider all indexes to be the same, as NVX doesn't support otherwise
+								return Integer.parseInt(str.split("/")[0]);
+							}
+							
+							return Integer.parseInt(str);
+						}).toArray();
+
+						mesh.getTriangles().add(indexes);
 					}
 					
 					vertexIndex++;
 				}
 			}
 		}
-		
-		System.out.println(mesh.getVertices());
 
 		return mesh;
 	}

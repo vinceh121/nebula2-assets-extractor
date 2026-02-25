@@ -1,7 +1,5 @@
 package me.vinceh121.n2ae.pkg;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -143,6 +141,8 @@ public class TableOfContents implements Serializable {
 	}
 
 	public void put(final String key, final TableOfContents value) {
+		assert key.equals(value.name);
+
 		this.entries.put(key, value);
 	}
 

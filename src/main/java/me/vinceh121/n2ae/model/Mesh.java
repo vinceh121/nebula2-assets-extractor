@@ -1,11 +1,14 @@
 package me.vinceh121.n2ae.model;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 public class Mesh {
+	public static final int DEFAULT_DATA_START = 0x1C;
 	private int countVertices, countIndices, countEdges, dataStart, dataSize;
-	private List<VertexType> types;
+	private final Set<VertexType> types = EnumSet.noneOf(VertexType.class);
 	private final List<Vertex> vertices = new Vector<>();
 	private final List<int[]> triangles = new Vector<>();
 	private final List<short[]> edges = new Vector<>();
@@ -50,12 +53,8 @@ public class Mesh {
 		this.dataSize = dataSize;
 	}
 
-	public List<VertexType> getTypes() {
+	public Set<VertexType> getTypes() {
 		return types;
-	}
-
-	public void setTypes(List<VertexType> types) {
-		this.types = types;
 	}
 
 	public List<Vertex> getVertices() {
@@ -68,5 +67,9 @@ public class Mesh {
 
 	public List<short[]> getEdges() {
 		return edges;
+	}
+
+	public long calculateSupposedSize() {
+		
 	}
 }

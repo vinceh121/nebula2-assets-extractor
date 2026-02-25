@@ -2,9 +2,6 @@ package me.vinceh121.n2ae.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Locale;
 
 import me.vinceh121.n2ae.FourccUtils;
 import me.vinceh121.n2ae.LEDataInputStream;
@@ -48,7 +45,7 @@ public class NvxFileReader extends AbstractMeshReader {
 		this.mesh.setDataStart(this.in.readIntLE());
 		this.mesh.setDataSize(this.in.readIntLE());
 
-		this.mesh.setTypes(VertexType.getTypes(vType));
+		this.mesh.getTypes().addAll(VertexType.getTypes(vType));
 	}
 
 	private void readData() throws IOException {

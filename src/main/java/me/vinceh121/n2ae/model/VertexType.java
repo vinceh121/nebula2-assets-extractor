@@ -1,8 +1,9 @@
 package me.vinceh121.n2ae.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public enum VertexType {
 	VOID(0),
@@ -25,21 +26,25 @@ public enum VertexType {
 		return this.mask;
 	}
 
-	public static List<VertexType> getTypes(final int types) {
+	public static Set<VertexType> getTypes(final int types) {
 		final List<VertexType> t = new ArrayList<>(VertexType.values().length);
+
 		for (final VertexType v : VertexType.values()) {
 			if ((types & v.getMask()) == v.getMask()) {
 				t.add(v);
 			}
 		}
-		return Collections.unmodifiableList(t);
+
+		return EnumSet.copyOf(t);
 	}
 
-	public static int getTypes(final List<VertexType> types) {
+	public static int getTypes(final Set<VertexType> types) {
 		int mask = 0;
+
 		for (final VertexType t : types) {
 			mask |= t.getMask();
 		}
+
 		return mask;
 	}
 }

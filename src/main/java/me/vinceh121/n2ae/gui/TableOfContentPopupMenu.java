@@ -1,9 +1,9 @@
 package me.vinceh121.n2ae.gui;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -20,6 +20,7 @@ import javax.swing.tree.TreePath;
 import me.vinceh121.n2ae.gltf.GLTFGenerator;
 import me.vinceh121.n2ae.model.Mesh;
 import me.vinceh121.n2ae.model.NvxFileReader;
+import me.vinceh121.n2ae.model.NvxFileWriter;
 import me.vinceh121.n2ae.model.ObjFileReader;
 import me.vinceh121.n2ae.model.ObjFileWriter;
 import me.vinceh121.n2ae.pkg.TableOfContents;
@@ -57,6 +58,8 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 			this.addModelOptions();
 		} else if (this.toc.getName().endsWith(".ntx")) {
 			this.addTextureOptions();
+		} else if (this.toc.isDirectory()) {
+			this.addDirectoryOptions();
 		}
 	}
 
@@ -142,23 +145,35 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 			}
 		});
 		mnExtract.add(mntGltf);
-		
+	}
+	
+	private void addDirectoryOptions() {
 		final JMenu mnInsert = new JMenu("Insert...");
 		this.add(mnInsert);
-		
-		final JMenuItem mntInsertObj = new JMenuItem("OBJ");
+
+		final JMenuItem mntInsertObj = new JMenuItem("OBJ to NVX");
 		mntInsertObj.addActionListener(e -> {
 			final JFileChooser fc = new JFileChooser();
 			final int status = fc.showOpenDialog(null);
-			
+
 			if (status != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
-			
+
 			final File file = fc.getSelectedFile();
-			
-			try (final ObjFileReader reader = new ObjFileReader(new FileInputStream(file))) {
+
+			try (final ObjFileReader reader = new ObjFileReader(new FileInputStream(file));
+					final ByteArrayOutputStream out = new ByteArrayOutputStream();
+					final NvxFileWriter writer = new NvxFileWriter(out)) {
 				final Mesh mesh = reader.readMesh();
+				writer.writeMesh(mesh);
+
+				final TableOfContents toc = new TableOfContents();
+				toc.setName(file.getName().replace(".obj", ".nvx"));
+				toc.setData(out.toByteArray());
+				toc.setLength(toc.getData().length);
+
+				this.toc.put(toc.getName(), toc);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, e);
