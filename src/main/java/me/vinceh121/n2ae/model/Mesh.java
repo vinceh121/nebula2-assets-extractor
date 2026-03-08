@@ -7,7 +7,7 @@ import java.util.Vector;
 
 public class Mesh {
 	public static final int DEFAULT_DATA_START = 0x1C;
-	private int countVertices, countIndices, countEdges, dataStart, dataSize;
+	private int countVertices, countIndices, countEdges, dataStart = DEFAULT_DATA_START, dataSize;
 	private final Set<VertexType> types = EnumSet.noneOf(VertexType.class);
 	private final List<Vertex> vertices = new Vector<>();
 	private final List<int[]> triangles = new Vector<>();
@@ -67,9 +67,5 @@ public class Mesh {
 
 	public List<short[]> getEdges() {
 		return edges;
-	}
-
-	public long calculateSupposedSize() {
-		
 	}
 }

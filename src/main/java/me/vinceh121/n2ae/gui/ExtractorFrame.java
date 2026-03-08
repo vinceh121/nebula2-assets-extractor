@@ -836,7 +836,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private void updateTreeModel() {
+	public void updateTreeModel() {
 		final DefaultMutableTreeNode root = new DefaultMutableTreeNode(this.toc);
 		this.buildTreeNodes(this.toc, root);
 		final DefaultTreeModel mdl = new DefaultTreeModel(root);

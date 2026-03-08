@@ -28,9 +28,11 @@ import me.vinceh121.n2ae.texture.NtxFileReader;
 
 public class TableOfContentPopupMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
+	private final ExtractorFrame frame;
 	private final TableOfContents toc;
 
 	public TableOfContentPopupMenu(final ExtractorFrame frame, final DefaultTreeModel model, final TreePath treePath) {
+		this.frame = frame;
 		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
 
 		final TableOfContents[] path = new TableOfContents[treePath.getPathCount()];
@@ -174,6 +176,7 @@ public class TableOfContentPopupMenu extends JPopupMenu {
 				toc.setLength(toc.getData().length);
 
 				this.toc.put(toc.getName(), toc);
+				this.frame.updateTreeModel();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, e);
