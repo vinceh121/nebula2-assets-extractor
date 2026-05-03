@@ -89,8 +89,9 @@ public class CmdWikiBox implements Callable<Integer> {
 					continue;
 				}
 
-				final WikiBoxGenerator gen = new WikiBoxGenerator();
-				gen.write(System.out, this.box.getWikiBox(), node);
+				final Map<String, Object> values = WikiBoxGenerator.extractValues(this.box.getWikiBox(), node);
+
+				WikiBoxGenerator.write(System.out, this.box.getWikiBox(), values);
 			}
 		}
 

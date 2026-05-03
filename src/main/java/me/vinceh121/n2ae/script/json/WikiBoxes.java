@@ -1,7 +1,8 @@
 package me.vinceh121.n2ae.script.json;
 
 public enum WikiBoxes {
-	GUNTOWER_MACHINEGUN(new WikiBox("Guntower Machinegun infobox").addEntry("cost", "/vhcl/setartefactuseenergy")
+	GUNTOWER_MACHINEGUN(new WikiBox("Guntower Machinegun infobox")
+		.addEntry("cost", "/vhcl/setartefactuseenergy")
 		.addEntry("buildtime", "/vhcl/bauphase/statewatch/settimeout")
 		.addEntry("health", "/vhcl/setenergy")
 		.addEntry("damage", "/turret/vhcl/normal/gun/setdamage")
@@ -11,7 +12,8 @@ public enum WikiBoxes {
 	// .addEntry("guns", "/turret/vhcl/normal/gun", 0)
 	),
 
-	GUNTOWER_FIREMISSILE(new WikiBox("Guntower Firemissile infobox").addEntry("cost", "/vhcl/setartefactuseenergy")
+	GUNTOWER_FIREMISSILE(new WikiBox("Guntower Firemissile infobox")
+		.addEntry("cost", "/vhcl/setartefactuseenergy")
 		.addEntry("buildtime", "/vhcl/bauphase/statewatch/settimeout")
 		.addEntry("health", "/vhcl/setenergy")
 		.addEntry("damage", "/weapon/vhcl/explode/explo/setenergy")
