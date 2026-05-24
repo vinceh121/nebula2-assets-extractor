@@ -86,6 +86,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.vinceh121.n2ae.gui.Icons.Name;
 import me.vinceh121.n2ae.model.NvxFileReader;
+import me.vinceh121.n2ae.model.ObjFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkFileReader;
 import me.vinceh121.n2ae.pkg.NnpkFileWriter;
 import me.vinceh121.n2ae.pkg.NnpkInMemoryFileReader;
@@ -369,6 +370,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 		mnEdit.addSeparator();
 
+		final JMenuItem mntInsertNvx = new JMenuItem("Insert NVX");
+		mntInsertNvx.addActionListener(this::insertNvx);
+		mnEdit.add(mntInsertNvx);
+
 		mnEdit.add(new SelectAllAction());
 
 		mnEdit.add(new InvertSelectAction());
@@ -473,10 +478,10 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 
 			if (f.length() == 0) {
 				try (final ByteArrayInputStream in = new ByteArrayInputStream(toc.getData());
-						PrintWriter writer = new PrintWriter(f)) {
-					final NvxFileReader reader = new NvxFileReader(in);
-					reader.readAll();
-					reader.writeObj(writer);
+						FileOutputStream out = new FileOutputStream(f);
+						final NvxFileReader reader = new NvxFileReader(in);
+						final ObjFileWriter writer = new ObjFileWriter(out)) {
+					writer.writeMesh(reader.readMesh());
 				}
 			}
 
@@ -502,6 +507,33 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e);
 		}
+	}
+	
+	private void insertNvx(ActionEvent e) {
+		final JFileChooser fc = new JFileChooser();
+		fc.addChoosableFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return ".obj Wavefront model file";
+			}
+
+			@Override
+			public boolean accept(File f) {
+				return f.getName().endsWith(".obj");
+			}
+		});
+		fc.setFileFilter(fc.getChoosableFileFilters()[1]);
+		
+		final int result = fc.showOpenDialog(null);
+		
+		if (result != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		
+		final File nvxFile = fc.getSelectedFile();
+		
+		
 	}
 
 	private void addTab(String name, Icon icon, Component comp) {
@@ -555,8 +587,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		final DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newToc);
 
 		if (selToc.isDirectory()) { // selected path is a dir, insert inside
-			this.getTreeModel()
-				.insertNodeInto(newNode, selNode, this.getTreeModel().getIndexOfChild(selNode.getParent(), selNode));
+			this.getTreeModel().insertNodeInto(newNode, selNode, 0);
 			selToc.getEntries().put(newToc.getName(), newToc);
 		} else if (selToc.isFile()) { // selected path is file, insert as sibling
 			final DefaultMutableTreeNode selParent = (DefaultMutableTreeNode) selNode.getParent();
@@ -805,7 +836,7 @@ public class ExtractorFrame extends JFrame implements SearchListener {
 		}
 	}
 
-	private void updateTreeModel() {
+	public void updateTreeModel() {
 		final DefaultMutableTreeNode root = new DefaultMutableTreeNode(this.toc);
 		this.buildTreeNodes(this.toc, root);
 		final DefaultTreeModel mdl = new DefaultTreeModel(root);

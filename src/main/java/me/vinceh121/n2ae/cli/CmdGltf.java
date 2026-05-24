@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.vinceh121.n2ae.animation.Curve;
 import me.vinceh121.n2ae.animation.NaxFileReader;
 import me.vinceh121.n2ae.gltf.GLTFGenerator;
+import me.vinceh121.n2ae.model.Mesh;
 import me.vinceh121.n2ae.model.NvxFileReader;
 import me.vinceh121.n2ae.script.IParser;
 import me.vinceh121.n2ae.script.NOBClazz;
@@ -82,10 +83,11 @@ public class CmdGltf implements Callable<Integer> {
 			try (FileInputStream meshIn = new FileInputStream(this.mesh)) {
 				final NvxFileReader meshReader = new NvxFileReader(meshIn);
 				meshReader.readAll();
+				final Mesh mesh = meshReader.getMesh();
 				gen.addMesh("skin",
-						meshReader.getTypes(),
-						meshReader.getVertices(),
-						meshReader.getTriangles(),
+						mesh.getTypes(),
+						mesh.getVertices(),
+						mesh.getTriangles(),
 						this.nobScript != null ? 0 : -1);
 			}
 		}

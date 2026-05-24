@@ -162,12 +162,12 @@ public class GLTFGenerator {
 		throw new IllegalStateException();
 	}
 
-	public Node addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices,
+	public Node addMesh(final String name, final Set<VertexType> types, final List<Vertex> vertices,
 			final List<int[]> triangles) throws IOException {
 		return this.addMesh(name, types, vertices, triangles, -1);
 	}
 
-	public Node addMesh(final String name, final List<VertexType> types, final List<Vertex> vertices,
+	public Node addMesh(final String name, final Set<VertexType> types, final List<Vertex> vertices,
 			final List<int[]> triangles, final int skinIdx) throws IOException {
 		final Mesh mesh = new Mesh();
 		mesh.setName(name);
